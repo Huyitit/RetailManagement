@@ -4,61 +4,48 @@ const SaleOrder = require('./SaleOrder');
 const Variant = require('./Variant');
 
 const SaleDetail = sequelize.define('SaleDetail', {
-  saleDetailId: {
+  id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true
   },
-  receiptId: {
+  orderId: {
     type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: SaleOrder,
-      key: 'receiptId'
-    }
+    allowNull: false
   },
   variantId: {
     type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: Variant,
-      key: 'variantId'
-    }
+    allowNull: false
+  },
+  serialCode: {
+    type: DataTypes.STRING(255),
+    allowNull: false
   },
   quantity: {
     type: DataTypes.INTEGER,
     allowNull: false,
-    validate: {
-      min: 1
-    }
+    defaultValue: 1
   },
   unitPrice: {
-    type: DataTypes.DECIMAL(18, 2),
+    type: DataTypes.DECIMAL(19, 3),
     allowNull: false
   },
-  discountAmount: {
-    type: DataTypes.DECIMAL(18, 2),
-    allowNull: false,
-    defaultValue: 0
+  totalDiscount: {
+    type: DataTypes.DECIMAL(19, 3),
+    allowNull: true
   },
-  finalPrice: {
-    type: DataTypes.DECIMAL(18, 2),
+  lineTotal: {
+    type: DataTypes.DECIMAL(19, 3),
     allowNull: false
   },
   returnedQuantity: {
     type: DataTypes.INTEGER,
     allowNull: false,
-    defaultValue: 0,
-    validate: {
-      min: 0
-    }
+    defaultValue: 0
   }
 }, {
-  tableName: 'SaleDetail',
+  tableName: 'orderDetail',
   timestamps: false
 });
 
-SaleDetail.belongsTo(SaleOrder, { foreignKey: 'receiptId' });
-SaleDetail.belongsTo(Variant, { foreignKey: 'variantId' });
-
-module.exports = SaleDetail;
+module.exports = SaleDetail;

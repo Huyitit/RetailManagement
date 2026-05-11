@@ -1,41 +1,50 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../configs/db');
-const Profile = require('./Profile');
+
 
 const Staff = sequelize.define('Staff', {
-  staffId: {
+  id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true
   },
-  profileId: {
+  storeId: {
     type: DataTypes.INTEGER,
-    allowNull: false,
-    unique: true,
-    references: {
-      model: Profile,
-      key: 'profileId'
-    }
+    allowNull: false
   },
   username: {
-    type: DataTypes.STRING(50),
+    type: DataTypes.STRING(255),
     allowNull: false,
     unique: true
   },
-  password: {
+  hashedPassword: {
     type: DataTypes.STRING(255),
     allowNull: false
   },
-  status: {
-    type: DataTypes.STRING(20),
+  fullname: {
+    type: DataTypes.STRING(255),
+    allowNull: false
+  },
+  phone: {
+    type: DataTypes.STRING(15),
+    allowNull: false
+  },
+  email: {
+    type: DataTypes.STRING(255),
+    allowNull: true
+  },
+  role: {
+    type: DataTypes.STRING(255),
+    allowNull: false
+  },
+  isDeleted: {
+    type: DataTypes.BOOLEAN,
     allowNull: false,
-    defaultValue: 'Active'
+    defaultValue: false
   }
 }, {
-  tableName: 'Staff',
-  timestamps: false
+  tableName: 'staff',
+  timestamps: true
 });
 
-Staff.belongsTo(Profile, { foreignKey: 'profileId' });
-
-module.exports = Staff;
+module.exports = Staff;

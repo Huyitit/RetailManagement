@@ -25,11 +25,6 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use((req, res, next) => {
-  const log = `[${new Date().toISOString()}] ${req.method} ${req.url}\n`;
-  fs.appendFileSync(path.join(__dirname, 'all_requests.log'), log);
-  next();
-});
 
 app.use((err, req, res, next) => {
   const log = `[${new Date().toISOString()}] EXPRESS ERROR: ${err.stack}\n`;
@@ -47,30 +42,7 @@ const PORT = process.env.PORT || 5001;
 
 sequelize.authenticate()
   .then(async () => {
-    console.log('✅ Connected');
-    await sequelize.query(`
-      IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='ReturnLog' AND xtype='U')
-      CREATE TABLE [ReturnLog] (
-          [id] INT IDENTITY(1,1) PRIMARY KEY,
-          [receiptId] INT NOT NULL,
-          [staffId] INT NULL,
-          [reason] NVARCHAR(255) NULL,
-          [returnedItems] NVARCHAR(MAX) NULL,
-          [refundAmount] DECIMAL(18,2) NULL,
-          [createdAt] DATETIME DEFAULT GETDATE()
-      );
-
-      DECLARE @SQL NVARCHAR(MAX) = '';
-      SELECT @SQL += 'ALTER TABLE SaleOrder DROP CONSTRAINT ' + name + ';'
-      FROM sys.check_constraints
-      WHERE parent_object_id = OBJECT_ID('SaleOrder')
-      AND definition LIKE '%saleStatus%';
-
-      IF @SQL <> '' EXEC sp_executesql @SQL;
-
-      ALTER TABLE SaleOrder ADD CONSTRAINT CK_SaleOrder_Status
-      CHECK (saleStatus IN (N'Draft', N'Pending', N'Completed', N'Cancelled', N'Warranty'));
-    `);
+    console.log('✅ Connected to MySQL');
   })
   .then(() => {
     return sequelize.sync({ alter: false });
@@ -82,4 +54,6 @@ sequelize.authenticate()
   })
   .catch(err => {
     fs.appendFileSync(ERROR_LOG_PATH, `BOOT ERROR: ${err.stack}\n`);
+    console.error('Boot Error:', err);
   });
+

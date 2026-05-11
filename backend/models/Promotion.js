@@ -2,10 +2,11 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../configs/db');
 
 const Promotion = sequelize.define('Promotion', {
-  promotionId: {
+  id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
-    autoIncrement: true
+    autoIncrement: true,
+    field: 'promotionId'
   },
   promotionName: {
     type: DataTypes.STRING(255),
@@ -13,40 +14,30 @@ const Promotion = sequelize.define('Promotion', {
   },
   discountPercent: {
     type: DataTypes.DECIMAL(5, 2),
-    allowNull: true,
-    validate: {
-      min: 0,
-      max: 100
-    }
+    allowNull: true
   },
   startDate: {
     type: DataTypes.DATE,
-    allowNull: true,
-    defaultValue: null
+    allowNull: true
   },
   endDate: {
     type: DataTypes.DATE,
-    allowNull: true,
-    defaultValue: null
+    allowNull: true
   },
   usageCount: {
     type: DataTypes.INTEGER,
     allowNull: false,
-    defaultValue: 0,
-    validate: {
-      min: 0
-    }
+    defaultValue: 0
+  },
+  isDeleted: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false
   }
 }, {
-  tableName: 'Promotion',
-  timestamps: false,
-  validate: {
-    dateCheck() {
-      if (this.endDate && this.startDate && this.endDate < this.startDate) {
-        throw new Error('End date must be after start date');
-      }
-    }
-  }
+  tableName: 'promotion',
+  timestamps: true
 });
+
 
 module.exports = Promotion;

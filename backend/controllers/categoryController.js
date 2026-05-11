@@ -5,9 +5,8 @@ exports.getCategories = async (req, res) => {
     const categories = await Category.findAll();
 
     const result = categories.map(c => ({
-      categoryId: c.categoryId,
-      categoryName: c.categoryName,
-      categoryDescription: c.categoryDescription
+      categoryId: c.id,
+      categoryName: c.name
     }));
 
     res.json(result);
@@ -27,11 +26,11 @@ exports.getCategory = async (req, res) => {
     }
 
     res.json({
-      categoryId: category.categoryId,
-      categoryName: category.categoryName,
-      categoryDescription: category.categoryDescription
+      categoryId: category.id,
+      categoryName: category.name
     });
   } catch (error) {
     res.status(500).json({ status: 'error', message: error.message });
   }
 };
+

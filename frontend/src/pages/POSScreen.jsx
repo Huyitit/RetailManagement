@@ -76,7 +76,7 @@ const POSScreen = () => {
     if (saved) {
       try {
         const p = JSON.parse(saved);
-        return { id: p.staffId || null, name: p.fullName || p.staffName || "Nhân viên" };
+        return { id: p.id || p.staffId || null, name: p.fullname || p.fullName || p.staffName || "Nhân viên" };
       } catch(e) { return { id: null, name: "Nhân viên" }; }
     }
     return { id: null, name: "Nhân viên" };
@@ -112,14 +112,14 @@ const POSScreen = () => {
       try {
         const staffRes = await apiCall('/auth/me');
         if (staffRes?.status === 'success' && staffRes.data) {
-          setStaffId(staffRes.data.staffId);
-          setStaffName(staffRes.data.fullName || staffRes.data.staffName);
+          setStaffId(staffRes.data.id);
+          setStaffName(staffRes.data.fullname || staffRes.data.fullName || staffRes.data.staffName);
         } else {
           const saved = localStorage.getItem('staffInfo');
           if (saved) {
             const parsed = JSON.parse(saved);
-            setStaffId(parsed.staffId || 1);
-            setStaffName(parsed.fullName || parsed.staffName || "Nhân viên");
+            setStaffId(parsed.id || parsed.staffId || 1);
+            setStaffName(parsed.fullname || parsed.fullName || parsed.staffName || "Nhân viên");
           }
         }
       } catch (e) { console.warn("Staff info fetch failed"); }
@@ -211,7 +211,25 @@ const POSScreen = () => {
         }]
       };
     });
-    if (activeOrder?.receiptId && activeOrder.receiptId !== 0) addOrderItem(activeOrder.receiptId, variant.variantId, 1);
+    let currentReceiptId = activeOrder?.receiptId;
+    
+    if (!currentReceiptId || currentReceiptId === 0) {
+      try {
+        const res = await createDraftOrder(staffId, activeOrder?.customerId);
+        currentReceiptId = res?.receiptId || 0;
+        if (currentReceiptId && currentReceiptId !== 0) {
+          updateActiveOrder({ receiptId: currentReceiptId });
+        }
+      } catch (e) {
+        console.error("Failed to create draft order on the fly", e);
+      }
+    }
+
+    if (currentReceiptId && currentReceiptId !== 0) {
+      await addOrderItem(currentReceiptId, variant.variantId, 1);
+    } else {
+      console.error("Cannot add item: receiptId is still 0");
+    }
   };
 
   const updateQty = async (vId, delta) => {
@@ -248,7 +266,11 @@ const POSScreen = () => {
         amountChange: method === 'Tiền mặt' ? Math.max(0, received - totalAmount) : 0,
         pointsToUse: activeOrder?.pointsToUse || 0,
         pointsEarned: activeOrder?.customerId ? pointsEarned : 0,
-        customerId: activeOrder?.customerId
+        customerId: activeOrder?.customerId,
+        subTotal: subtotal,
+        discountAmount: discount + pointsDiscount,
+        taxAmount: tax,
+        finalTotal: totalAmount
       };
       await checkoutOrder(activeOrder?.receiptId, data);
 
@@ -364,10 +386,10 @@ const POSScreen = () => {
   `}</style>
       <div id="pos-main-container" style={{ display: 'flex', height: '100vh', width: '100vw', background: '#f8fafc', overflow: 'hidden' }}>
 
-        {/* KHU VỰC TRÁI: SEARCH + CATEGORIES + PRODUCT GRID */}
+        {}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
 
-          {/* TOP HEADER */}
+          {}
           <header style={{ height: 'var(--header-height)', padding: '0 24px', display: 'flex', alignItems: 'center', gap: '20px', background: 'white', borderBottom: '1px solid var(--border-strong)', flexShrink: 0 }}>
             <button
               onClick={() => navigate('/dashboard')}
@@ -420,12 +442,12 @@ const POSScreen = () => {
                 </div>
               </div>
               <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                <img src="https://ui-avatars.com/api/?name=Minh+Anh&background=0D8ABC&color=fff" alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(staffName)}&background=0D8ABC&color=fff`} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
             </div>
           </header>
 
-          {/* PRODUCT GRID - Cố định chiều cao và cho phép cuộn */}
+          {}
           <div style={{ flex: 1, padding: '24px', overflowY: 'scroll', maxHeight: 'calc(100vh - 140px)', background: '#f8fafc' }} className="custom-scrollbar">
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '24px', paddingBottom: '40px' }}>
               {filteredProducts.flatMap(p => (p.variants || []).map(variant => {
@@ -468,7 +490,7 @@ const POSScreen = () => {
                         {p.productName}
                       </div>
 
-                      {/* HIỂN THỊ THUỘC TÍNH (MÀU, RAM,...) - ÉP BUỘC HIỂN THỊ */}
+                      {}
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', justifyContent: 'center', marginBottom: '8px', minHeight: '20px' }}>
                         {variant.attributes?.map((attr, i) => (
                           <span key={i} style={{ fontSize: '11px', background: 'var(--primary-light)', color: 'var(--primary)', padding: '4px 10px', borderRadius: '8px', fontWeight: '800', border: '1px solid var(--primary-glow)', textTransform: 'uppercase' }}>
@@ -495,9 +517,9 @@ const POSScreen = () => {
           </div>
         </div>
 
-        {/* KHU VỰC PHẢI: GIỎ HÀNG */}
+        {}
         <div style={{ width: '420px', background: 'white', borderLeft: '1px solid var(--border-strong)', display: 'flex', flexDirection: 'column', zIndex: 10 }}>
-          {/* Tabs Đơn hàng */}
+          {}
           <div style={{ display: 'flex', padding: '12px 16px 0 16px', gap: '6px', borderBottom: '1px solid var(--border-light)', background: '#f8fafc' }}>
             {orders.map(o => (
               <div
@@ -561,7 +583,7 @@ const POSScreen = () => {
             <div style={{ fontSize: '12px', color: 'var(--text-light)', marginTop: '4px' }}>Mã đơn hàng: <span style={{ fontWeight: '700', color: 'var(--primary)' }}>{formatOrderId(activeOrder?.receiptId)}</span></div>
           </div>
 
-          {/* Danh sách món trong giỏ */}
+          {}
           <div className="custom-scrollbar" style={{ flex: 1, overflowY: 'auto', padding: '0 16px' }}>
             {(!activeOrder?.cart?.length) ? (
               <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', opacity: 0.2 }}>
@@ -599,7 +621,7 @@ const POSScreen = () => {
                       </div>
                     </div>
 
-                    {/* THUỘC TÍNH TRONG GIỎ HÀNG */}
+                    {}
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', margin: '6px 0' }}>
                       {item.attributes?.map((attr, i) => (
                         <span key={i} style={{ fontSize: '10px', background: 'var(--primary-light)', color: 'var(--primary)', padding: '2px 8px', borderRadius: '6px', fontWeight: '800', border: '1px solid var(--primary-glow)' }}>
@@ -627,7 +649,7 @@ const POSScreen = () => {
             )}
           </div>
 
-          {/* Footer Giỏ hàng */}
+          {}
           <div style={{ padding: '24px', background: '#f8fafc', borderTop: '1px solid var(--border-strong)' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: 'var(--text-light)' }}>
@@ -669,11 +691,11 @@ const POSScreen = () => {
         </div>
       </div>
 
-    {/* ================= MODAL THANH TOÁN ================= */}
+    {}
       {showPaymentModal && activeOrder && (
         <div className="modal-backdrop" style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
           <div className="modal-content" style={{ background: 'white', width: '650px', height: '100vh', maxHeight: '100vh', padding: '24px', boxShadow: '0 25px 50px rgba(0,0,0,0.2)', display: 'flex', flexDirection: 'column', gap: '20px', overflow: 'hidden' }}>
-            {/* Header */}
+            {}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                 <button onClick={() => paymentSubView ? setPaymentSubView(null) : setShowPaymentModal(false)} style={{ width: '44px', height: '44px', borderRadius: '12px', border: 'none', background: '#f1f5f9', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ArrowLeft size={20} color="#64748b" /></button>
@@ -685,9 +707,9 @@ const POSScreen = () => {
               <X size={24} color="#94a3b8" cursor="pointer" onClick={() => setShowPaymentModal(false)} />
             </div>
 
-            {/* Scrollable Middle Section */}
+            {}
             <div className="custom-scrollbar" style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '20px', paddingRight: '8px' }}>
-              {/* Search Bar & Quick Add trong Modal */}
+              {}
               <div style={{ display: 'flex', gap: '12px', flexShrink: 0, alignItems: 'flex-start' }}>
                 {isAddingCustomer ? (
                   <div style={{ flex: 1, background: '#f8fafc', padding: '16px', borderRadius: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -738,7 +760,7 @@ const POSScreen = () => {
                 )}
               </div>
 
-              {/* Customer Card */}
+              {}
               <div style={{ border: '2px solid #f1f5f9', borderRadius: '24px', padding: '20px', flexShrink: 0 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                 <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
@@ -808,7 +830,7 @@ const POSScreen = () => {
               )}
             </div>
 
-            {/* Payment Methods */}
+            {}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', flexShrink: 0 }}>
               <div onClick={() => { setPaymentSubView('cash'); setAmountReceived(formatInputMoney(totalAmount)); }} style={{ padding: '24px', border: paymentSubView === 'cash' ? '2px solid var(--primary)' : '2px solid #f1f5f9', borderRadius: '24px', textAlign: 'center', cursor: 'pointer', background: paymentSubView === 'cash' ? '#eff6ff' : 'transparent' }}>
                 <Banknote size={28} color={paymentSubView === 'cash' ? 'var(--primary)' : '#64748b'} style={{ marginBottom: '8px' }} />
@@ -820,7 +842,7 @@ const POSScreen = () => {
               </div>
             </div>
 
-            {/* Cash Input / QR Image */}
+            {}
             {paymentSubView === 'cash' && (
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', flexShrink: 0 }}>
                 <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '20px' }}>
@@ -837,14 +859,14 @@ const POSScreen = () => {
             )}
             {paymentSubView === 'qr' && (
               <div style={{ textAlign: 'center', background: '#f8fafc', padding: '20px', borderRadius: '24px', flexShrink: 0 }}>
-                <img src={`https://img.vietqr.io/image/mb-88886666-compact.png?amount=${totalAmount}`} style={{ width: '260px', borderRadius: '16px', marginBottom: '16px', boxShadow: '0 10px 20px rgba(0,0,0,0.05)' }} />
+                <img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=Payment+HD${activeOrder?.receiptId}`} alt="qr" style={{ width: '200px', height: '200px', marginBottom: '16px' }} />
                 <div style={{ fontSize: '15px', fontWeight: '800', color: '#64748b' }}>
                   Quý khách vui lòng quét mã QR<br/>để hoàn tất thanh toán
                 </div>
               </div>
             )}
 
-            {/* Order Summary Card */}
+            {}
             <div style={{ border: '2px solid #f1f5f9', borderRadius: '24px', padding: '24px', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
               <div style={{ marginBottom: '16px' }}>
                 {activeOrder?.cart?.map((item, idx) => (
@@ -901,7 +923,7 @@ const POSScreen = () => {
         </div>
       )}
 
-      {/* Success / Receipt Modal */}
+      {}
       {showReceiptModal && (
         <div className="modal-backdrop" style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.95)', backdropFilter: 'blur(20px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100, padding: '20px', overflowY: 'auto' }}>
           <div className="modal-content" style={{ background: 'white', borderRadius: '32px', width: '1100px', maxWidth: '100%', minHeight: '80vh', display: 'grid', gridTemplateColumns: '380px 1fr', overflow: 'hidden', boxShadow: '0 50px 100px rgba(0,0,0,0.5)', margin: 'auto' }}>
@@ -933,7 +955,7 @@ const POSScreen = () => {
                         <span style={{ whiteSpace: 'nowrap' }}>{formatMoney(item.finalPrice * item.quantity)}</span>
                       </div>
 
-                      {/* THUỘC TÍNH TRONG HÓA ĐƠN IN */}
+                      {}
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '4px', marginBottom: '4px' }}>
                         {item.attributes?.map((attr, idx) => (
                           <span key={idx} style={{ fontSize: '10px', color: '#475569', background: '#f1f5f9', padding: '1px 6px', borderRadius: '4px', border: '1px solid #e2e8f0', fontWeight: '700' }}>

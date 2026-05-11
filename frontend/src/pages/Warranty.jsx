@@ -49,7 +49,7 @@ const Warranty = () => {
 
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: '#f8fafc', overflow: 'hidden' }}>
-      {/* Header */}
+      {}
       <header style={{ padding: '32px 40px', background: 'white', borderBottom: '1px solid #e2e8f0', flexShrink: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           {view !== 'search' && (
@@ -114,7 +114,7 @@ const Warranty = () => {
         {view === 'detail' && selectedProduct && (
           <div style={{ width: '900px', display: 'grid', gridTemplateColumns: '1fr 340px', gap: '32px' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-              {/* Product Info */}
+              {}
               <div style={{ background: 'white', padding: '32px', borderRadius: '32px', border: '1px solid #e2e8f0' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
                   <div>
@@ -141,7 +141,7 @@ const Warranty = () => {
                 </div>
               </div>
 
-              {/* History */}
+              {}
               <div style={{ background: 'white', padding: '32px', borderRadius: '32px', border: '1px solid #e2e8f0' }}>
                 <h4 style={{ fontSize: '13px', fontWeight: '900', color: '#94a3b8', textTransform: 'uppercase', marginBottom: '24px' }}>Lịch sử bảo hành & Sửa chữa</h4>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
@@ -162,7 +162,7 @@ const Warranty = () => {
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-              {/* Customer Info Card */}
+              {}
               <div style={{ background: 'var(--primary)', padding: '24px', borderRadius: '32px', color: 'white', boxShadow: '0 20px 40px rgba(37, 99, 235, 0.2)' }}>
                 <div style={{ display: 'flex', gap: '16px', alignItems: 'center', marginBottom: '20px' }}>
                   <div style={{ width: '56px', height: '56px', borderRadius: '16px', background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><User size={28} /></div>
@@ -177,7 +177,7 @@ const Warranty = () => {
                 </div>
               </div>
 
-              {/* Action Sidebar */}
+              {}
               <div style={{ background: 'white', padding: '24px', borderRadius: '32px', border: '1px solid #e2e8f0', flex: 1 }}>
                 <h4 style={{ fontSize: '13px', fontWeight: '900', color: '#94a3b8', textTransform: 'uppercase', marginBottom: '20px' }}>Thao tác xử lý</h4>
 

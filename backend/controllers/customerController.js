@@ -1,5 +1,6 @@
-const { Customer, Profile } = require('../models');
+const { Customer } = require('../models');
 const { Op } = require('sequelize');
+
 exports.searchCustomers = async (req, res) => {
   try {
     const { q } = req.query;
@@ -9,24 +10,22 @@ exports.searchCustomers = async (req, res) => {
     }
 
     const customers = await Customer.findAll({
-      include: [{
-        model: Profile,
-        where: {
-          [Op.or]: [
-            { fullName: { [Op.like]: `%${q}%` } },
-            { phoneNumber: { [Op.like]: `%${q}%` } }
-          ]
-        }
-      }],
+      where: {
+        isDeleted: false,
+        [Op.or]: [
+          { fullname: { [Op.like]: `%${q}%` } },
+          { phone: { [Op.like]: `%${q}%` } }
+        ]
+      },
       limit: 10
     });
 
     const result = customers.map(c => ({
-      customerId: c.customerId,
-      fullName: c.Profile?.fullName,
-      phoneNumber: c.Profile?.phoneNumber,
-      rewardPoints: c.rewardPoints || 0,
-      memberTier: c.memberTier || 'Bronze'
+      customerId: c.id,
+      fullName: c.fullname,
+      phoneNumber: c.phone,
+      rewardPoints: c.points || 0,
+      memberTier: 'Bronze'
     }));
 
     res.json(result);
@@ -34,49 +33,42 @@ exports.searchCustomers = async (req, res) => {
     res.status(500).json({ status: 'error', message: error.message });
   }
 };
+
 exports.createCustomer = async (req, res) => {
   try {
-    const { fullName, phoneNumber, gender, dateOfBirth, customerAddress } = req.body;
+    const { fullName, phoneNumber, email } = req.body;
 
     if (!fullName || !phoneNumber) {
       return res.status(400).json({ status: 'error', message: 'Cần tên và số điện thoại' });
     }
 
-    const existingProfile = await Profile.findOne({
-      where: { phoneNumber: phoneNumber }
+    const existingCustomer = await Customer.findOne({
+      where: { phone: phoneNumber, isDeleted: false }
     });
 
-    if (existingProfile) {
+    if (existingCustomer) {
       return res.status(409).json({
         status: 'error',
         message: 'Số điện thoại đã được sử dụng'
       });
     }
 
-    const profile = await Profile.create({
-      fullName,
-      phoneNumber,
-      gender: gender || null,
-      dateOfBirth: dateOfBirth || null,
-      role: 'Customer'
-    });
-
     const customer = await Customer.create({
-      profileId: profile.profileId,
-      rewardPoints: 0,
-      memberTier: 'Bronze',
-      customerAddress: customerAddress || null
+      fullname: fullName,
+      phone: phoneNumber,
+      email: email || '',
+      points: 0
     });
 
     res.status(201).json({
       status: 'success',
       message: 'Đã tạo khách hàng và áp dụng vào đơn hàng',
       data: {
-        customerId: customer.customerId,
-        fullName: profile.fullName,
-        phoneNumber: profile.phoneNumber,
-        rewardPoints: customer.rewardPoints,
-        memberTier: customer.memberTier,
+        customerId: customer.id,
+        fullName: customer.fullname,
+        phoneNumber: customer.phone,
+        rewardPoints: customer.points,
+        memberTier: 'Bronze',
         appliedAt: new Date().toISOString()
       }
     });
@@ -84,4 +76,5 @@ exports.createCustomer = async (req, res) => {
     res.status(500).json({ status: 'error', message: error.message });
   }
 };
+
 

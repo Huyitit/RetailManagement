@@ -1,57 +1,61 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../configs/db');
-const Receipt = require('./Receipt');
 const Customer = require('./Customer');
 
 const SaleOrder = sequelize.define('SaleOrder', {
-  receiptId: {
+  id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
-    references: {
-      model: Receipt,
-      key: 'receiptId'
-    }
+    autoIncrement: true
   },
   customerId: {
     type: DataTypes.INTEGER,
-    allowNull: true,
-    references: {
-      model: Customer,
-      key: 'customerId'
-    }
+    allowNull: true
+  },
+  staffId: {
+    type: DataTypes.INTEGER,
+    allowNull: false
+  },
+  subTotal: {
+    type: DataTypes.DECIMAL(19, 3),
+    allowNull: true
+  },
+  discountAmount: {
+    type: DataTypes.DECIMAL(19, 3),
+    allowNull: true
+  },
+  taxAmount: {
+    type: DataTypes.DECIMAL(19, 3),
+    allowNull: true
+  },
+  finalTotal: {
+    type: DataTypes.DECIMAL(19, 3),
+    allowNull: true
   },
   paymentMethod: {
-    type: DataTypes.STRING(50),
+    type: DataTypes.STRING(255),
     allowNull: true
-  },
-  saleStatus: {
-    type: DataTypes.STRING(20),
-    allowNull: false,
-    defaultValue: 'Draft'
   },
   refundAmount: {
-    type: DataTypes.DECIMAL(18, 2),
-    allowNull: true,
+    type: DataTypes.DECIMAL(19, 3),
     defaultValue: 0
   },
-  amountReceived: {
-    type: DataTypes.DECIMAL(18, 2),
-    allowNull: true
-  },
-  amountChange: {
-    type: DataTypes.DECIMAL(18, 2),
-    allowNull: true
+  status: {
+    type: DataTypes.ENUM('Draft', 'Completed', 'Cancelled', 'Warranty'),
+    defaultValue: 'Draft'
   },
   paymentReference: {
     type: DataTypes.STRING(100),
     allowNull: true
+  },
+  isDeleted: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false
   }
 }, {
-  tableName: 'SaleOrder',
-  timestamps: false
+  tableName: 'order',
+  timestamps: true
 });
-
-SaleOrder.belongsTo(Receipt, { foreignKey: 'receiptId' });
-SaleOrder.belongsTo(Customer, { foreignKey: 'customerId' });
 
 module.exports = SaleOrder;

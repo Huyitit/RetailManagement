@@ -1,24 +1,19 @@
 const { Sequelize } = require('sequelize');
-const sequelize = new Sequelize('Cuahangbanle', 'sa', '123456', {
-  host: 'localhost',
-  dialect: 'mssql',
-  port: 1433,
-  dialectOptions: {
-    options: {
-      encrypt: false,
-      trustServerCertificate: true,
-      useUTC: false,
-      dateFirst: 1
-    }
-  },
-  logging: false
 
+const sequelize = new Sequelize('StoreManagement', 'root', '08082005', {
+  host: '127.0.0.1',
+  dialect: 'mysql',
+  port: 3306,
+  logging: false,
+  define: {
+    timestamps: true 
+  }
 });
 
 const connectDB = async () => {
   try {
     await sequelize.authenticate();
-    console.log('✅ Kết nối SQL Server thành công (Cửa hàng bán lẻ)!');
+    console.log('✅ Kết nối MySQL thành công (StoreManagement)!');
   } catch (error) {
     console.error('❌ Lỗi kết nối Database:', error.message);
   }
@@ -26,4 +21,4 @@ const connectDB = async () => {
 
 connectDB();
 
-module.exports = sequelize;
+module.exports = sequelize;

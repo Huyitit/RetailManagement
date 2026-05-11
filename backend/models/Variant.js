@@ -3,51 +3,56 @@ const sequelize = require('../configs/db');
 const Product = require('./Product');
 
 const Variant = sequelize.define('Variant', {
-  variantId: {
+  id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true
   },
   productId: {
     type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: Product,
-      key: 'productId'
-    }
+    allowNull: false
   },
-  SKU: {
-    type: DataTypes.STRING(50),
-    allowNull: false,
+  skuCode: {
+    type: DataTypes.STRING(255),
+    allowNull: true,
     unique: true
   },
-  costPrice: {
-    type: DataTypes.DECIMAL(18, 2),
-    allowNull: false
-  },
   sellPrice: {
-    type: DataTypes.DECIMAL(18, 2),
+    type: DataTypes.DECIMAL(19, 3),
     allowNull: false
   },
-  quantity: {
+  importPrice: {
+    type: DataTypes.DECIMAL(19, 3),
+    allowNull: true
+  },
+  stockQuantity: {
     type: DataTypes.INTEGER,
     allowNull: false,
     defaultValue: 0
   },
+  discount: {
+    type: DataTypes.DECIMAL(19, 2),
+    allowNull: false,
+    defaultValue: 0
+  },
   imageUrl: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(2083),
     allowNull: true
   },
   minStock: {
     type: DataTypes.INTEGER,
     allowNull: false,
     defaultValue: 5
+  },
+  isDeleted: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false
   }
 }, {
-  tableName: 'Variant',
-  timestamps: false
+  tableName: 'variant',
+  timestamps: true
 });
 
-Variant.belongsTo(Product, { foreignKey: 'productId' });
-
 module.exports = Variant;
+

@@ -32,7 +32,7 @@ const Login = () => {
 
   return (
     <div style={{ display: 'flex', width: '100vw', height: '100vh', overflow: 'hidden', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-      {/* Left Side - Marketing */}
+      {}
       <div style={{
         flex: 1.2,
         position: 'relative',
@@ -75,7 +75,7 @@ const Login = () => {
         </div>
       </div>
 
-      {/* Right Side - Form */}
+      {}
       <div style={{ flex: 0.8, background: '#f8fafc', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 100px' }}>
         <div style={{ maxWidth: '440px', width: '100%' }}>
           <h2 style={{ fontSize: '32px', fontWeight: '900', color: '#0f172a', marginBottom: '40px' }}>Đăng nhập hệ thống</h2>

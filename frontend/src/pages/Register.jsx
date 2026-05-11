@@ -36,7 +36,7 @@ const Register = () => {
 
   return (
     <div style={{ display: 'flex', width: '100vw', height: '100vh', overflow: 'hidden', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-      {/* Left Side - Profile/Brand */}
+      {}
       <div style={{
         flex: 1.2,
         position: 'relative',
@@ -69,7 +69,7 @@ const Register = () => {
           <div style={{ display: 'flex', marginLeft: '12px' }}>
             {[1,2,3].map(i => (
               <div key={i} style={{ width: '48px', height: '48px', borderRadius: '50%', border: '4px solid #111827', marginLeft: '-12px', background: '#ccc', overflow: 'hidden' }}>
-                <img src={`https://i.pravatar.cc/150?u=${i}`} alt="avatar" style={{ width: '100%', height: '100%' }} />
+                <img src={`https://ui-avatars.com/api/?name=Staff+${i}&background=random`} alt="staff" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
             ))}
           </div>
@@ -77,7 +77,7 @@ const Register = () => {
         </div>
       </div>
 
-      {/* Right Side - Form */}
+      {}
       <div style={{ flex: 0.8, background: 'white', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 100px', overflowY: 'auto' }}>
         <div style={{ maxWidth: '440px', width: '100%', padding: '40px 0' }}>
           <h2 style={{ fontSize: '32px', fontWeight: '900', color: '#0f172a', marginBottom: '40px' }}>Đăng ký nhân viên</h2>

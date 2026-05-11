@@ -6,31 +6,19 @@ const Variant = require('./Variant');
 const Promotion_Variant = sequelize.define('Promotion_Variant', {
   promotionId: {
     type: DataTypes.INTEGER,
-    primaryKey: true,
-    references: {
-      model: Promotion,
-      key: 'promotionId'
-    }
+    primaryKey: true
   },
   variantId: {
     type: DataTypes.INTEGER,
-    primaryKey: true,
-    references: {
-      model: Variant,
-      key: 'variantId'
-    }
+    primaryKey: true
   },
   appliedAt: {
     type: DataTypes.DATE,
-    allowNull: true,
-    defaultValue: null
+    defaultValue: DataTypes.NOW
   }
 }, {
-  tableName: 'Promotion_Variant',
+  tableName: 'promotion_variant',
   timestamps: false
 });
 
-Promotion_Variant.belongsTo(Promotion, { foreignKey: 'promotionId' });
-Promotion_Variant.belongsTo(Variant, { foreignKey: 'variantId' });
-
-module.exports = Promotion_Variant;
+module.exports = Promotion_Variant;

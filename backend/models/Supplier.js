@@ -1,31 +1,46 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../configs/db');
-const Profile = require('./Profile');
+
 
 const Supplier = sequelize.define('Supplier', {
-  supplierId: {
+  id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true
   },
-  profileId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    unique: true,
-    references: {
-      model: Profile,
-      key: 'profileId'
-    }
+  companyName: {
+    type: DataTypes.STRING(255),
+    allowNull: false
   },
-  contactInfo: {
-    type: DataTypes.TEXT,
+  contactName: {
+    type: DataTypes.STRING(255),
+    allowNull: false
+  },
+  phone: {
+    type: DataTypes.STRING(15),
+    allowNull: false
+  },
+  email: {
+    type: DataTypes.STRING(255),
     allowNull: true
+  },
+  address: {
+    type: DataTypes.STRING(255),
+    allowNull: true
+  },
+  taxCode: {
+    type: DataTypes.STRING(255),
+    allowNull: true,
+    unique: true
+  },
+  isDeleted: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false
   }
 }, {
-  tableName: 'Supplier',
-  timestamps: false
+  tableName: 'supplier',
+  timestamps: true
 });
 
-Supplier.belongsTo(Profile, { foreignKey: 'profileId' });
-
-module.exports = Supplier;
+module.exports = Supplier;

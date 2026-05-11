@@ -6,30 +6,20 @@ const Attribute = require('./Attribute');
 const Variant_Attribute_Value = sequelize.define('Variant_Attribute_Value', {
   variantId: {
     type: DataTypes.INTEGER,
-    primaryKey: true,
-    references: {
-      model: Variant,
-      key: 'variantId'
-    }
+    primaryKey: true
   },
   attributeId: {
     type: DataTypes.INTEGER,
-    primaryKey: true,
-    references: {
-      model: Attribute,
-      key: 'attributeId'
-    }
+    primaryKey: true
   },
   value: {
     type: DataTypes.STRING(255),
     allowNull: false
   }
 }, {
-  tableName: 'Variant_Attribute_Value',
+  tableName: 'variantAttribute',
   timestamps: false
 });
 
-Variant_Attribute_Value.belongsTo(Variant, { foreignKey: 'variantId' });
-Variant_Attribute_Value.belongsTo(Attribute, { foreignKey: 'attributeId' });
-
 module.exports = Variant_Attribute_Value;
+

@@ -1,14 +1,13 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../configs/db');
 
-
-const Customer = sequelize.define('Customer', {
+const Store = sequelize.define('Store', {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true
   },
-  fullname: {
+  name: {
     type: DataTypes.STRING(255),
     allowNull: false
   },
@@ -18,11 +17,15 @@ const Customer = sequelize.define('Customer', {
   },
   email: {
     type: DataTypes.STRING(255),
-    allowNull: true
+    allowNull: false
   },
-  points: {
-    type: DataTypes.INTEGER,
-    defaultValue: 0
+  address: {
+    type: DataTypes.STRING(255),
+    allowNull: false
+  },
+  taxCode: {
+    type: DataTypes.STRING(255),
+    unique: true
   },
   isDeleted: {
     type: DataTypes.BOOLEAN,
@@ -30,9 +33,8 @@ const Customer = sequelize.define('Customer', {
     defaultValue: false
   }
 }, {
-  tableName: 'customer',
+  tableName: 'store',
   timestamps: true
 });
 
-module.exports = Customer;
-
+module.exports = Store;

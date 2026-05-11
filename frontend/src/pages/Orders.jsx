@@ -87,15 +87,15 @@ const Orders = () => {
   return (
     <>
       <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: '#f8fafc', overflow: 'hidden' }}>
-        {/* Header */}
+        {}
         <header style={{ padding: '32px 40px', background: 'white', borderBottom: '1px solid #e2e8f0' }}>
           <h1 style={{ fontSize: '28px', fontWeight: '950', color: '#0f172a', margin: 0 }}>Danh sách hóa đơn</h1>
           <p style={{ color: '#64748b', fontSize: '14px', marginTop: '4px', fontWeight: '600' }}>Quản lý đơn bán hàng, trạng thái thanh toán</p>
         </header>
 
-        {/* Stats & Filters */}
+        {}
         <div className="custom-scrollbar" style={{ flex: 1, overflowY: 'auto', padding: '32px 40px' }}>
-          {/* Stats Cards */}
+          {}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', marginBottom: '32px' }}>
             <div style={{ background: 'white', padding: '24px', borderRadius: '24px', border: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <div>
@@ -129,7 +129,7 @@ const Orders = () => {
             </div>
           </div>
 
-          {/* Table Section */}
+          {}
           <div style={{ background: 'white', borderRadius: '24px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
             <div style={{ padding: '24px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ display: 'flex', gap: '12px' }}>
@@ -170,6 +170,7 @@ const Orders = () => {
                 <tr style={{ background: '#f8fafc', borderBottom: '1px solid #f1f5f9' }}>
                   <th style={{ padding: '16px 24px', textAlign: 'left', fontSize: '11px', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase' }}>Mã HĐ</th>
                   <th style={{ padding: '16px 24px', textAlign: 'left', fontSize: '11px', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase' }}>Khách hàng</th>
+                  <th style={{ padding: '16px 24px', textAlign: 'left', fontSize: '11px', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase' }}>Thu ngân</th>
                   <th style={{ padding: '16px 24px', textAlign: 'left', fontSize: '11px', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase' }}>Ngày tạo</th>
                   <th style={{ padding: '16px 24px', textAlign: 'left', fontSize: '11px', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase' }}>Thanh toán</th>
                   <th style={{ padding: '16px 24px', textAlign: 'left', fontSize: '11px', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase' }}>Trạng thái</th>
@@ -195,6 +196,7 @@ const Orders = () => {
                       </div>
                     </td>
                     <td style={{ padding: '20px 24px', fontWeight: '700', color: '#1e293b' }}>{order.customerName}</td>
+                    <td style={{ padding: '20px 24px', fontSize: '13px', color: '#64748b', fontWeight: '700' }}>{order.staffName || 'N/A'}</td>
                     <td style={{ padding: '20px 24px', fontSize: '13px', color: '#64748b', fontWeight: '600' }}>
                       {new Date(order.orderAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })} • {new Date(order.orderAt).toLocaleDateString('vi-VN')}
                     </td>
@@ -203,13 +205,13 @@ const Orders = () => {
                     <td style={{ padding: '20px 24px', textAlign: 'right' }}>
                       {(order.saleStatus === 'Warranty' && parseFloat(order.refundAmount || 0) > 0) ? (
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-                          <div style={{ fontWeight: '900', color: '#0f172a', fontSize: '15px' }}>{formatMoney(Number(order.totalPrice) - Number(order.refundAmount || 0))}</div>
+                          <div style={{ fontWeight: '900', color: '#0f172a', fontSize: '15px' }}>{formatMoney(order.netTotal)}</div>
                           <div style={{ fontWeight: '600', color: '#ef4444', fontSize: '11px', textDecoration: 'line-through', marginTop: '2px' }}>{formatMoney(order.totalPrice)}</div>
                         </div>
                       ) : (order.saleStatus === 'Cancelled') ? (
                         <div style={{ fontWeight: '600', color: '#ef4444', fontSize: '15px', textDecoration: 'line-through', opacity: 0.7 }}>{formatMoney(order.totalPrice)}</div>
                       ) : (
-                        <div style={{ fontWeight: '900', color: '#0f172a', fontSize: '15px' }}>{formatMoney(order.totalPrice)}</div>
+                        <div style={{ fontWeight: '900', color: '#0f172a', fontSize: '15px' }}>{formatMoney(order.netTotal || order.totalPrice)}</div>
                       )}
                     </td>
                   </tr>
@@ -217,7 +219,7 @@ const Orders = () => {
               </tbody>
             </table>
 
-            {/* Pagination UI */}
+            {}
             {totalPages > 1 && (
               <div style={{ padding: '24px', borderTop: '1px solid #f1f5f9', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '20px' }}>
                 <button

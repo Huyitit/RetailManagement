@@ -9,33 +9,29 @@ const WarrantyLog = sequelize.define('WarrantyLog', {
     primaryKey: true,
     autoIncrement: true
   },
-  receiptId: {
+  orderDetailId: {
     type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: SaleOrder,
-      key: 'receiptId'
-    }
+    allowNull: false
   },
   staffId: {
     type: DataTypes.INTEGER,
-    allowNull: true,
-    references: {
-      model: Staff,
-      key: 'staffId'
-    }
+    allowNull: true
   },
-  reason: {
+  claimDate: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW
+  },
+  issueDescription: {
     type: DataTypes.STRING(255),
     allowNull: true
   },
-  warrantyItems: {
-    type: DataTypes.TEXT,
-    allowNull: true
-  },
-  warrantyType: {
+  resolutionType: {
     type: DataTypes.STRING(50),
-    allowNull: true
+    allowNull: false
+  },
+  status: {
+    type: DataTypes.STRING(50),
+    allowNull: false
   },
   refundAmount: {
     type: DataTypes.DECIMAL(18, 2),
@@ -45,16 +41,19 @@ const WarrantyLog = sequelize.define('WarrantyLog', {
     type: DataTypes.STRING(100),
     allowNull: true
   },
-  createdAt: {
-    type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW
+  warrantyType: {
+    type: DataTypes.STRING(50),
+    allowNull: true
+  },
+  isDeleted: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false
   }
 }, {
-  tableName: 'WarrantyLog',
-  timestamps: false
+  tableName: 'warranty',
+  timestamps: true
 });
 
-WarrantyLog.belongsTo(SaleOrder, { foreignKey: 'receiptId' });
-WarrantyLog.belongsTo(Staff, { foreignKey: 'staffId' });
-
 module.exports = WarrantyLog;
+

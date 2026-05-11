@@ -85,7 +85,7 @@ const OrderDetailModal = ({ receiptId, onClose }) => {
         setError(`Lỗi từ API (${res.status}): ${res.data?.message || "Không tìm thấy dữ liệu"}`);
       }
     } catch (err) {
-      setError(`Lỗi kết nối: ${err.message}. Kiểm tra Backend http://127.0.0.1:5000`);
+      setError(`Lỗi kết nối: ${err.message}. Kiểm tra Backend http://127.0.0.1:5001`);
     } finally {
       setLoading(false);
     }
@@ -98,8 +98,11 @@ const OrderDetailModal = ({ receiptId, onClose }) => {
     const items = orderItems || order?.items;
     if (items) {
       items.forEach(item => {
-
-        total += (item.finalPrice || 0) * (newItems[item.variantId] || 0);
+        const qtyToReturn = newItems[item.variantId] || 0;
+        if (qtyToReturn > 0) {
+          const unitPriceAfterDiscount = (item.finalPrice || 0) / (item.quantity || 1);
+          total += unitPriceAfterDiscount * qtyToReturn;
+        }
       });
     }
     if (vat) total *= 1.1;
@@ -143,7 +146,7 @@ const OrderDetailModal = ({ receiptId, onClose }) => {
       const savedStaff = localStorage.getItem('staffInfo');
       if (savedStaff) {
         const parsed = JSON.parse(savedStaff);
-        currentStaffId = parsed.staffId || 1;
+        currentStaffId = parsed.id || parsed.staffId || 1;
       }
 
       const res = await processReturn(receiptId, {
@@ -319,6 +322,21 @@ const OrderDetailModal = ({ receiptId, onClose }) => {
                       <option value="Replacement">1 đổi 1 (Cấp lại máy mới)</option>
                       <option value="Refund">Hoàn tiền</option>
                     </select>
+
+                    {warrantyType === 'Refund' && (
+                      <div style={{ marginTop: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <input
+                          type="checkbox"
+                          id="vatToggle"
+                          checked={includeVat}
+                          onChange={handleVatToggle}
+                          style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                        />
+                        <label htmlFor="vatToggle" style={{ fontSize: '13px', fontWeight: '700', color: '#059669', cursor: 'pointer' }}>
+                          Cộng thuế VAT (10%) vào tiền hoàn
+                        </label>
+                      </div>
+                    )}
                   </div>
 
                   {warrantyType === 'Refund' && (

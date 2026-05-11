@@ -1,10 +1,7 @@
-const fs = require('fs');
-const path = require('path');
 const {
-  SaleOrder, SaleDetail, Receipt, Variant, Customer,
-  Product, Profile, Promotion, Promotion_Variant, WarrantyLog
+  SaleOrder, SaleDetail, Variant, Customer,
+  Product, Promotion, Promotion_Variant, WarrantyLog, Staff
 } = require('../models');
-const Staff = require('../models/Staff');
 const sequelize = require('../configs/db');
 const { Op } = require('sequelize');
 
@@ -13,33 +10,26 @@ exports.createOrder = async (req, res) => {
     const { staffId, customerId } = req.body;
     if (!staffId) return res.status(400).json({ status: 'error', message: 'staffId là bắt buộc' });
 
-    const [receiptRes] = await sequelize.query(
-      `INSERT INTO [Receipt] (staffId, totalPrice, orderAt, type)
-       OUTPUT INSERTED.receiptId
-       VALUES (:staffId, 0, GETDATE(), 'SALE')`,
-      { replacements: { staffId }, type: sequelize.QueryTypes.INSERT }
-    );
-
-    const receiptId = receiptRes[0].receiptId;
-
     const saleOrder = await SaleOrder.create({
-      receiptId: receiptId,
+      staffId: staffId,
       customerId: customerId || null,
+      subTotal: 0,
+      discountAmount: 0,
+      taxAmount: 0,
+      finalTotal: 0,
       paymentMethod: 'Tiền mặt',
-      saleStatus: 'Draft',
       refundAmount: 0,
-      amountReceived: 0,
-      amountChange: 0,
-      paymentReference: null
+      status: 'Draft',
+      isDeleted: false
     });
 
     res.status(201).json({
       status: 'success',
       data: {
-        receiptId: receiptId,
-        staffId: staffId || currentStaffId,
+        receiptId: saleOrder.id,
+        staffId: saleOrder.staffId,
         customerId: saleOrder.customerId,
-        status: saleOrder.saleStatus
+        status: 'Draft'
       }
     });
   } catch (error) {
@@ -48,74 +38,67 @@ exports.createOrder = async (req, res) => {
   }
 };
 
+
 exports.getAllOrders = async (req, res) => {
   try {
     const { startDate, endDate, search, page = 1, limit = 20 } = req.query;
-    const offset = (page - 1) * limit;
+    const offset = (Number(page) - 1) * Number(limit);
+    const limitNum = Number(limit);
 
-    let whereClause = "WHERE SaleOrder.saleStatus IN ('Completed', 'Warranty') AND Receipt.type = 'SALE'";
-    const replacements = {};
+    const { Op } = require('sequelize');
+    const where = {
+      isDeleted: false,
+      status: { [Op.in]: ['Completed', 'Warranty'] }
+    };
 
     if (startDate && endDate) {
-      whereClause += " AND Receipt.orderAt BETWEEN :start AND :end";
-      replacements.start = startDate;
-      replacements.end = endDate;
+      where.createdAt = { [Op.between]: [startDate, endDate] };
     }
 
     if (search && search.trim() !== '') {
       const s = `%${search.trim()}%`;
-      whereClause += " AND (CAST(SaleOrder.receiptId AS VARCHAR) LIKE :search OR Profile.fullName LIKE :search)";
-      replacements.search = s;
+      where[Op.or] = [
+        { id: { [Op.like]: s } },
+        { '$Customer.fullname$': { [Op.like]: s } }
+      ];
     }
 
-    const countQuery = `
-      SELECT COUNT(*) as total
-      FROM SaleOrder
-      JOIN Receipt ON SaleOrder.receiptId = Receipt.receiptId
-      LEFT JOIN Customer ON SaleOrder.customerId = Customer.customerId
-      LEFT JOIN Profile ON Customer.profileId = Profile.profileId
-      ${whereClause}
-    `;
-
-    const dataQuery = `
-      SELECT
-        SaleOrder.receiptId,
-        Receipt.orderAt,
-        ISNULL(Profile.fullName, N'Khách lẻ') as customerName,
-        Receipt.totalPrice,
-        ISNULL(SaleOrder.refundAmount, 0) as refundAmount,
-        (Receipt.totalPrice - ISNULL(SaleOrder.refundAmount, 0)) as netTotal,
-        SaleOrder.paymentMethod,
-        SaleOrder.saleStatus
-      FROM SaleOrder
-      JOIN Receipt ON SaleOrder.receiptId = Receipt.receiptId
-      LEFT JOIN Customer ON SaleOrder.customerId = Customer.customerId
-      LEFT JOIN Profile ON Customer.profileId = Profile.profileId
-      ${whereClause}
-      ORDER BY SaleOrder.receiptId DESC
-      OFFSET :offset ROWS FETCH NEXT :limit ROWS ONLY
-    `;
-
-    const [countResult] = await sequelize.query(countQuery, { replacements, type: sequelize.QueryTypes.SELECT });
-    const orders = await sequelize.query(dataQuery, {
-      replacements: { ...replacements, offset: parseInt(offset), limit: parseInt(limit) },
-      type: sequelize.QueryTypes.SELECT
+    const { rows, count } = await SaleOrder.findAndCountAll({
+      where,
+      include: [
+        { model: Staff, required: false },
+        { model: Customer, required: false }
+      ],
+      order: [['id', 'DESC']],
+      limit: limitNum,
+      offset: offset,
+      distinct: true
     });
 
-    const totalItems = countResult?.total || 0;
+    const orders = rows.map(o => ({
+      receiptId: o.id,
+      orderAt: o.createdAt,
+      customerName: o.Customer?.fullname || 'Khách lẻ',
+      staffName: o.Staff?.fullname || o.Staff?.username || 'N/A',
+      totalPrice: Number(o.finalTotal || 0),
+      refundAmount: Number(o.refundAmount || 0),
+      netTotal: Number(o.finalTotal || 0) - Number(o.refundAmount || 0),
+      paymentMethod: o.paymentMethod || 'Tiền mặt',
+      saleStatus: o.status || 'Completed'
+    }));
 
     res.json({
       status: 'success',
       data: orders,
       pagination: {
-        totalItems: totalItems,
-        totalPages: Math.ceil(totalItems / limit),
+        totalItems: count,
+        totalPages: Math.ceil(count / limitNum),
         currentPage: parseInt(page),
-        limit: parseInt(limit)
+        limit: limitNum
       }
     });
   } catch (error) {
-    console.error("Error in getAllOrders:", error);
+    console.error('Lỗi lấy đơn hàng:', error);
     res.status(500).json({ status: 'error', message: error.message });
   }
 };
@@ -126,12 +109,12 @@ exports.getOrderStats = async (req, res) => {
 
     const statsQuery = `
       SELECT
-        (SELECT COUNT(*) FROM SaleOrder JOIN Receipt ON SaleOrder.receiptId = Receipt.receiptId WHERE SaleOrder.saleStatus IN ('Completed', 'Warranty') AND Receipt.type = 'SALE' AND CAST(Receipt.orderAt AS DATE) = :today) as todayCount,
-        (SELECT SUM(Receipt.totalPrice - ISNULL(SaleOrder.refundAmount, 0)) FROM SaleOrder JOIN Receipt ON SaleOrder.receiptId = Receipt.receiptId WHERE SaleOrder.saleStatus IN ('Completed', 'Warranty') AND Receipt.type = 'SALE' AND CAST(Receipt.orderAt AS DATE) = :today) as todayTotal,
-        (SELECT COUNT(*) FROM SaleOrder JOIN Receipt ON SaleOrder.receiptId = Receipt.receiptId WHERE SaleOrder.saleStatus IN ('Completed', 'Warranty') AND Receipt.type = 'SALE' AND Receipt.orderAt >= DATEADD(day, -7, GETDATE())) as weekCount,
-        (SELECT SUM(Receipt.totalPrice - ISNULL(SaleOrder.refundAmount, 0)) FROM SaleOrder JOIN Receipt ON SaleOrder.receiptId = Receipt.receiptId WHERE SaleOrder.saleStatus IN ('Completed', 'Warranty') AND Receipt.type = 'SALE' AND Receipt.orderAt >= DATEADD(day, -7, GETDATE())) as weekTotal,
-        (SELECT COUNT(*) FROM SaleOrder WHERE saleStatus = 'Cancelled' OR (saleStatus = 'Warranty' AND refundAmount > 0)) as cancelledCount,
-        (SELECT SUM(ISNULL(refundAmount, 0)) FROM SaleOrder WHERE saleStatus = 'Cancelled' OR (saleStatus = 'Warranty' AND refundAmount > 0)) as cancelledTotal
+        (SELECT COUNT(*) FROM \`order\` WHERE isDeleted = 0 AND DATE(createdAt) = :today) as todayCount,
+        (SELECT SUM(finalTotal - COALESCE(refundAmount, 0)) FROM \`order\` WHERE isDeleted = 0 AND DATE(createdAt) = :today) as todayTotal,
+        (SELECT COUNT(*) FROM \`order\` WHERE isDeleted = 0 AND createdAt >= DATE_SUB(NOW(), INTERVAL 7 DAY)) as weekCount,
+        (SELECT SUM(finalTotal - COALESCE(refundAmount, 0)) FROM \`order\` WHERE isDeleted = 0 AND createdAt >= DATE_SUB(NOW(), INTERVAL 7 DAY)) as weekTotal,
+        (SELECT COUNT(*) FROM \`order\` WHERE isDeleted = 0 AND refundAmount > 0) as cancelledCount,
+        (SELECT SUM(COALESCE(refundAmount, 0)) FROM \`order\` WHERE isDeleted = 0 AND refundAmount > 0) as cancelledTotal
     `;
 
     const [stats] = await sequelize.query(statsQuery, { replacements: { today: todayStr }, type: sequelize.QueryTypes.SELECT });
@@ -150,16 +133,21 @@ exports.getOrderStats = async (req, res) => {
   }
 };
 
+
 exports.updateOrderItem = async (req, res) => {
   try {
     const { id } = req.params;
     const { variantId, quantity } = req.body;
-    const detail = await SaleDetail.findOne({ where: { receiptId: id, variantId } });
+    const detail = await SaleDetail.findOne({ where: { orderId: id, variantId } });
     if (!detail) return res.status(404).json({ status: 'error', message: 'Không tìm thấy' });
-    await detail.update({ quantity });
-    const allDetails = await SaleDetail.findAll({ where: { receiptId: id } });
-    const total = allDetails.reduce((sum, d) => sum + (d.finalPrice * d.quantity), 0);
-    await Receipt.update({ totalPrice: total }, { where: { receiptId: id } });
+
+    const lineTotal = detail.unitPrice * quantity;
+    await detail.update({ quantity, lineTotal });
+
+    const allDetails = await SaleDetail.findAll({ where: { orderId: id } });
+    const total = allDetails.reduce((sum, d) => sum + Number(d.lineTotal), 0);
+    await SaleOrder.update({ finalTotal: total, subTotal: total }, { where: { id: id } });
+
     res.json({ status: 'success' });
   } catch (error) { res.status(500).json({ status: 'error' }); }
 };
@@ -170,11 +158,29 @@ exports.addOrderItem = async (req, res) => {
     const { variantId, quantity } = req.body;
     const variant = await Variant.findByPk(variantId);
     if (!variant) return res.status(404).json({ status: 'error' });
-    const [detail, created] = await SaleDetail.findOrCreate({ where: { receiptId: id, variantId }, defaults: { quantity, unitPrice: variant.sellPrice, finalPrice: variant.sellPrice } });
-    if (!created) await detail.update({ quantity: detail.quantity + quantity });
-    const allDetails = await SaleDetail.findAll({ where: { receiptId: id } });
-    const total = allDetails.reduce((sum, d) => sum + (d.finalPrice * d.quantity), 0);
-    await Receipt.update({ totalPrice: total }, { where: { receiptId: id } });
+
+    const [detail, created] = await SaleDetail.findOrCreate({
+      where: { orderId: id, variantId },
+      defaults: {
+        quantity,
+        unitPrice: variant.sellPrice,
+        lineTotal: variant.sellPrice * quantity,
+        serialCode: 'N/A'
+      }
+    });
+
+    if (!created) {
+      const newQty = detail.quantity + quantity;
+      await detail.update({
+        quantity: newQty,
+        lineTotal: detail.unitPrice * newQty
+      });
+    }
+
+    const allDetails = await SaleDetail.findAll({ where: { orderId: id } });
+    const total = allDetails.reduce((sum, d) => sum + Number(d.lineTotal), 0);
+    await SaleOrder.update({ finalTotal: total, subTotal: total }, { where: { id: id } });
+
     res.json({ status: 'success' });
   } catch (error) { res.status(500).json({ status: 'error' }); }
 };
@@ -182,10 +188,12 @@ exports.addOrderItem = async (req, res) => {
 exports.deleteOrderItem = async (req, res) => {
   try {
     const { orderId, variantId } = req.params;
-    await SaleDetail.destroy({ where: { receiptId: orderId, variantId } });
-    const allDetails = await SaleDetail.findAll({ where: { receiptId: orderId } });
-    const total = allDetails.reduce((sum, d) => sum + (d.finalPrice * d.quantity), 0);
-    await Receipt.update({ totalPrice: total }, { where: { receiptId: orderId } });
+    await SaleDetail.destroy({ where: { orderId, variantId } });
+
+    const allDetails = await SaleDetail.findAll({ where: { orderId } });
+    const total = allDetails.reduce((sum, d) => sum + Number(d.lineTotal), 0);
+    await SaleOrder.update({ finalTotal: total, subTotal: total }, { where: { id: orderId } });
+
     res.json({ status: 'success' });
   } catch (error) { res.status(500).json({ status: 'error' }); }
 };
@@ -194,33 +202,40 @@ exports.checkoutOrder = async (req, res) => {
   const transaction = await sequelize.transaction();
   try {
     const { id } = req.params;
-    const { paymentMethod, amountReceived, amountChange, customerId, pointsToUse, pointsEarned } = req.body;
+    const {
+      paymentMethod, customerId,
+      pointsToUse, pointsEarned,
+      subTotal, discountAmount, taxAmount, finalTotal
+    } = req.body;
 
-    const order = await SaleOrder.findOne({ where: { receiptId: id }, transaction });
+    const order = await SaleOrder.findOne({ where: { id: id }, transaction });
     if (!order) throw new Error('Không tìm thấy đơn hàng');
+
     await order.update({
       paymentMethod,
-      saleStatus: 'Completed',
       customerId: customerId || order.customerId,
-      amountReceived: Number(amountReceived || 0),
-      amountChange: Number(amountChange || 0)
+      subTotal: subTotal || order.subTotal,
+      discountAmount: discountAmount || order.discountAmount,
+      taxAmount: taxAmount || order.taxAmount,
+      finalTotal: finalTotal || order.finalTotal,
+      status: 'Completed'
     }, { transaction });
-    const details = await SaleDetail.findAll({ where: { receiptId: id }, transaction });
+
+    const details = await SaleDetail.findAll({ where: { orderId: id }, transaction });
     for (const d of details) {
       const v = await Variant.findByPk(d.variantId, { transaction });
       if (v) {
-        if (v.quantity < d.quantity) throw new Error(`Sản phẩm ${v.SKU} không đủ hàng (Kho: ${v.quantity})`);
-        await v.update({ quantity: v.quantity - d.quantity }, { transaction });
+        if (v.stockQuantity < d.quantity) throw new Error(`Sản phẩm ${v.skuCode} không đủ hàng (Kho: ${v.stockQuantity})`);
+        await v.update({ stockQuantity: v.stockQuantity - d.quantity }, { transaction });
       }
     }
-    const actualTotal = Number(amountReceived || 0) - Number(amountChange || 0);
-    await Receipt.update({ totalPrice: actualTotal }, { where: { receiptId: id }, transaction });
+
     if (customerId) {
       const customer = await Customer.findByPk(customerId, { transaction });
       if (customer) {
-        const actualPointsToUse = Math.min(Number(pointsToUse || 0), customer.rewardPoints || 0);
-        const newPoints = Math.max(0, (customer.rewardPoints || 0) - actualPointsToUse + (Number(pointsEarned) || 0));
-        await customer.update({ rewardPoints: newPoints }, { transaction });
+        const actualPointsToUse = Math.min(Number(pointsToUse || 0), customer.points || 0);
+        const newPoints = Math.max(0, (customer.points || 0) - actualPointsToUse + (Number(pointsEarned) || 0));
+        await customer.update({ points: newPoints }, { transaction });
       }
     }
 
@@ -233,60 +248,70 @@ exports.checkoutOrder = async (req, res) => {
   }
 };
 
+
 exports.getOrder = async (req, res) => {
   try {
     const { id } = req.params;
-    const logPath = path.join(__dirname, '..', 'trace_api.log');
-    fs.appendFileSync(logPath, `[${new Date().toISOString()}] REQUEST getOrder ID: ${id}\n`);
+
     const order = await SaleOrder.findOne({
-      where: { receiptId: id },
+      where: { id: id },
       include: [
-        { model: Receipt, include: [{ model: Staff, include: [Profile] }] },
-        { model: Customer, include: [Profile] },
+        { model: Staff },
+        { model: Customer },
         {
           model: SaleDetail,
           include: [{ model: Variant, include: [Product] }]
-        },
-        {
-          model: WarrantyLog,
-          include: [{ model: Staff, include: [Profile] }]
         }
       ]
     });
 
-    fs.appendFileSync(logPath, `[${new Date().toISOString()}] RESULT for ID ${id}: ${order ? 'FOUND' : 'NOT FOUND'}\n`);
     if (!order) return res.status(404).json({ status: 'error', message: 'Không tìm thấy đơn hàng' });
 
+    const warranties = await WarrantyLog.findAll({
+      include: [
+        { model: Staff },
+        {
+          model: SaleDetail,
+          where: { orderId: id },
+          include: [{ model: Variant, include: [Product] }]
+        }
+      ]
+    });
+
     const result = {
-      receiptId: order.receiptId,
+      receiptId: order.id,
       customerId: order.customerId,
-      customerName: order.Customer?.Profile?.fullName || 'Khách lẻ',
-      staffName: order.Receipt?.Staff?.Profile?.fullName || 'N/A',
-      orderAt: order.Receipt?.orderAt,
+      customerName: order.Customer?.fullname || 'Khách lẻ',
+      staffName: order.Staff?.fullname || 'N/A',
+      orderAt: order.createdAt,
       paymentMethod: order.paymentMethod,
-      saleStatus: order.saleStatus,
-      totalPrice: Number(order.Receipt?.totalPrice || 0),
+      saleStatus: order.status || 'Completed',
+      totalPrice: Number(order.finalTotal || 0),
       refundAmount: Number(order.refundAmount || 0),
-      returnReason: order.returnReason,
+      netTotal: Number(order.finalTotal || 0) - Number(order.refundAmount || 0),
       items: order.SaleDetails?.map(d => ({
         variantId: d.variantId,
         productName: d.Variant?.Product?.productName || "Sản phẩm",
-        variantSKU: d.Variant?.SKU || "N/A",
+        variantSKU: d.Variant?.skuCode || "N/A",
         image: d.Variant?.imageUrl,
         warrantyPeriod: d.Variant?.Product?.warrantyPeriod || 12,
         quantity: d.quantity,
         returnedQuantity: d.returnedQuantity || 0,
         unitPrice: d.unitPrice,
-        discountAmount: d.discountAmount,
-        finalPrice: d.finalPrice
+        discountAmount: d.totalDiscount,
+        finalPrice: d.lineTotal,
+        detailId: d.id
       })) || [],
-      warrantyHistory: order.WarrantyLogs?.map(log => ({
+      warrantyHistory: warranties.map(log => ({
         id: log.id,
-        staffName: log.Staff?.Profile?.fullName || 'N/A',
-        reason: log.reason,
+        staffName: log.Staff?.fullname || 'N/A',
+        reason: log.issueDescription,
         warrantyType: log.warrantyType,
         refundAmount: Number(log.refundAmount || 0),
-        warrantyItems: JSON.parse(log.warrantyItems || '[]'),
+        warrantyItems: [{
+          productName: log.SaleDetail?.Variant?.Product?.productName || 'Sản phẩm',
+          quantity: 1
+        }],
         paymentMethod: log.paymentMethod,
         createdAt: log.createdAt
       })) || []
@@ -294,9 +319,11 @@ exports.getOrder = async (req, res) => {
 
     res.json({ status: 'success', data: result });
   } catch (error) {
+    console.error("GetOrder Error:", error);
     res.status(500).json({ status: 'error', message: error.message });
   }
 };
+
 
 exports.processReturn = async (req, res) => {
   const transaction = await sequelize.transaction();
@@ -304,81 +331,73 @@ exports.processReturn = async (req, res) => {
     const id = parseInt(req.params.id);
     const { refundAmount, returnReason, items, staffId, warrantyType, paymentMethod } = req.body;
 
-    console.log(`>>> [WARRANTY] START PROCESSING Order: ${id}, Type: ${warrantyType}, Refund: ${refundAmount}`);
+    const totalRefund = (warrantyType === 'Refund') ? Math.round(Number(refundAmount) || 0) : 0;
 
-    const [orderInfo] = await sequelize.query(
-      `SELECT Receipt.orderAt FROM SaleOrder JOIN Receipt ON SaleOrder.receiptId = Receipt.receiptId WHERE SaleOrder.receiptId = :id`,
-      { replacements: {id}, transaction, type: sequelize.QueryTypes.SELECT }
-    );
+    const order = await SaleOrder.findByPk(id, { transaction });
+    if (!order) throw new Error("Không tìm thấy đơn hàng gốc.");
 
-    if (!orderInfo) throw new Error("Không tìm thấy đơn hàng gốc.");
-    const orderDate = new Date(orderInfo.orderAt);
-
-    const warrantyProducts = [];
     if (items && Array.isArray(items)) {
       for (const item of items) {
         const vId = parseInt(item.variantId);
         const qty = parseInt(item.returnQty);
         if (!qty || qty <= 0) continue;
 
-        const [pInfo] = await sequelize.query(
-          `SELECT p.productName, p.warrantyPeriod FROM Variant v JOIN Product p ON v.productId = p.productId WHERE v.variantId = :vId`,
-          { replacements: { vId }, transaction, type: sequelize.QueryTypes.SELECT }
-        );
+        const detail = await SaleDetail.findOne({
+          where: { orderId: id, variantId: vId },
+          include: [{ model: Variant, include: [Product] }],
+          transaction
+        });
 
-        if (!pInfo) continue;
+        if (!detail) continue;
 
-        const warrantyMonths = parseInt(pInfo.warrantyPeriod) || 12;
+        const warrantyMonths = parseInt(detail.Variant?.Product?.warrantyPeriod) || 12;
+        const orderDate = new Date(order.createdAt);
         const expirationDate = new Date(orderDate);
         expirationDate.setMonth(expirationDate.getMonth() + warrantyMonths);
 
         if (new Date() > expirationDate) {
-          throw new Error(`Sản phẩm '${pInfo.productName}' đã hết hạn bảo hành (${warrantyMonths} tháng).`);
+          throw new Error(`Sản phẩm '${detail.Variant?.Product?.productName}' đã hết hạn bảo hành (${warrantyMonths} tháng).`);
         }
 
         if (warrantyType === 'Replacement') {
-          await sequelize.query(
-            `UPDATE Variant SET quantity = quantity - :qty WHERE variantId = :vId`,
-            { replacements: { qty, vId }, transaction }
+          await Variant.update(
+            { stockQuantity: sequelize.literal(`stockQuantity - ${qty}`) },
+            { where: { id: vId }, transaction }
           );
         } else if (warrantyType === 'Refund') {
-          await sequelize.query(
-            `UPDATE Variant SET quantity = quantity + :qty WHERE variantId = :vId`,
-            { replacements: { qty, vId }, transaction }
+          await Variant.update(
+            { stockQuantity: sequelize.literal(`stockQuantity + ${qty}`) },
+            { where: { id: vId }, transaction }
           );
         }
 
-        await sequelize.query(
-          `UPDATE SaleDetail SET returnedQuantity = ISNULL(returnedQuantity, 0) + :qty WHERE receiptId = :id AND variantId = :vId`,
-          { replacements: { qty, id, vId }, transaction }
+        await detail.update(
+          { returnedQuantity: Number(detail.returnedQuantity || 0) + qty },
+          { transaction }
         );
 
-        warrantyProducts.push({ productName: pInfo.productName, quantity: qty });
+        const finalRefundForItem = (warrantyType === 'Refund') ? Math.round((detail.unitPrice * qty) * 1.1) : 0;
+
+        await WarrantyLog.create({
+          orderDetailId: detail.id,
+          staffId: staffId || 1,
+          claimDate: new Date(),
+          issueDescription: returnReason || 'Bảo hành sản phẩm',
+          resolutionType: warrantyType === 'Refund' ? 'Refund' : 'Replacement',
+          status: 'Completed',
+          refundAmount: finalRefundForItem,
+          paymentMethod: paymentMethod,
+          warrantyType: warrantyType
+        }, { transaction });
       }
     }
 
-    const finalRefund = (warrantyType === 'Refund') ? Math.round(Number(refundAmount) || 0) : 0;
-
-    await sequelize.query(
-      `UPDATE SaleOrder SET saleStatus = 'Warranty', refundAmount = ISNULL(refundAmount, 0) + :refund WHERE receiptId = :id`,
-      { replacements: { refund: finalRefund, id }, transaction }
-    );
-
-    await sequelize.query(
-      `INSERT INTO WarrantyLog (receiptId, staffId, reason, warrantyItems, warrantyType, refundAmount, paymentMethod, createdAt)
-       VALUES (:id, :staffId, :reason, :items, :type, :refund, :paymentMethod, GETDATE())`,
+    await order.update(
       {
-        replacements: {
-          id,
-          staffId: staffId || 1,
-          reason: returnReason || 'Bảo hành sản phẩm',
-          items: JSON.stringify(warrantyProducts),
-          type: warrantyType,
-          refund: finalRefund,
-          paymentMethod: paymentMethod
-        },
-        transaction
-      }
+        refundAmount: Number(order.refundAmount || 0) + totalRefund,
+        status: 'Warranty'
+      },
+      { transaction }
     );
 
     await transaction.commit();
@@ -386,7 +405,7 @@ exports.processReturn = async (req, res) => {
   } catch (error) {
     if (transaction) await transaction.rollback();
     console.error(">>> [WARRANTY ERROR]:", error);
-    res.status(500).json({ status: 'error', message: `BACKEND ERROR: ${error.message} ${error.original?.message || ''}` });
+    res.status(500).json({ status: 'error', message: `BACKEND ERROR: ${error.message}` });
   }
 };
 

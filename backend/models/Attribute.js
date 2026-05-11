@@ -2,18 +2,19 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../configs/db');
 
 const Attribute = sequelize.define('Attribute', {
-  attributeId: {
+  id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true
   },
-  attributeName: {
-    type: DataTypes.STRING(100),
+  name: {
+    type: DataTypes.STRING(255),
     allowNull: false
   }
 }, {
-  tableName: 'Attribute',
+  tableName: 'attribute',
   timestamps: false
 });
+
 
 module.exports = Attribute;

@@ -27,7 +27,7 @@ const Dashboard = () => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#f8fafc', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-      {/* Top Header */}
+      {}
       <header style={{ height: '80px', background: 'white', borderBottom: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 40px', flexShrink: 0 }}>
         <h2 style={{ fontSize: '24px', fontWeight: '900', color: '#0f172a' }}>Tổng quan hệ thống</h2>
         <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
@@ -37,19 +37,19 @@ const Dashboard = () => {
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '8px 16px', background: '#f1f5f9', borderRadius: '12px' }}>
             <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: '14px', fontWeight: '800', color: '#1e293b' }}>{staff.fullName}</div>
+              <div style={{ fontSize: '14px', fontWeight: '800', color: '#1e293b' }}>{staff.fullname || staff.fullName || staff.username || 'Nhân viên'}</div>
               <div style={{ fontSize: '11px', fontWeight: '700', color: '#64748b' }}>Nhân viên</div>
             </div>
             <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#cbd5e1', overflow: 'hidden' }}>
-              <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(staff.fullName)}&background=random`} alt="avatar" style={{ width: '100%', height: '100%' }} />
+              <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(staff.fullname || staff.fullName || staff.username || 'Nhân viên')}&background=random`} alt="avatar" style={{ width: '100%', height: '100%' }} />
             </div>
           </div>
         </div>
       </header>
 
-      {/* Dashboard Content */}
+      {}
       <main style={{ padding: '40px', flex: 1, overflowY: 'auto' }}>
-        {/* Stats Cards */}
+        {}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '24px', marginBottom: '40px' }}>
           {stats.map((s, idx) => (
             <div key={idx} style={{ background: 'white', padding: '24px', borderRadius: '24px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
@@ -62,7 +62,7 @@ const Dashboard = () => {
           ))}
         </div>
 
-        {/* Quick Actions / Shortcuts */}
+        {}
         <h3 style={{ fontSize: '20px', fontWeight: '900', color: '#0f172a', marginBottom: '20px' }}>Phím tắt nhanh</h3>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
           {menuItems.slice(0, 3).map((item, idx) => (

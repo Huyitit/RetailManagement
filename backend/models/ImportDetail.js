@@ -4,53 +4,46 @@ const ImportOrder = require('./ImportOrder');
 const Variant = require('./Variant');
 
 const ImportDetail = sequelize.define('ImportDetail', {
-  importDetailId: {
+  id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true
   },
-  receiptId: {
+  importReceiptId: {
     type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: ImportOrder,
-      key: 'receiptId'
-    }
+    allowNull: false
   },
   variantId: {
     type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: Variant,
-      key: 'variantId'
-    }
+    allowNull: false
+  },
+  supplierId: {
+    type: DataTypes.INTEGER,
+    allowNull: false
   },
   quantity: {
     type: DataTypes.INTEGER,
-    allowNull: false,
-    validate: {
-      min: 1
-    }
+    allowNull: false
   },
   importPrice: {
-    type: DataTypes.DECIMAL(18, 2),
+    type: DataTypes.DECIMAL(19, 3),
+    allowNull: false
+  },
+  lineTotal: {
+    type: DataTypes.DECIMAL(19, 3),
     allowNull: false
   },
   batchNumber: {
-    type: DataTypes.STRING(50),
+    type: DataTypes.STRING(255),
     allowNull: true
   },
   expiryDate: {
     type: DataTypes.DATE,
-    allowNull: true,
-    defaultValue: null
+    allowNull: true
   }
 }, {
-  tableName: 'ImportDetail',
+  tableName: 'importDetail',
   timestamps: false
 });
 
-ImportDetail.belongsTo(ImportOrder, { foreignKey: 'receiptId' });
-ImportDetail.belongsTo(Variant, { foreignKey: 'variantId' });
-
-module.exports = ImportDetail;
+module.exports = ImportDetail;
