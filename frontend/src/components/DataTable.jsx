@@ -6,8 +6,9 @@ const DataTable = ({
   onEdit, 
   onDelete, 
   onRowClick,
+  onRowDoubleClick,
   isLoading, 
-  emptyMessage = "Không có dữ liệu",
+  emptyMessage = "Khong co du lieu",
   pagination
 }) => {
   if (isLoading) {
@@ -50,7 +51,8 @@ const DataTable = ({
               <tr 
                 key={rowIndex} 
                 onClick={() => onRowClick && onRowClick(row)}
-                className={`hover:bg-slate-50 transition-colors ${onRowClick ? 'cursor-pointer' : ''}`}
+                onDoubleClick={() => onRowDoubleClick && onRowDoubleClick(row)}
+                className={`hover:bg-slate-50 transition-colors ${onRowClick || onRowDoubleClick ? 'cursor-pointer' : ''}`}
               >
                 {columns.map((col, colIndex) => (
                   <td key={colIndex} className={`px-6 py-4 text-slate-800 ${col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : ''}`}>

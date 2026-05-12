@@ -150,6 +150,18 @@ const Inventory = () => {
       return;
     }
 
+    if (activeTab === 'import') {
+      const invalidItem = details.find((d) => {
+        const qty = Number(d.qty);
+        const price = Number(d.price);
+        return !Number.isFinite(qty) || !Number.isInteger(qty) || qty <= 0 || !Number.isFinite(price) || price < 0;
+      });
+      if (invalidItem) {
+        setError(`Sản phẩm ${invalidItem.sku} có số lượng hoặc giá nhập không hợp lệ.`);
+        return;
+      }
+    }
+
     // Validate Export Stock
     if (activeTab === 'export') {
       const invalidItem = details.find(d => Number(d.qty) > d.currentStock);
@@ -169,7 +181,7 @@ const Inventory = () => {
           note: notes,
           items: details.map(d => ({
             variantId: d.variantId,
-            quantity: Number(d.qty),
+            quantity: Number.parseInt(d.qty, 10),
             importPrice: Number(d.price)
           }))
         };

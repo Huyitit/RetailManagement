@@ -75,6 +75,33 @@ exports.createImportReceipt = async (req, res) => {
     if (!supplierId) { await transaction.rollback(); return res.status(400).json({ status: 'error', message: 'Nhà cung cấp là bắt buộc' }); }
     if (!items || !Array.isArray(items) || items.length === 0) { await transaction.rollback(); return res.status(400).json({ status: 'error', message: 'Danh sách sản phẩm trống' }); }
 
+    const supplier = await Supplier.findOne({ where: { id: supplierId, isDeleted: false }, transaction });
+    if (!supplier) { await transaction.rollback(); return res.status(404).json({ status: 'error', message: 'Nhà cung cấp không tồn tại' }); }
+
+    const seenVariants = new Set();
+    for (const item of items) {
+      if (!item?.variantId) { await transaction.rollback(); return res.status(400).json({ status: 'error', message: 'Thiếu mã biến thể' }); }
+      if (seenVariants.has(item.variantId)) {
+        await transaction.rollback();
+        return res.status(400).json({ status: 'error', message: 'Danh sách sản phẩm bị trùng biến thể' });
+      }
+      seenVariants.add(item.variantId);
+
+      const qty = Number(item.quantity);
+      if (!Number.isFinite(qty) || !Number.isInteger(qty) || qty <= 0) {
+        await transaction.rollback();
+        return res.status(400).json({ status: 'error', message: 'Số lượng nhập phải là số nguyên dương' });
+      }
+
+      if (item.importPrice !== undefined && item.importPrice !== null) {
+        const price = Number(item.importPrice);
+        if (!Number.isFinite(price) || price < 0) {
+          await transaction.rollback();
+          return res.status(400).json({ status: 'error', message: 'Giá nhập không hợp lệ' });
+        }
+      }
+    }
+
     let totalAmount = 0;
     const details = [];
 
@@ -82,10 +109,13 @@ exports.createImportReceipt = async (req, res) => {
       const variant = await Variant.findOne({ where: { id: item.variantId, isDeleted: false }, transaction });
       if (!variant) { await transaction.rollback(); return res.status(404).json({ status: 'error', message: `Variant ${item.variantId} không tồn tại` }); }
 
-      const price = item.importPrice || Number(variant.importPrice) || 0;
-      const lineTotal = price * item.quantity;
+      const quantity = Number(item.quantity);
+      const price = item.importPrice !== undefined && item.importPrice !== null
+        ? Number(item.importPrice)
+        : Number(variant.importPrice) || 0;
+      const lineTotal = price * quantity;
       totalAmount += lineTotal;
-      details.push({ variantId: item.variantId, supplierId, quantity: item.quantity, importPrice: price, lineTotal, batchNumber: item.batchNumber || null });
+      details.push({ variantId: item.variantId, supplierId, quantity, importPrice: price, lineTotal, batchNumber: item.batchNumber || null });
     }
 
     const receipt = await ImportReceipt.create({ supplierId, importDate: new Date(), totalAmount, note: note || null }, { transaction });
@@ -93,7 +123,9 @@ exports.createImportReceipt = async (req, res) => {
     for (const d of details) {
       await ImportDetail.create({ importReceiptId: receipt.id, ...d }, { transaction });
       await Variant.update({ stockQuantity: sequelize.literal(`stockQuantity + ${d.quantity}`) }, { where: { id: d.variantId }, transaction });
-      if (d.importPrice) await Variant.update({ importPrice: d.importPrice }, { where: { id: d.variantId }, transaction });
+      if (d.importPrice !== null && d.importPrice !== undefined) {
+        await Variant.update({ importPrice: d.importPrice }, { where: { id: d.variantId }, transaction });
+      }
     }
 
     await transaction.commit();

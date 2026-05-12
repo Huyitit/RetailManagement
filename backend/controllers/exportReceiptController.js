@@ -72,7 +72,26 @@ exports.createExportReceipt = async (req, res) => {
   try {
     const { supplierId, reason, items } = req.body;
     if (!supplierId) { await transaction.rollback(); return res.status(400).json({ status: 'error', message: 'Nhà cung cấp là bắt buộc' }); }
-    if (!items || items.length === 0) { await transaction.rollback(); return res.status(400).json({ status: 'error', message: 'Danh sách sản phẩm trống' }); }
+    if (!items || !Array.isArray(items) || items.length === 0) { await transaction.rollback(); return res.status(400).json({ status: 'error', message: 'Danh sách sản phẩm trống' }); }
+
+    const supplier = await Supplier.findOne({ where: { id: supplierId, isDeleted: false }, transaction });
+    if (!supplier) { await transaction.rollback(); return res.status(404).json({ status: 'error', message: 'Nhà cung cấp không tồn tại' }); }
+
+    const seenVariants = new Set();
+    for (const item of items) {
+      if (!item?.variantId) { await transaction.rollback(); return res.status(400).json({ status: 'error', message: 'Thiếu mã biến thể' }); }
+      if (seenVariants.has(item.variantId)) {
+        await transaction.rollback();
+        return res.status(400).json({ status: 'error', message: 'Danh sách sản phẩm bị trùng biến thể' });
+      }
+      seenVariants.add(item.variantId);
+
+      const qty = Number(item.quantity);
+      if (!Number.isFinite(qty) || !Number.isInteger(qty) || qty <= 0) {
+        await transaction.rollback();
+        return res.status(400).json({ status: 'error', message: 'Số lượng xuất phải là số nguyên dương' });
+      }
+    }
 
     let totalAmount = 0;
     const details = [];
@@ -81,14 +100,15 @@ exports.createExportReceipt = async (req, res) => {
       const variant = await Variant.findOne({ where: { id: item.variantId, isDeleted: false }, transaction });
       if (!variant) { await transaction.rollback(); return res.status(404).json({ status: 'error', message: `Variant ${item.variantId} không tồn tại` }); }
 
-      if (variant.stockQuantity < item.quantity) {
+      const quantity = Number(item.quantity);
+      if (variant.stockQuantity < quantity) {
         await transaction.rollback();
         return res.status(400).json({ status: 'error', message: `Số lượng xuất vượt quá tồn kho (${variant.skuCode}: kho còn ${variant.stockQuantity})` });
       }
 
       const price = Number(variant.importPrice) || 0;
-      totalAmount += price * item.quantity;
-      details.push({ variantId: item.variantId, quantity: item.quantity, errorNote: item.errorNote || null });
+      totalAmount += price * quantity;
+      details.push({ variantId: item.variantId, quantity, errorNote: item.errorNote || null });
     }
 
     const receipt = await ExportReceipt.create({ supplierId, exportDate: new Date(), reason: reason || 'Trả nhà cung cấp', totalAmount }, { transaction });

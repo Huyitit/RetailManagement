@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { getRevenueReport, getInventoryReport, getDebtReport } from '../services/api';
+import { getRevenueReport, getRevenueByDate, getInventoryReport, getDebtReport, getDebtDetail } from '../services/api';
 import DataTable from '../components/DataTable';
 import StatCard from '../components/StatCard';
+import Modal from '../components/Modal';
 import { BarChart3, TrendingUp, AlertTriangle, Wallet, ArrowDownRight, PackageOpen } from 'lucide-react';
 
 const Reports = () => {
@@ -10,14 +11,25 @@ const Reports = () => {
   
   // States
   const [revenueData, setRevenueData] = useState({ summary: {}, daily: [] });
-  const [inventoryData, setInventoryData] = useState([]);
-  const [debtData, setDebtData] = useState({ totalDebt: 0, details: [] });
+  const [inventoryData, setInventoryData] = useState({ summary: {}, items: [] });
+  const [debtData, setDebtData] = useState([]);
+  const [revenueDetailOpen, setRevenueDetailOpen] = useState(false);
+  const [revenueDetailDate, setRevenueDetailDate] = useState('');
+  const [revenueDetailOrders, setRevenueDetailOrders] = useState([]);
+  const [revenueDetailLoading, setRevenueDetailLoading] = useState(false);
+  const [revenueDetailError, setRevenueDetailError] = useState('');
+  const [debtDetailOpen, setDebtDetailOpen] = useState(false);
+  const [debtDetailSupplier, setDebtDetailSupplier] = useState(null);
+  const [debtDetailReceipts, setDebtDetailReceipts] = useState([]);
+  const [debtDetailLoading, setDebtDetailLoading] = useState(false);
+  const [debtDetailError, setDebtDetailError] = useState('');
   
   // Filters
   const [dateRange, setDateRange] = useState({
     start: new Date(new Date().setDate(1)).toISOString().split('T')[0], // 1st of month
     end: new Date().toISOString().split('T')[0]
   });
+  const [inventoryFilter, setInventoryFilter] = useState('low_stock');
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -26,7 +38,7 @@ const Reports = () => {
         const res = await getRevenueReport({ startDate: dateRange.start, endDate: dateRange.end });
         if (res.data?.status === 'success') setRevenueData(res.data.data);
       } else if (activeTab === 'inventory') {
-        const res = await getInventoryReport({ type: 'low_stock', threshold: 10 });
+        const res = await getInventoryReport({ filter: inventoryFilter });
         if (res.data?.status === 'success') setInventoryData(res.data.data);
       } else if (activeTab === 'debt') {
         const res = await getDebtReport();
@@ -41,7 +53,55 @@ const Reports = () => {
 
   useEffect(() => {
     fetchData();
-  }, [activeTab, dateRange]);
+  }, [activeTab, dateRange, inventoryFilter]);
+
+  const openRevenueDetail = async (row) => {
+    const date = row?.date;
+    if (!date) return;
+    setRevenueDetailDate(date);
+    setRevenueDetailOpen(true);
+    setRevenueDetailLoading(true);
+    setRevenueDetailError('');
+    try {
+      const res = await getRevenueByDate(date);
+      if (res.data?.status === 'success') {
+        setRevenueDetailOrders(res.data.data || []);
+      } else {
+        setRevenueDetailOrders([]);
+        setRevenueDetailError('Khong the tai chi tiet doanh thu.');
+      }
+    } catch (err) {
+      console.error('Failed to fetch revenue detail:', err);
+      setRevenueDetailOrders([]);
+      setRevenueDetailError('Khong the tai chi tiet doanh thu.');
+    } finally {
+      setRevenueDetailLoading(false);
+    }
+  };
+
+  const openDebtDetail = async (row) => {
+    const supplierId = row?.supplierId;
+    if (!supplierId) return;
+    setDebtDetailSupplier(row);
+    setDebtDetailOpen(true);
+    setDebtDetailLoading(true);
+    setDebtDetailError('');
+    try {
+      const res = await getDebtDetail(supplierId);
+      if (res.data?.status === 'success') {
+        setDebtDetailReceipts(res.data.data?.receipts || []);
+      } else {
+        setDebtDetailReceipts([]);
+        setDebtDetailError('Khong the tai chi tiet cong no.');
+      }
+    } catch (err) {
+      console.error('Failed to fetch debt detail:', err);
+      setDebtDetailReceipts([]);
+      setDebtDetailError('Khong the tai chi tiet cong no.');
+    } finally {
+      setDebtDetailLoading(false);
+    }
+  };
 
   const formatMoney = (val) => new Intl.NumberFormat('vi-VN').format(Math.round(val || 0)) + ' đ';
 
@@ -49,27 +109,46 @@ const Reports = () => {
   const revenueColumns = [
     { header: 'Ngày', accessor: 'date', render: (row) => <div className="font-bold">{new Date(row.date).toLocaleDateString('vi-VN')}</div> },
     { header: 'Số lượng đơn', accessor: 'orderCount', align: 'center', render: (row) => <span className="px-2 py-1 bg-slate-100 rounded-lg text-slate-700 font-bold">{row.orderCount}</span> },
-    { header: 'Doanh thu thuần', accessor: 'revenue', align: 'right', render: (row) => <span className="font-bold text-indigo-700">{formatMoney(row.revenue)}</span> }
+    { header: 'Doanh thu', accessor: 'revenue', align: 'right', render: (row) => <span className="font-bold text-indigo-700">{formatMoney(row.revenue)}</span> },
+    { header: 'Hoan tien', accessor: 'refund', align: 'right', render: (row) => <span className="text-rose-600">{formatMoney(row.refund)}</span> }
   ];
 
   // --- Inventory Renderers ---
   const inventoryColumns = [
-    { header: 'Mã SKU', accessor: 'sku', render: (row) => <span className="font-bold text-slate-800">{row.sku}</span> },
-    { header: 'Sản phẩm', accessor: 'name', render: (row) => <span className="text-sm">{row.Product?.name || 'N/A'}</span> },
+    { header: 'Mã SKU', accessor: 'skuCode', render: (row) => <span className="font-bold text-slate-800">{row.skuCode}</span> },
+    { header: 'Sản phẩm', accessor: 'productName', render: (row) => <span className="text-sm">{row.productName || 'N/A'}</span> },
     { header: 'Tồn kho hiện tại', accessor: 'stockQuantity', align: 'center', render: (row) => (
-      <span className={`px-2 py-1 rounded-md text-xs font-bold ${row.stockQuantity <= 5 ? 'bg-rose-100 text-rose-700' : 'bg-amber-100 text-amber-700'}`}>
+      <span className={`px-2 py-1 rounded-md text-xs font-bold ${row.stockQuantity <= row.minStock ? 'bg-rose-100 text-rose-700' : 'bg-amber-100 text-amber-700'}`}>
         {row.stockQuantity}
       </span>
     )},
-    { header: 'Giá bán', accessor: 'price', align: 'right', render: (row) => <span>{formatMoney(row.price)}</span> }
+    { header: 'Gia ban', accessor: 'sellPrice', align: 'right', render: (row) => <span>{formatMoney(row.sellPrice)}</span> }
   ];
 
   // --- Debt Renderers ---
   const debtColumns = [
-    { header: 'Nhà cung cấp', accessor: 'supplierName', render: (row) => <span className="font-bold text-slate-800">{row.supplierName}</span> },
-    { header: 'Tổng nhập', accessor: 'totalImportValue', align: 'right', render: (row) => <span>{formatMoney(row.totalImportValue)}</span> },
-    { header: 'Đã thanh toán', accessor: 'totalPaid', align: 'right', render: (row) => <span className="text-emerald-600">{formatMoney(row.totalPaid)}</span> },
-    { header: 'Còn nợ', accessor: 'remainingDebt', align: 'right', render: (row) => <span className="font-bold text-rose-600">{formatMoney(row.remainingDebt)}</span> }
+    { header: 'Nha cung cap', accessor: 'companyName', render: (row) => <span className="font-bold text-slate-800">{row.companyName}</span> },
+    { header: 'Tong nhap', accessor: 'totalImported', align: 'right', render: (row) => <span>{formatMoney(row.totalImported)}</span> },
+    { header: 'Da thanh toan', accessor: 'totalPaid', align: 'right', render: (row) => <span className="text-emerald-600">{formatMoney(row.totalPaid)}</span> },
+    { header: 'Con no', accessor: 'totalDebt', align: 'right', render: (row) => <span className="font-bold text-rose-600">{formatMoney(row.totalDebt)}</span> }
+  ];
+
+  const revenueDetailColumns = [
+    { header: 'Ma don', accessor: 'orderId', render: (row) => <span className="font-bold text-slate-800">{row.orderId}</span> },
+    { header: 'Khach hang', accessor: 'customerName', render: (row) => <span>{row.customerName || 'Khach le'}</span> },
+    { header: 'Thoi gian', accessor: 'createdAt', render: (row) => <span>{new Date(row.createdAt).toLocaleString('vi-VN')}</span> },
+    { header: 'Thanh toan', accessor: 'paymentMethod', render: (row) => <span>{row.paymentMethod || 'N/A'}</span> },
+    { header: 'So sp', accessor: 'itemCount', align: 'center', render: (row) => <span className="px-2 py-1 bg-slate-100 rounded-lg text-slate-700 font-bold">{row.itemCount}</span> },
+    { header: 'Tong tien', accessor: 'finalTotal', align: 'right', render: (row) => <span className="font-bold text-indigo-700">{formatMoney(row.finalTotal)}</span> },
+    { header: 'Hoan tien', accessor: 'refundAmount', align: 'right', render: (row) => <span className="text-rose-600">{formatMoney(row.refundAmount)}</span> }
+  ];
+
+  const debtDetailColumns = [
+    { header: 'Ma phieu', accessor: 'receiptId', render: (row) => <span className="font-bold text-slate-800">{row.receiptId}</span> },
+    { header: 'Ngay nhap', accessor: 'importDate', render: (row) => <span>{new Date(row.importDate).toLocaleDateString('vi-VN')}</span> },
+    { header: 'So dong', accessor: 'items', align: 'center', render: (row) => <span className="px-2 py-1 bg-slate-100 rounded-lg text-slate-700 font-bold">{row.items?.length || 0}</span> },
+    { header: 'Tong tien', accessor: 'totalAmount', align: 'right', render: (row) => <span className="font-bold text-indigo-700">{formatMoney(row.totalAmount)}</span> },
+    { header: 'Ghi chu', accessor: 'note', render: (row) => <span>{row.note || 'N/A'}</span> }
   ];
 
   return (
@@ -112,27 +191,44 @@ const Reports = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <StatCard title="Tổng Doanh Thu" value={formatMoney(revenueData.summary?.totalRevenue)} icon={<TrendingUp size={24}/>} />
-              <StatCard title="Số đơn hoàn thành" value={revenueData.summary?.totalOrders || 0} icon={<PackageOpen size={24}/>} />
-              <StatCard title="Lợi nhuận gộp (Ước tính)" value={formatMoney((revenueData.summary?.totalRevenue || 0) * 0.3)} subtitle="~30% biên lợi nhuận" icon={<BarChart3 size={24}/>} />
+              <StatCard title="Tong doanh thu" value={formatMoney(revenueData.summary?.totalRevenue)} icon={<TrendingUp size={24}/>} />
+              <StatCard title="So don hoan thanh" value={revenueData.summary?.totalOrders || 0} icon={<PackageOpen size={24}/>} />
+              <StatCard title="Doanh thu thuan" value={formatMoney(revenueData.summary?.netRevenue)} icon={<BarChart3 size={24}/>} />
+              <StatCard title="Thue" value={formatMoney(revenueData.summary?.totalTax)} icon={<BarChart3 size={24}/>} />
+              <StatCard title="Chiet khau" value={formatMoney(revenueData.summary?.totalDiscount)} icon={<ArrowDownRight size={24}/>} />
+              <StatCard title="Hoan tien" value={formatMoney(revenueData.summary?.totalRefund)} icon={<ArrowDownRight size={24}/>} />
             </div>
 
             <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
               <h3 className="font-bold text-slate-800 mb-4">Chi tiết theo ngày</h3>
-              <DataTable columns={revenueColumns} data={revenueData.daily} isLoading={isLoading} />
+              <DataTable columns={revenueColumns} data={revenueData.daily} isLoading={isLoading} onRowDoubleClick={openRevenueDetail} />
             </div>
           </div>
         )}
 
         {activeTab === 'inventory' && (
           <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="flex items-center justify-between bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+              <h3 className="font-bold text-slate-800 flex items-center gap-2"><AlertTriangle size={18} className="text-amber-500"/> Bo loc ton kho</h3>
+              <select
+                value={inventoryFilter}
+                onChange={(e) => setInventoryFilter(e.target.value)}
+                className="border border-slate-200 rounded-lg px-3 py-1.5 text-sm font-semibold text-slate-700 focus:ring-2 focus:ring-amber-500"
+              >
+                <option value="all">Tat ca</option>
+                <option value="low_stock">Sap het hang</option>
+                <option value="long_standing">Ton kho lau ngay</option>
+              </select>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-               <StatCard title="Sản phẩm sắp hết hàng" value={inventoryData.length} subtitle="Tồn kho dưới 10 sản phẩm" icon={<AlertTriangle size={24}/>} />
+              <StatCard title="San pham sap het hang" value={inventoryData.summary?.lowStockCount || 0} subtitle="Ton kho duoi muc toi thieu" icon={<AlertTriangle size={24}/>} />
+              <StatCard title="Het hang" value={inventoryData.summary?.outOfStockCount || 0} subtitle="San pham da het hang" icon={<PackageOpen size={24}/>} />
             </div>
             
             <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
               <h3 className="font-bold text-slate-800 mb-4">Danh sách hàng cần nhập thêm</h3>
-              <DataTable columns={inventoryColumns} data={inventoryData} isLoading={isLoading} emptyMessage="Kho đang ở trạng thái an toàn, không có sản phẩm sắp hết." />
+              <DataTable columns={inventoryColumns} data={inventoryData.items} isLoading={isLoading} emptyMessage="Kho dang o trang thai an toan, khong co san pham sap het." />
             </div>
           </div>
         )}
@@ -140,17 +236,55 @@ const Reports = () => {
         {activeTab === 'debt' && (
           <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-               <StatCard title="Tổng công nợ cần trả" value={formatMoney(debtData.totalDebt)} subtitle="Tiền hàng chưa thanh toán cho NCC" icon={<ArrowDownRight size={24}/>} />
+              <StatCard title="Tong cong no can tra" value={formatMoney(debtData.reduce((sum, d) => sum + Number(d.totalDebt || 0), 0))} subtitle="Tien hang chua thanh toan cho NCC" icon={<ArrowDownRight size={24}/>} />
             </div>
 
             <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
               <h3 className="font-bold text-slate-800 mb-4">Chi tiết công nợ theo nhà cung cấp</h3>
-              <DataTable columns={debtColumns} data={debtData.details} isLoading={isLoading} emptyMessage="Không có khoản nợ nào được ghi nhận." />
+              <DataTable columns={debtColumns} data={debtData} isLoading={isLoading} emptyMessage="Khong co khoan no nao duoc ghi nhan." onRowClick={openDebtDetail} />
             </div>
           </div>
         )}
 
       </div>
+
+      <Modal
+        isOpen={revenueDetailOpen}
+        onClose={() => setRevenueDetailOpen(false)}
+        title={`Chi tiet doanh thu ngay ${revenueDetailDate ? new Date(revenueDetailDate).toLocaleDateString('vi-VN') : ''}`}
+        size="xl"
+      >
+        {revenueDetailError && (
+          <div className="mb-4 px-4 py-2 rounded-lg bg-rose-50 text-rose-700 text-sm font-semibold">
+            {revenueDetailError}
+          </div>
+        )}
+        <DataTable
+          columns={revenueDetailColumns}
+          data={revenueDetailOrders}
+          isLoading={revenueDetailLoading}
+          emptyMessage="Khong co don hang nao trong ngay nay."
+        />
+      </Modal>
+
+      <Modal
+        isOpen={debtDetailOpen}
+        onClose={() => setDebtDetailOpen(false)}
+        title={`Chi tiet cong no - ${debtDetailSupplier?.companyName || ''}`}
+        size="xl"
+      >
+        {debtDetailError && (
+          <div className="mb-4 px-4 py-2 rounded-lg bg-rose-50 text-rose-700 text-sm font-semibold">
+            {debtDetailError}
+          </div>
+        )}
+        <DataTable
+          columns={debtDetailColumns}
+          data={debtDetailReceipts}
+          isLoading={debtDetailLoading}
+          emptyMessage="Khong co phieu nhap nao cho nha cung cap nay."
+        />
+      </Modal>
     </div>
   );
 };
