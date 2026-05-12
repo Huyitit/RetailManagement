@@ -50,9 +50,9 @@ sequelize.authenticate()
   .then(async () => {
     console.log('✅ Connected to MySQL');
   })
-  .then(() => {
-    return sequelize.sync({ alter: false });
-  })
+  // .then(() => {
+  //   return sequelize.sync({ alter: false });
+  // })
   .then(() => {
     app.listen(PORT, () => {
       console.log(`🚀 Server on ${PORT}`);

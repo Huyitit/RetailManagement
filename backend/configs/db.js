@@ -1,7 +1,7 @@
 const { Sequelize } = require('sequelize');
 
-const sequelize = new Sequelize('StoreManagement', 'root', '1812', {
-  host: '127.0.0.1',
+const sequelize = new Sequelize('storemanagement', 'root', '1812', {
+  host: 'localhost',
   dialect: 'mysql',
   port: 3306,
   logging: false,
