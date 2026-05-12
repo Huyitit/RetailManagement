@@ -29,7 +29,7 @@ const ImportReceipt = sequelize.define('ImportReceipt', {
     defaultValue: false
   }
 }, {
-  tableName: 'importReceipt',
+  tableName: 'importreceipt',
   timestamps: true
 });
 

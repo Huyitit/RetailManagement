@@ -15,7 +15,7 @@ const VariantAttribute = sequelize.define('VariantAttribute', {
     allowNull: false
   }
 }, {
-  tableName: 'variantAttribute',
+  tableName: 'variantattribute',
   timestamps: false
 });
 

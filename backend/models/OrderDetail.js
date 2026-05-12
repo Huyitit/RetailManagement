@@ -42,7 +42,7 @@ const OrderDetail = sequelize.define('OrderDetail', {
     defaultValue: 0
   }
 }, {
-  tableName: 'orderDetail',
+  tableName: 'orderdetail',
   timestamps: false
 });
 

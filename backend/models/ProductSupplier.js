@@ -11,7 +11,7 @@ const ProductSupplier = sequelize.define('ProductSupplier', {
     primaryKey: true
   }
 }, {
-  tableName: 'productSupplier',
+  tableName: 'productsupplier',
   timestamps: false
 });
 

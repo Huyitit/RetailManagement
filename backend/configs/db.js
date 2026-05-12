@@ -6,7 +6,7 @@ const sequelize = new Sequelize('storemanagement', 'root', '1812', {
   port: 3306,
   logging: false,
   define: {
-    timestamps: true 
+    timestamps: true
   }
 });
 

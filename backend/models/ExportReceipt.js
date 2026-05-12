@@ -29,7 +29,7 @@ const ExportReceipt = sequelize.define('ExportReceipt', {
     defaultValue: false
   }
 }, {
-  tableName: 'exportReceipt',
+  tableName: 'exportreceipt',
   timestamps: true
 });
 

@@ -41,7 +41,7 @@ const ImportDetail = sequelize.define('ImportDetail', {
     allowNull: true
   }
 }, {
-  tableName: 'importDetail',
+  tableName: 'importdetail',
   timestamps: false
 });
 

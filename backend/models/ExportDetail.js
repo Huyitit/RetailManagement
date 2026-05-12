@@ -25,7 +25,7 @@ const ExportDetail = sequelize.define('ExportDetail', {
     allowNull: true
   }
 }, {
-  tableName: 'exportDetail',
+  tableName: 'exportdetail',
   timestamps: false
 });
 
