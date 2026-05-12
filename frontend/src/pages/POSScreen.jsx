@@ -252,7 +252,8 @@ const POSScreen = () => {
     setCustomerSearch(q);
     if (q.length < 1) { setCustomerResults([]); setShowCustomerDropdown(false); return; }
     const res = await searchCustomers(q);
-    setCustomerResults(res || []);
+    const list = res?.data || (Array.isArray(res) ? res : []);
+    setCustomerResults(list);
     setShowCustomerDropdown(true);
   };
 
@@ -858,10 +859,47 @@ const POSScreen = () => {
               </div>
             )}
             {paymentSubView === 'qr' && (
-              <div style={{ textAlign: 'center', background: '#f8fafc', padding: '20px', borderRadius: '24px', flexShrink: 0 }}>
-                <img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=Payment+HD${activeOrder?.receiptId}`} alt="qr" style={{ width: '200px', height: '200px', marginBottom: '16px' }} />
-                <div style={{ fontSize: '15px', fontWeight: '800', color: '#64748b' }}>
-                  Quý khách vui lòng quét mã QR<br/>để hoàn tất thanh toán
+              <div style={{
+                textAlign: 'center',
+                background: 'white',
+                padding: '12px',
+                borderRadius: '28px',
+                border: '1.5px solid #ef4444',
+                flexShrink: 0,
+                boxShadow: '0 12px 40px rgba(239, 68, 68, 0.12)',
+                margin: '10px auto',
+                width: '240px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '4px'
+              }}>
+                {}
+                <div style={{
+                  width: '100%',
+                  height: '215px',
+                  overflow: 'hidden',
+                  borderRadius: '16px 16px 0 0'
+                }}>
+                  <img
+                    src={`https://img.vietqr.io/image/MB-088886666-print.png?amount=${totalAmount}&addInfo=${encodeURIComponent(`Thanh toan HD${activeOrder?.receiptId}`)}&accountName=${encodeURIComponent('Chủ POS')}`}
+                    alt="qr-top"
+                    style={{ width: '100%', display: 'block' }}
+                  />
+                </div>
+                
+                {}
+                <div style={{
+                  width: '100%',
+                  height: '40px',
+                  overflow: 'hidden',
+                  borderRadius: '0 0 16px 16px',
+                  position: 'relative'
+                }}>
+                  <img
+                    src={`https://img.vietqr.io/image/MB-088886666-print.png?amount=${totalAmount}&addInfo=${encodeURIComponent(`Thanh toan HD${activeOrder?.receiptId}`)}&accountName=${encodeURIComponent('Chủ POS')}`}
+                    alt="qr-bottom"
+                    style={{ width: '100%', display: 'block', marginTop: '-295px' }}
+                  />
                 </div>
               </div>
             )}
