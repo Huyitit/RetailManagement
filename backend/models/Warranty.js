@@ -1,9 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../configs/db');
-const SaleOrder = require('./SaleOrder');
-const Staff = require('./Staff');
 
-const WarrantyLog = sequelize.define('WarrantyLog', {
+const Warranty = sequelize.define('Warranty', {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -55,5 +53,4 @@ const WarrantyLog = sequelize.define('WarrantyLog', {
   timestamps: true
 });
 
-module.exports = WarrantyLog;
-
+module.exports = Warranty;

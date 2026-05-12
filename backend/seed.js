@@ -1,7 +1,7 @@
 const {
   sequelize, Store, Staff, Customer, Supplier, Category,
-  Product, Variant, SaleOrder, SaleDetail, Promotion, Promotion_Variant,
-  Attribute, Variant_Attribute_Value
+  Product, Variant, Order, OrderDetail, Promotion, PromotionVariant,
+  Attribute, VariantAttribute
 } = require('./models');
 
 const bcrypt = require('bcryptjs');
@@ -68,7 +68,7 @@ async function seed() {
         Object.keys(attributes).forEach(key => {
           if (v[key]) values.push({ variantId: variant.id, attributeId: attributes[key].id, value: v[key] });
         });
-        if (values.length > 0) await Variant_Attribute_Value.bulkCreate(values);
+        if (values.length > 0) await VariantAttribute.bulkCreate(values);
       }
     };
 
@@ -89,7 +89,7 @@ async function seed() {
     const promoVariants = [
       { promotionId: promo.id, variantId: createdVariants[0].id }
     ];
-    await Promotion_Variant.bulkCreate(promoVariants);
+    await PromotionVariant.bulkCreate(promoVariants);
 
     console.log('🛒 ĐANG TẠO ĐƠN HÀNG MẪU...');
     for (let i = 0; i < 3; i++) {
@@ -98,7 +98,7 @@ async function seed() {
       const subtotal = Number(v.sellPrice) * qty;
       const total = subtotal * 1.1; // with tax
 
-      const order = await SaleOrder.create({
+      const order = await Order.create({
         staffId: 1,
         customerId: 1,
         subTotal: subtotal,
@@ -109,7 +109,7 @@ async function seed() {
         refundAmount: 0
       });
 
-      await SaleDetail.create({
+      await OrderDetail.create({
         orderId: order.id,
         variantId: v.id,
         quantity: qty,

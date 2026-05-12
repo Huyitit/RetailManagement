@@ -25,30 +25,30 @@ const OrderDetailModal = ({ receiptId, onClose }) => {
   const getWarrantyStatus = (orderDateStr, warrantyMonths) => {
     if (!orderDateStr) return { expired: false, text: `Còn bảo hành (${warrantyMonths || 12} tháng)` };
 
-    const orderDate = new Date(orderDateStr.replace('Z', ''));
+    const orderDate = new Date(orderDateStr);
     const months = parseInt(warrantyMonths) || 12;
 
     const expirationDate = new Date(orderDate);
     expirationDate.setMonth(expirationDate.getMonth() + months);
 
     const now = new Date();
+    
     if (now > expirationDate) return { expired: true, text: 'Hết hạn bảo hành' };
 
-    const diffMonths = (expirationDate.getFullYear() - now.getFullYear()) * 12 + (expirationDate.getMonth() - now.getMonth());
+    const diffTime = expirationDate - now;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-    if (diffMonths > 0) {
-      return { expired: false, text: `Còn bảo hành (${diffMonths} tháng)` };
+    if (diffDays > 30) {
+      const remainingMonths = Math.floor(diffDays / 30);
+      return { expired: false, text: `Còn bảo hành (~${remainingMonths} tháng)` };
     } else {
-
-      const diffTime = expirationDate - now;
-      const diffDays = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
       return { expired: false, text: `Còn bảo hành (${diffDays} ngày)` };
     }
   };
 
   const formatLocalDate = (dateStr) => {
     if (!dateStr) return '';
-    const dateObj = new Date(dateStr.replace('Z', ''));
+    const dateObj = new Date(dateStr);
     return dateObj.toLocaleString('vi-VN');
   };
 
@@ -74,7 +74,8 @@ const OrderDetailModal = ({ receiptId, onClose }) => {
         const items = {};
         if (data.items) {
           data.items.forEach(item => {
-            items[item.variantId] = item.quantity;
+            const status = getWarrantyStatus(data.orderAt, item.warrantyPeriod);
+            items[item.variantId] = status.expired ? 0 : 0; // Default all to 0 for warranty mode
           });
         }
         setReturnItems(items);

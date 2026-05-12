@@ -1,9 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../configs/db');
-const Variant = require('./Variant');
-const Attribute = require('./Attribute');
 
-const Variant_Attribute_Value = sequelize.define('Variant_Attribute_Value', {
+const VariantAttribute = sequelize.define('VariantAttribute', {
   variantId: {
     type: DataTypes.INTEGER,
     primaryKey: true
@@ -21,5 +19,4 @@ const Variant_Attribute_Value = sequelize.define('Variant_Attribute_Value', {
   timestamps: false
 });
 
-module.exports = Variant_Attribute_Value;
-
+module.exports = VariantAttribute;

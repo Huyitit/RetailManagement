@@ -1,8 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../configs/db');
-const Customer = require('./Customer');
 
-const SaleOrder = sequelize.define('SaleOrder', {
+const Order = sequelize.define('Order', {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -40,13 +39,13 @@ const SaleOrder = sequelize.define('SaleOrder', {
     type: DataTypes.DECIMAL(19, 3),
     defaultValue: 0
   },
-  status: {
-    type: DataTypes.ENUM('Draft', 'Completed', 'Cancelled', 'Warranty'),
-    defaultValue: 'Draft'
-  },
   paymentReference: {
     type: DataTypes.STRING(100),
     allowNull: true
+  },
+  status: {
+    type: DataTypes.ENUM('Draft', 'Completed', 'Cancelled', 'Warranty'),
+    defaultValue: 'Draft'
   },
   isDeleted: {
     type: DataTypes.BOOLEAN,
@@ -58,4 +57,4 @@ const SaleOrder = sequelize.define('SaleOrder', {
   timestamps: true
 });
 
-module.exports = SaleOrder;
+module.exports = Order;

@@ -1,4 +1,4 @@
-const { Product, Variant, Category, Variant_Attribute_Value, Attribute, Promotion } = require('../models');
+const { Product, Variant, Category, VariantAttribute, Attribute, Promotion } = require('../models');
 
 exports.getProducts = async (req, res) => {
   try {
@@ -15,7 +15,7 @@ exports.getProducts = async (req, res) => {
           where: { isDeleted: false },
           include: [
             {
-              model: Variant_Attribute_Value,
+              model: VariantAttribute,
               as: 'attributeValues',
               include: [{ model: Attribute, as: 'attribute' }]
             },
@@ -84,7 +84,7 @@ exports.getProduct = async (req, res) => {
         { model: Category }, 
         { 
           model: Variant, 
-          include: [{ model: Variant_Attribute_Value, as: 'attributeValues', include: [{ model: Attribute, as: 'attribute' }] }] 
+          include: [{ model: VariantAttribute, as: 'attributeValues', include: [{ model: Attribute, as: 'attribute' }] }] 
         }
       ]
     });
@@ -99,7 +99,7 @@ exports.getProductVariants = async (req, res) => {
   try {
     const variants = await Variant.findAll({
       where: { productId: req.params.id, isDeleted: false },
-      include: [{ model: Variant_Attribute_Value, as: 'attributeValues', include: [{ model: Attribute, as: 'attribute' }] }]
+      include: [{ model: VariantAttribute, as: 'attributeValues', include: [{ model: Attribute, as: 'attribute' }] }]
     });
     res.json(variants);
   } catch (error) {
@@ -110,7 +110,7 @@ exports.getProductVariants = async (req, res) => {
 exports.getVariant = async (req, res) => {
   try {
     const variant = await Variant.findByPk(req.params.id, {
-      include: [{ model: Product }, { model: Variant_Attribute_Value, as: 'attributeValues', include: [{ model: Attribute, as: 'attribute' }] }]
+      include: [{ model: Product }, { model: VariantAttribute, as: 'attributeValues', include: [{ model: Attribute, as: 'attribute' }] }]
     });
     if (!variant) return res.status(404).json({ message: 'Không tìm thấy biến thể' });
     res.json(variant);
