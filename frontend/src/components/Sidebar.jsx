@@ -1,11 +1,17 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, ShoppingCart, ReceiptText, ShieldCheck, LogOut } from 'lucide-react';
+import { LayoutDashboard, ShoppingCart, ReceiptText, ShieldCheck, LogOut, Users, Building2, UserCog, Package, PackageOpen, BarChart3 } from 'lucide-react';
 
 const Sidebar = () => {
   const menuItems = [
     { icon: <LayoutDashboard size={20} />, label: 'Tổng quan', path: '/dashboard' },
+    { icon: <BarChart3 size={20} />, label: 'Báo cáo', path: '/reports' },
     { icon: <ReceiptText size={20} />, label: 'Đơn hàng', path: '/orders' },
+    { icon: <Package size={20} />, label: 'Sản phẩm', path: '/products' },
+    { icon: <PackageOpen size={20} />, label: 'Kho hàng', path: '/inventory' },
+    { icon: <Users size={20} />, label: 'Khách hàng', path: '/customers' },
+    { icon: <Building2 size={20} />, label: 'Nhà cung cấp', path: '/suppliers' },
+    { icon: <UserCog size={20} />, label: 'Nhân sự', path: '/staff' },
   ];
 
   return (

@@ -7,6 +7,12 @@ import Sidebar from './components/Sidebar';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Suppliers from './pages/Suppliers';
+import Customers from './pages/Customers';
+import Staff from './pages/Staff';
+import Products from './pages/Products';
+import Inventory from './pages/Inventory';
+import Reports from './pages/Reports';
 
 const LayoutWrapper = ({ children }) => {
   const location = useLocation();
@@ -39,6 +45,12 @@ function App() {
           <Route path="/pos" element={<POSScreen />} />
           <Route path="/orders" element={<Orders />} />
           <Route path="/warranty" element={<Warranty />} />
+          <Route path="/products" element={<Products />} />
+          <Route path="/inventory" element={<Inventory />} />
+          <Route path="/suppliers" element={<Suppliers />} />
+          <Route path="/customers" element={<Customers />} />
+          <Route path="/staff" element={<Staff />} />
+          <Route path="/reports" element={<Reports />} />
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </LayoutWrapper>
