@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  getImportReceipts, createImportReceipt, 
-  getExportReceipts, createExportReceipt,
+  getImportReceipts, createImportReceipt, getImportReceiptById,
+  getExportReceipts, createExportReceipt, getExportReceiptById,
   searchSuppliers, searchVariants 
 } from '../services/api';
 import DataTable from '../components/DataTable';
 import Modal from '../components/Modal';
+import ReceiptDetailModal from '../components/ReceiptDetailModal';
 import SearchAutocomplete from '../components/SearchAutocomplete';
 import StatusBadge from '../components/StatusBadge';
 import { PackageOpen, PackageMinus, Plus, Search, Building2, Layers, Trash2, ArrowRightLeft } from 'lucide-react';
@@ -20,11 +21,16 @@ const Inventory = () => {
   // Modal States
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState('');
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [detailData, setDetailData] = useState(null);
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [detailError, setDetailError] = useState('');
 
   // Form State
   const [selectedSupplier, setSelectedSupplier] = useState(null);
   const [details, setDetails] = useState([]); // { variantId, sku, name, qty, price, currentStock }
   const [notes, setNotes] = useState('');
+  const [exportReason, setExportReason] = useState('return_supplier');
 
   const fetchReceipts = async (page = 1) => {
     setIsLoading(true);
@@ -63,33 +69,57 @@ const Inventory = () => {
     setSelectedSupplier(null);
     setDetails([]);
     setNotes('');
+    setExportReason('return_supplier');
     setIsModalOpen(true);
+  };
+
+  const handleOpenDetail = async (row) => {
+    setDetailError('');
+    setDetailLoading(true);
+    setDetailData(null);
+    setIsDetailOpen(true);
+    try {
+      if (activeTab === 'import') {
+        const res = await getImportReceiptById(row.receiptId);
+        setDetailData(res.data?.data || null);
+      } else {
+        const res = await getExportReceiptById(row.receiptId);
+        setDetailData(res.data?.data || null);
+      }
+    } catch (err) {
+      setDetailError(err.response?.data?.message || 'Không thể tải chi tiết phiếu.');
+    } finally {
+      setDetailLoading(false);
+    }
   };
 
   // Autocomplete Search Handlers
   const fetchSuppliersForSearch = async (q) => {
     try {
       const res = await searchSuppliers(q);
-      return res.data?.data || [];
+      return Array.isArray(res.data) ? res.data : res.data?.data || [];
     } catch (e) { return []; }
   };
 
   const fetchVariantsForSearch = async (q) => {
     try {
       const res = await searchVariants(q);
-      return res.data?.data || [];
+      return Array.isArray(res.data) ? res.data : res.data?.data || [];
     } catch (e) { return []; }
   };
 
   const handleAddVariant = (variant) => {
     if (details.find(d => d.variantId === variant.variantId)) return; // Already added
+    const defaultPrice = activeTab === 'import'
+      ? Number(variant.importPrice || 0)
+      : Number(variant.sellPrice || 0);
     setDetails([...details, {
       variantId: variant.variantId,
-      sku: variant.sku,
-      name: variant.Product?.name || 'Unknown',
-      currentStock: variant.stockQuantity,
+      sku: variant.skuCode || 'N/A',
+      name: variant.productName || 'Unknown',
+      currentStock: Number(variant.stockQuantity || 0),
       qty: 1,
-      price: variant.price // default to selling price, user can override for import/export
+      price: defaultPrice
     }]);
   };
 
@@ -107,6 +137,11 @@ const Inventory = () => {
 
   const handleSave = async () => {
     if (activeTab === 'import' && !selectedSupplier) {
+      setError('Vui lòng chọn Nhà cung cấp.');
+      return;
+    }
+
+    if (activeTab === 'export' && exportReason === 'return_supplier' && !selectedSupplier) {
       setError('Vui lòng chọn Nhà cung cấp.');
       return;
     }
@@ -128,20 +163,32 @@ const Inventory = () => {
       const staffInfo = JSON.parse(localStorage.getItem('staffInfo') || '{}');
       const staffId = staffInfo.staffId || 1; // Fallback for dev
 
-      const payload = {
-        staffId,
-        notes,
-        details: details.map(d => ({
-          variantId: d.variantId,
-          quantity: Number(d.qty),
-          price: Number(d.price)
-        }))
-      };
-
       if (activeTab === 'import') {
-        payload.supplierId = selectedSupplier.supplierId;
+        const payload = {
+          supplierId: selectedSupplier.supplierId,
+          note: notes,
+          items: details.map(d => ({
+            variantId: d.variantId,
+            quantity: Number(d.qty),
+            importPrice: Number(d.price)
+          }))
+        };
         await createImportReceipt(payload);
       } else {
+        const reasonLabel = exportReason === 'return_supplier'
+          ? 'Trả nhà cung cấp'
+          : exportReason === 'warranty'
+            ? 'Xuất bảo hành'
+            : 'Xuất hủy';
+        const payload = {
+          supplierId: exportReason === 'return_supplier' ? selectedSupplier?.supplierId : undefined,
+          reason: notes ? `${reasonLabel}: ${notes}` : reasonLabel,
+          items: details.map(d => ({
+            variantId: d.variantId,
+            quantity: Number(d.qty),
+            errorNote: null
+          }))
+        };
         await createExportReceipt(payload);
       }
 
@@ -155,39 +202,36 @@ const Inventory = () => {
   const formatMoney = (val) => new Intl.NumberFormat('vi-VN').format(val) + ' đ';
 
   const columns = activeTab === 'import' ? [
-    { header: 'Mã phiếu', accessor: 'importId', render: (row) => (
+    { header: 'Mã phiếu', accessor: 'receiptId', render: (row) => (
       <div className="font-bold text-slate-800 flex items-center gap-2">
         <div className="p-2 bg-blue-50 text-blue-600 rounded-lg"><PackageOpen size={16}/></div>
-        IMP-{String(row.importId).padStart(5, '0')}
+        IMP-{String(row.receiptId).padStart(5, '0')}
       </div>
     )},
-    { header: 'Nhà cung cấp', accessor: 'supplierId', render: (row) => (
-      <div className="font-medium text-slate-700">{row.Supplier?.companyName || 'N/A'}</div>
+    { header: 'Nhà cung cấp', accessor: 'supplierName', render: (row) => (
+      <div className="font-medium text-slate-700">{row.supplierName || 'N/A'}</div>
     )},
-    { header: 'Nhân viên', accessor: 'staffId', render: (row) => (
-      <div className="text-slate-600">{row.Staff?.fullname || 'N/A'}</div>
-    )},
-    { header: 'Ngày lập', accessor: 'createdAt', render: (row) => (
-      <div className="text-slate-600 text-sm">{new Date(row.createdAt).toLocaleString('vi-VN')}</div>
+    { header: 'Ngày lập', accessor: 'importDate', render: (row) => (
+      <div className="text-slate-600 text-sm">{new Date(row.importDate).toLocaleString('vi-VN')}</div>
     )},
     { header: 'Tổng tiền', accessor: 'totalAmount', align: 'right', render: (row) => (
       <div className="font-bold text-slate-900">{formatMoney(row.totalAmount)}</div>
     )}
   ] : [
-    { header: 'Mã phiếu', accessor: 'exportId', render: (row) => (
+    { header: 'Mã phiếu', accessor: 'receiptId', render: (row) => (
       <div className="font-bold text-slate-800 flex items-center gap-2">
         <div className="p-2 bg-amber-50 text-amber-600 rounded-lg"><PackageMinus size={16}/></div>
-        EXP-{String(row.exportId).padStart(5, '0')}
+        EXP-{String(row.receiptId).padStart(5, '0')}
       </div>
     )},
-    { header: 'Nhân viên', accessor: 'staffId', render: (row) => (
-      <div className="text-slate-600">{row.Staff?.fullname || 'N/A'}</div>
+    { header: 'Nhà cung cấp', accessor: 'supplierName', render: (row) => (
+      <div className="text-slate-600">{row.supplierName || 'N/A'}</div>
     )},
-    { header: 'Ghi chú', accessor: 'notes', render: (row) => (
-      <div className="text-slate-600 text-sm max-w-[200px] truncate">{row.notes || 'Không có ghi chú'}</div>
+    { header: 'Lý do', accessor: 'reason', render: (row) => (
+      <div className="text-slate-600 text-sm max-w-[200px] truncate">{row.reason || 'Không có lý do'}</div>
     )},
-    { header: 'Ngày lập', accessor: 'createdAt', render: (row) => (
-      <div className="text-slate-600 text-sm">{new Date(row.createdAt).toLocaleString('vi-VN')}</div>
+    { header: 'Ngày lập', accessor: 'exportDate', render: (row) => (
+      <div className="text-slate-600 text-sm">{new Date(row.exportDate).toLocaleString('vi-VN')}</div>
     )},
     { header: 'Tổng giá trị xuất', accessor: 'totalAmount', align: 'right', render: (row) => (
       <div className="font-bold text-slate-900">{formatMoney(row.totalAmount)}</div>
@@ -251,6 +295,7 @@ const Inventory = () => {
             columns={columns} 
             data={data} 
             isLoading={isLoading}
+            onRowClick={handleOpenDetail}
             pagination={{ ...pagination, onPageChange: fetchReceipts }}
           />
         </div>
@@ -276,7 +321,22 @@ const Inventory = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Left Col: Info & Search */}
             <div className="space-y-5 md:col-span-1">
-              {activeTab === 'import' && (
+              {activeTab === 'export' && (
+                <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                  <label className="block text-xs font-bold text-slate-600 mb-2 uppercase">Lý do xuất *</label>
+                  <select
+                    className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 bg-white"
+                    value={exportReason}
+                    onChange={(e) => { setExportReason(e.target.value); setSelectedSupplier(null); }}
+                  >
+                    <option value="return_supplier">Trả nhà cung cấp</option>
+                    <option value="warranty">Xuất bảo hành</option>
+                    <option value="damage">Xuất hủy</option>
+                  </select>
+                </div>
+              )}
+
+              {(activeTab === 'import' || exportReason === 'return_supplier') && (
                 <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
                   <label className="block text-xs font-bold text-slate-600 mb-2 uppercase flex items-center gap-1"><Building2 size={14}/> Nhà cung cấp *</label>
                   {selectedSupplier ? (
@@ -310,12 +370,12 @@ const Inventory = () => {
                   onSearch={fetchVariantsForSearch}
                   onSelect={handleAddVariant}
                   placeholder="Gõ tên SKU hoặc sản phẩm..."
-                  displayValue={(item) => item.sku}
+                  displayValue={(item) => item.skuCode}
                   renderItem={(item) => (
                     <div className="flex justify-between items-center">
                       <div>
-                        <div className="font-bold text-slate-800 text-sm">{item.sku}</div>
-                        <div className="text-xs text-slate-500">{item.Product?.name}</div>
+                        <div className="font-bold text-slate-800 text-sm">{item.skuCode || 'N/A'}</div>
+                        <div className="text-xs text-slate-500">{item.productName}</div>
                       </div>
                       <div className="text-xs font-bold text-indigo-600">Tồn: {item.stockQuantity}</div>
                     </div>
@@ -391,6 +451,15 @@ const Inventory = () => {
           </div>
         </div>
       </Modal>
+
+      <ReceiptDetailModal
+        isOpen={isDetailOpen}
+        onClose={() => setIsDetailOpen(false)}
+        type={activeTab}
+        detail={detailData}
+        isLoading={detailLoading}
+        error={detailError}
+      />
     </div>
   );
 };

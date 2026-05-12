@@ -5,6 +5,7 @@ import {
   updateProduct,
   deleteProduct,
   getCategories,
+  getProductById,
   createVariant,
   updateVariant as updateVariantApi,
   deleteVariant as deleteVariantApi
@@ -75,44 +76,67 @@ const Products = () => {
     return () => clearTimeout(delayDebounceFn);
   }, [search]);
 
-  const handleOpenModal = (product = null) => {
+  const handleOpenModal = async (product = null) => {
     setError('');
     if (product) {
       setIsEditMode(true);
       setCurrentProduct(product);
-      setFormData({
-        categoryId: product.categoryId,
-        name: product.productName || product.name || '',
-        brand: product.brand || '',
-        description: product.productDescription || product.description || '',
-        warrantyPeriod: product.warrantyPeriod
-      });
-      // Flatten variants for edit mode (assuming product brings its variants, if not need separate fetch)
-      // Usually product list endpoint returns base info. Edit mode might be complex if we can't edit variants via product API.
-      // For now, assume variants array is available or we only edit base product info.
-      setVariants((product.variants || []).map((variant) => ({
-        variantId: variant.variantId,
-        sku: variant.SKU || variant.skuCode || '',
-        price: variant.sellPrice || '',
-        stockQuantity: variant.quantity ?? 0,
-        attributesList: (variant.attributes || []).map((attr) => ({
-          name: attr.name || '',
-          value: attr.value || ''
-        }))
-      })));
-      setRemovedVariantIds([]);
-    } else {
-      setIsEditMode(false);
-      setCurrentProduct(null);
-      setFormData({ categoryId: categories[0]?.categoryId || '', name: '', brand: '', description: '', warrantyPeriod: 12 });
-      setVariants([{ sku: '', price: '', stockQuantity: 0, attributesList: [{ name: '', value: '' }] }]);
-      setRemovedVariantIds([]);
+      setIsModalOpen(true);
+      try {
+        const response = await getProductById(product.productId);
+        const detail = response.data;
+        setFormData({
+          categoryId: detail.categoryId,
+          name: detail.productName || '',
+          brand: detail.brand || '',
+          description: detail.description || '',
+          warrantyPeriod: detail.warrantyPeriod
+        });
+        setVariants((detail.Variants || []).map((variant) => ({
+          variantId: variant.id,
+          sku: variant.skuCode || '',
+          price: variant.sellPrice || '',
+          importPrice: variant.importPrice || '',
+          discount: variant.discount || '',
+          minStock: variant.minStock || '',
+          stockQuantity: variant.stockQuantity ?? 0,
+          attributesList: (variant.attributeValues || []).map((attr) => ({
+            name: attr.attribute?.name || '',
+            value: attr.value || ''
+          }))
+        })));
+        setRemovedVariantIds([]);
+      } catch (err) {
+        setError(err.response?.data?.message || 'Không thể tải chi tiết sản phẩm.');
+      }
+      return;
     }
+    setIsEditMode(false);
+    setCurrentProduct(null);
+    setFormData({ categoryId: categories[0]?.categoryId || '', name: '', brand: '', description: '', warrantyPeriod: 12 });
+    setVariants([{
+      sku: '',
+      price: '',
+      importPrice: '',
+      discount: '',
+      minStock: '',
+      stockQuantity: 0,
+      attributesList: [{ name: '', value: '' }]
+    }]);
+    setRemovedVariantIds([]);
     setIsModalOpen(true);
   };
 
   const addVariantField = () => {
-    setVariants([...variants, { sku: '', price: '', stockQuantity: 0, attributesList: [{ name: '', value: '' }] }]);
+    setVariants([...variants, {
+      sku: '',
+      price: '',
+      importPrice: '',
+      discount: '',
+      minStock: '',
+      stockQuantity: 0,
+      attributesList: [{ name: '', value: '' }]
+    }]);
   };
 
   const updateVariant = (index, field, value) => {
@@ -201,6 +225,9 @@ const Products = () => {
           .map((variant) => updateVariantApi(variant.variantId, {
             skuCode: variant.sku,
             sellPrice: Number(variant.price),
+            importPrice: variant.importPrice === '' ? undefined : Number(variant.importPrice),
+            discount: variant.discount === '' ? undefined : Number(variant.discount),
+            minStock: variant.minStock === '' ? undefined : Number(variant.minStock),
             stockQuantity: Number(variant.stockQuantity),
             attributes: attributesFromVariant(variant.attributesList)
           }));
@@ -211,6 +238,7 @@ const Products = () => {
             productId: currentProduct.productId,
             skuCode: variant.sku,
             sellPrice: Number(variant.price),
+            importPrice: variant.importPrice === '' ? undefined : Number(variant.importPrice),
             stockQuantity: Number(variant.stockQuantity),
             attributes: attributesFromVariant(variant.attributesList)
           }));
@@ -238,6 +266,7 @@ const Products = () => {
           variants: variants.map(v => ({
             skuCode: v.sku,
             sellPrice: Number(v.price),
+            importPrice: v.importPrice === '' ? undefined : Number(v.importPrice),
             stockQuantity: Number(v.stockQuantity),
             attributes: attributesFromVariant(v.attributesList)
           }))

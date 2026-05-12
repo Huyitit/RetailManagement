@@ -89,13 +89,34 @@ const ProductModal = ({
                 <div className="grid grid-cols-4 gap-3 flex-1">
                   <div>
                     <label className="block text-xs font-semibold text-slate-500 mb-1">Mã SKU *</label>
-                    <input type="text" className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 font-medium"
-                      value={v.sku} onChange={e => updateVariant(index, 'sku', e.target.value)} placeholder="IP15P-256-BLK" />
+                    <input
+                      type="text"
+                      className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 font-medium disabled:bg-slate-100 disabled:text-slate-500"
+                      value={v.sku}
+                      onChange={e => updateVariant(index, 'sku', e.target.value)}
+                      placeholder="IP15P-256-BLK"
+                      disabled={isEditMode && Boolean(v.variantId)}
+                    />
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-slate-500 mb-1">Giá bán (₫) *</label>
                     <input type="number" className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 font-medium"
                       value={v.price} onChange={e => updateVariant(index, 'price', e.target.value)} placeholder="28000000" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-500 mb-1">Giá nhập (₫)</label>
+                    <input type="number" className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 font-medium"
+                      value={v.importPrice || ''} onChange={e => updateVariant(index, 'importPrice', e.target.value)} placeholder="20000000" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-500 mb-1">Giảm giá (%)</label>
+                    <input type="number" className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 font-medium"
+                      value={v.discount || ''} onChange={e => updateVariant(index, 'discount', e.target.value)} placeholder="0" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-500 mb-1">Tồn tối thiểu</label>
+                    <input type="number" className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 font-medium"
+                      value={v.minStock || ''} onChange={e => updateVariant(index, 'minStock', e.target.value)} placeholder="5" />
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-slate-500 mb-1">Tồn kho *</label>
