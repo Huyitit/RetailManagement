@@ -1,4 +1,6 @@
-const { Product, Variant, Category, VariantAttribute, Attribute, Promotion } = require('../models');
+const { Product, Variant, Category, VariantAttribute, Attribute, Promotion, OrderDetail, ImportDetail, ExportDetail } = require('../models');
+const sequelize = require('../configs/db');
+const { Op } = require('sequelize');
 
 exports.getProducts = async (req, res) => {
   try {
@@ -119,3 +121,135 @@ exports.getVariant = async (req, res) => {
   }
 };
 
+// POST /api/v1/products — Create product with optional variants
+exports.createProduct = async (req, res) => {
+  const transaction = await sequelize.transaction();
+  try {
+    const { productName, categoryId, brand, description, warrantyPeriod, taxRate, variants } = req.body;
+
+    if (!productName || !categoryId || !brand) {
+      await transaction.rollback();
+      return res.status(400).json({ status: 'error', message: 'Tên, danh mục và hãng SX là bắt buộc' });
+    }
+
+    const product = await Product.create({
+      productName, categoryId, brand,
+      description: description || null,
+      warrantyPeriod: warrantyPeriod || 12,
+      taxRate: taxRate || 0,
+      status: 'Active'
+    }, { transaction });
+
+    // Create variants if provided
+    if (variants && Array.isArray(variants) && variants.length > 0) {
+      for (const v of variants) {
+        // Check SKU duplicate
+        if (v.skuCode) {
+          const existing = await Variant.findOne({ where: { skuCode: v.skuCode }, transaction });
+          if (existing) {
+            await transaction.rollback();
+            return res.status(409).json({ status: 'error', message: `Mã SKU "${v.skuCode}" đã tồn tại` });
+          }
+        }
+
+        const variant = await Variant.create({
+          productId: product.id,
+          skuCode: v.skuCode || null,
+          sellPrice: v.sellPrice || 0,
+          importPrice: v.importPrice || 0,
+          stockQuantity: v.stockQuantity || 0,
+          imageUrl: v.imageUrl || null
+        }, { transaction });
+
+        // Create variant attributes
+        if (v.attributes && Array.isArray(v.attributes)) {
+          for (const attr of v.attributes) {
+            let attribute = await Attribute.findOne({ where: { name: attr.name }, transaction });
+            if (!attribute) attribute = await Attribute.create({ name: attr.name }, { transaction });
+
+            await VariantAttribute.create({
+              variantId: variant.id,
+              attributeId: attribute.id,
+              value: attr.value
+            }, { transaction });
+          }
+        }
+      }
+    }
+
+    await transaction.commit();
+    res.status(201).json({
+      status: 'success',
+      message: 'Thêm sản phẩm thành công',
+      data: { productId: product.id, productName: product.productName }
+    });
+  } catch (error) {
+    if (transaction) await transaction.rollback();
+    console.error('Lỗi tạo sản phẩm:', error);
+    res.status(500).json({ status: 'error', message: error.message });
+  }
+};
+
+// PUT /api/v1/products/:id — Update product general info
+exports.updateProduct = async (req, res) => {
+  try {
+    const product = await Product.findOne({ where: { id: req.params.id, isDeleted: false } });
+    if (!product) return res.status(404).json({ status: 'error', message: 'Không tìm thấy sản phẩm' });
+
+    const { productName, categoryId, brand, description, warrantyPeriod, taxRate } = req.body;
+
+    await product.update({
+      productName: productName || product.productName,
+      categoryId: categoryId || product.categoryId,
+      brand: brand || product.brand,
+      description: description !== undefined ? description : product.description,
+      warrantyPeriod: warrantyPeriod !== undefined ? warrantyPeriod : product.warrantyPeriod,
+      taxRate: taxRate !== undefined ? taxRate : product.taxRate
+    });
+
+    res.json({
+      status: 'success',
+      message: 'Cập nhật sản phẩm thành công',
+      data: { productId: product.id, productName: product.productName }
+    });
+  } catch (error) {
+    res.status(500).json({ status: 'error', message: error.message });
+  }
+};
+
+// DELETE /api/v1/products/:id — Soft delete or deactivate product
+exports.deleteProduct = async (req, res) => {
+  try {
+    const product = await Product.findOne({
+      where: { id: req.params.id, isDeleted: false },
+      include: [{ model: Variant, attributes: ['id'] }]
+    });
+    if (!product) return res.status(404).json({ status: 'error', message: 'Không tìm thấy sản phẩm' });
+
+    const variantIds = product.Variants?.map(v => v.id) || [];
+
+    // Check if any variant has transaction history
+    let hasHistory = false;
+    if (variantIds.length > 0) {
+      const orderCount = await OrderDetail.count({ where: { variantId: { [Op.in]: variantIds } } });
+      const importCount = await ImportDetail.count({ where: { variantId: { [Op.in]: variantIds } } });
+      hasHistory = orderCount > 0 || importCount > 0;
+    }
+
+    if (hasHistory) {
+      // Deactivate instead of delete
+      await product.update({ status: 'Discontinued', isDeleted: true });
+      await Variant.update({ isDeleted: true }, { where: { productId: product.id } });
+      return res.json({ status: 'success', message: 'Sản phẩm đã chuyển sang trạng thái "Ngừng kinh doanh"' });
+    }
+
+    // Hard delete (no history)
+    await VariantAttribute.destroy({ where: { variantId: { [Op.in]: variantIds } } });
+    await Variant.destroy({ where: { productId: product.id } });
+    await product.destroy();
+
+    res.json({ status: 'success', message: 'Xóa sản phẩm thành công' });
+  } catch (error) {
+    res.status(500).json({ status: 'error', message: error.message });
+  }
+};

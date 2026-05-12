@@ -37,7 +37,13 @@ app.use('/api/v1/products', require('./routes/productRoutes'));
 app.use('/api/v1/customers', require('./routes/customerRoutes'));
 app.use('/api/v1/orders', require('./routes/orderRoutes'));
 app.use('/api/v1/auth', require('./routes/authRoutes'));
-
+app.use('/api/v1/suppliers', require('./routes/supplierRoutes'));
+app.use('/api/v1/import-receipts', require('./routes/importReceiptRoutes'));
+app.use('/api/v1/export-receipts', require('./routes/exportReceiptRoutes'));
+app.use('/api/v1/variants', require('./routes/variantRoutes'));
+app.use('/api/v1/staff', require('./routes/staffRoutes'));
+app.use('/api/v1/warranty', require('./routes/warrantyRoutes'));
+app.use('/api/v1/reports', require('./routes/reportRoutes'));
 const PORT = process.env.PORT || 5001;
 
 sequelize.authenticate()
