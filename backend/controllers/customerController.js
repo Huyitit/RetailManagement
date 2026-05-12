@@ -1,4 +1,4 @@
-const { Customer } = require('../models');
+const { Customer, Order } = require('../models');
 const { Op } = require('sequelize');
 
 exports.searchCustomers = async (req, res) => {
@@ -201,6 +201,14 @@ exports.deleteCustomer = async (req, res) => {
 
     if (!customer) {
       return res.status(404).json({ status: 'error', message: 'Không tìm thấy khách hàng' });
+    }
+
+    const orderCount = await Order.count({ where: { customerId: customer.id } });
+    if (orderCount > 0) {
+      return res.status(409).json({
+        status: 'error',
+        message: 'Khách hàng đã có giao dịch, không thể xóa'
+      });
     }
 
     await customer.update({ isDeleted: true });

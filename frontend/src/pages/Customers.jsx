@@ -87,7 +87,7 @@ const Customers = () => {
         await deleteCustomer(customer.customerId);
         fetchCustomers(pagination.currentPage);
       } catch (err) {
-        alert(err.response?.data?.message || 'Lỗi khi xóa');
+        alert(err.response?.data?.message || 'Loi khi xoa');
       }
     }
   };

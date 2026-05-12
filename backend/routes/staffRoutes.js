@@ -1,8 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const staffController = require('../controllers/staffController');
+const { authenticate, requireAdmin } = require('../middleware/auth');
 
-// All staff routes typically require admin privileges, but we handle that in middleware/controller later
+// All staff routes require admin privileges
+router.use(authenticate, requireAdmin);
 router.get('/', staffController.getStaffList);
 router.post('/', staffController.createStaff);
 router.get('/:id', staffController.getStaff);

@@ -93,7 +93,7 @@ const Suppliers = () => {
         await deleteSupplier(supplier.supplierId);
         fetchSuppliers(pagination.currentPage);
       } catch (err) {
-        alert(err.response?.data?.message || 'Lỗi khi xóa nhà cung cấp');
+        alert(err.response?.data?.message || 'Loi khi xoa nha cung cap');
       }
     }
   };

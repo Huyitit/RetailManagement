@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getStaffList, createStaff, updateStaff, deactivateStaff, assignStaffRole } from '../services/api';
+import { getStaffList, createStaff, updateStaff, deactivateStaff, assignStaffRole, resetStaffPassword } from '../services/api';
 import DataTable from '../components/DataTable';
 import Modal from '../components/Modal';
 import StatusBadge from '../components/StatusBadge';
@@ -14,6 +14,10 @@ const Staff = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [currentStaff, setCurrentStaff] = useState(null);
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [passwordStaff, setPasswordStaff] = useState(null);
+  const [passwordForm, setPasswordForm] = useState({ newPassword: '', confirmPassword: '' });
+  const [passwordError, setPasswordError] = useState('');
   
   const [formData, setFormData] = useState({ username: '', password: '', fullname: '', phone: '', email: '', role: 'Cashier' });
   const [error, setError] = useState('');
@@ -65,6 +69,13 @@ const Staff = () => {
     setIsModalOpen(true);
   };
 
+  const handleOpenPasswordModal = (staff) => {
+    setPasswordStaff(staff);
+    setPasswordForm({ newPassword: '', confirmPassword: '' });
+    setPasswordError('');
+    setIsPasswordModalOpen(true);
+  };
+
   const handleSave = async () => {
     if (!formData.fullname || !formData.phone || (!isEditMode && (!formData.username || !formData.password))) {
       setError('Vui lòng điền đủ thông tin bắt buộc.');
@@ -95,8 +106,30 @@ const Staff = () => {
         await deactivateStaff(staff.staffId);
         fetchStaff(pagination.currentPage);
       } catch (err) {
-        alert(err.response?.data?.message || 'Lỗi khi vô hiệu hóa');
+        alert(err.response?.data?.message || 'Loi khi vo hieu hoa');
       }
+    }
+  };
+
+  const handleResetPassword = async () => {
+    if (!passwordForm.newPassword || passwordForm.newPassword.length < 6) {
+      setPasswordError('Mat khau moi phai co it nhat 6 ky tu.');
+      return;
+    }
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      setPasswordError('Mat khau xac nhan khong khop.');
+      return;
+    }
+
+    try {
+      await resetStaffPassword(passwordStaff.staffId, {
+        newPassword: passwordForm.newPassword,
+        confirmPassword: passwordForm.confirmPassword
+      });
+      setIsPasswordModalOpen(false);
+      alert('Doi mat khau thanh cong.');
+    } catch (err) {
+      setPasswordError(err.response?.data?.message || 'Khong the doi mat khau.');
     }
   };
 
@@ -120,6 +153,14 @@ const Staff = () => {
     )},
     { header: 'Quyền (Role)', accessor: 'role', render: (row) => (
       <StatusBadge status={row.role === 'Admin' ? 'Hoàn tất' : row.role === 'Manager' ? 'Active' : 'Draft'} />
+    )},
+    { header: 'Mat khau', accessor: 'password', align: 'center', render: (row) => (
+      <button
+        onClick={(e) => { e.stopPropagation(); handleOpenPasswordModal(row); }}
+        className="px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+      >
+        Doi mat khau
+      </button>
     )}
   ];
 
@@ -210,6 +251,42 @@ const Staff = () => {
               <option value="Manager">Manager (Quản lý)</option>
               <option value="Admin">Admin (Quản trị)</option>
             </select>
+          </div>
+        </div>
+      </Modal>
+
+      <Modal
+        isOpen={isPasswordModalOpen}
+        onClose={() => setIsPasswordModalOpen(false)}
+        title={`Doi mat khau - ${passwordStaff?.username || ''}`}
+        footer={
+          <>
+            <button onClick={() => setIsPasswordModalOpen(false)} className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg text-sm font-medium transition-colors">Huy</button>
+            <button onClick={handleResetPassword} className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors shadow-sm">Luu thay doi</button>
+          </>
+        }
+      >
+        <div className="space-y-4">
+          {passwordError && <div className="p-3 bg-rose-50 text-rose-600 rounded-lg text-sm">{passwordError}</div>}
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Mat khau moi</label>
+            <input
+              type="password"
+              className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500"
+              value={passwordForm.newPassword}
+              onChange={e => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Xac nhan mat khau moi</label>
+            <input
+              type="password"
+              className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500"
+              value={passwordForm.confirmPassword}
+              onChange={e => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+            />
           </div>
         </div>
       </Modal>

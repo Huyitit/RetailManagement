@@ -245,11 +245,9 @@ exports.deleteSupplier = async (req, res) => {
     const exportCount = await ExportReceipt.count({ where: { supplierId: supplier.id } });
 
     if (importCount > 0 || exportCount > 0) {
-      // Soft delete — keep for history
-      await supplier.update({ isDeleted: true });
-      return res.json({
-        status: 'success',
-        message: 'Nhà cung cấp đã được vô hiệu hóa (có lịch sử giao dịch)'
+      return res.status(409).json({
+        status: 'error',
+        message: 'Nhà cung cấp đã có lịch sử giao dịch, không thể xóa'
       });
     }
 
