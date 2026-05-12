@@ -127,13 +127,25 @@ exports.createVariant = async (req, res) => {
   }
 };
 
-// PUT /api/v1/variants/:id — Update variant info (SKU locked)
+// PUT /api/v1/variants/:id — Update variant info
 exports.updateVariant = async (req, res) => {
+  const transaction = await sequelize.transaction();
   try {
-    const variant = await Variant.findOne({ where: { id: req.params.id, isDeleted: false } });
-    if (!variant) return res.status(404).json({ status: 'error', message: 'Không tìm thấy biến thể' });
+    const variant = await Variant.findOne({ where: { id: req.params.id, isDeleted: false }, transaction });
+    if (!variant) {
+      await transaction.rollback();
+      return res.status(404).json({ status: 'error', message: 'Không tìm thấy biến thể' });
+    }
 
-    const { sellPrice, importPrice, discount, imageUrl, minStock } = req.body;
+    const { skuCode, sellPrice, importPrice, discount, imageUrl, minStock, stockQuantity, attributes } = req.body;
+
+    if (skuCode !== undefined && skuCode !== variant.skuCode) {
+      const existing = await Variant.findOne({ where: { skuCode, isDeleted: false }, transaction });
+      if (existing) {
+        await transaction.rollback();
+        return res.status(409).json({ status: 'error', message: `Mã SKU "${skuCode}" đã tồn tại` });
+      }
+    }
 
     // Validate numeric fields
     if (sellPrice !== undefined && (isNaN(sellPrice) || sellPrice < 0)) {
@@ -144,15 +156,35 @@ exports.updateVariant = async (req, res) => {
     }
 
     await variant.update({
+      skuCode: skuCode !== undefined ? skuCode : variant.skuCode,
       sellPrice: sellPrice !== undefined ? sellPrice : variant.sellPrice,
       importPrice: importPrice !== undefined ? importPrice : variant.importPrice,
       discount: discount !== undefined ? discount : variant.discount,
       imageUrl: imageUrl !== undefined ? imageUrl : variant.imageUrl,
-      minStock: minStock !== undefined ? minStock : variant.minStock
-    });
+      minStock: minStock !== undefined ? minStock : variant.minStock,
+      stockQuantity: stockQuantity !== undefined ? stockQuantity : variant.stockQuantity
+    }, { transaction });
 
+    if (attributes && Array.isArray(attributes)) {
+      await VariantAttribute.destroy({ where: { variantId: variant.id }, transaction });
+
+      for (const attr of attributes) {
+        if (!attr?.name || !attr?.value) continue;
+        let attribute = await Attribute.findOne({ where: { name: attr.name }, transaction });
+        if (!attribute) attribute = await Attribute.create({ name: attr.name }, { transaction });
+
+        await VariantAttribute.create({
+          variantId: variant.id,
+          attributeId: attribute.id,
+          value: attr.value
+        }, { transaction });
+      }
+    }
+
+    await transaction.commit();
     res.json({ status: 'success', message: 'Cập nhật biến thể thành công', data: { variantId: variant.id } });
   } catch (error) {
+    if (transaction) await transaction.rollback();
     res.status(500).json({ status: 'error', message: error.message });
   }
 };

@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { getProducts, createProduct, updateProduct, deleteProduct, getCategories } from '../services/api';
+import {
+  getProducts,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+  getCategories,
+  createVariant,
+  updateVariant as updateVariantApi,
+  deleteVariant as deleteVariantApi
+} from '../services/api';
 import DataTable from '../components/DataTable';
 import ProductModal from '../components/ProductModal';
 import StatusBadge from '../components/StatusBadge';
@@ -23,6 +32,7 @@ const Products = () => {
   
   // Dynamic Variants Builder
   const [variants, setVariants] = useState([]);
+  const [removedVariantIds, setRemovedVariantIds] = useState([]);
 
   const [error, setError] = useState('');
 
@@ -81,6 +91,7 @@ const Products = () => {
       // Usually product list endpoint returns base info. Edit mode might be complex if we can't edit variants via product API.
       // For now, assume variants array is available or we only edit base product info.
       setVariants((product.variants || []).map((variant) => ({
+        variantId: variant.variantId,
         sku: variant.SKU || variant.skuCode || '',
         price: variant.sellPrice || '',
         stockQuantity: variant.quantity ?? 0,
@@ -89,11 +100,13 @@ const Products = () => {
           value: attr.value || ''
         }))
       })));
+      setRemovedVariantIds([]);
     } else {
       setIsEditMode(false);
       setCurrentProduct(null);
       setFormData({ categoryId: categories[0]?.categoryId || '', name: '', brand: '', description: '', warrantyPeriod: 12 });
       setVariants([{ sku: '', price: '', stockQuantity: 0, attributesList: [{ name: '', value: '' }] }]);
+      setRemovedVariantIds([]);
     }
     setIsModalOpen(true);
   };
@@ -136,6 +149,10 @@ const Products = () => {
   };
 
   const removeVariant = (index) => {
+    const target = variants[index];
+    if (isEditMode && target?.variantId) {
+      setRemovedVariantIds((prev) => (prev.includes(target.variantId) ? prev : [...prev, target.variantId]));
+    }
     setVariants(variants.filter((_, i) => i !== index));
   };
 
@@ -150,9 +167,18 @@ const Products = () => {
       return;
     }
 
+    const hasInvalidPrice = variants.some((variant) => {
+      const price = Number(variant.price);
+      return !Number.isFinite(price) || price <= 0;
+    });
+    if (hasInvalidPrice) {
+      setError('Giá bán của mỗi phiên bản phải lớn hơn 0.');
+      return;
+    }
+
     try {
       if (isEditMode) {
-        // Just update base product
+        // Update base product
         await updateProduct(currentProduct.productId, {
           productName: formData.name,
           categoryId: formData.categoryId,
@@ -160,6 +186,38 @@ const Products = () => {
           description: formData.description,
           warrantyPeriod: formData.warrantyPeriod
         });
+
+        const attributesFromVariant = (attributesList) => {
+          return (attributesList || [])
+            .map((attr) => ({
+              name: attr.name?.trim() || '',
+              value: attr.value?.trim() || ''
+            }))
+            .filter((attr) => attr.name && attr.value);
+        };
+
+        const updateRequests = variants
+          .filter((variant) => variant.variantId)
+          .map((variant) => updateVariantApi(variant.variantId, {
+            skuCode: variant.sku,
+            sellPrice: Number(variant.price),
+            stockQuantity: Number(variant.stockQuantity),
+            attributes: attributesFromVariant(variant.attributesList)
+          }));
+
+        const createRequests = variants
+          .filter((variant) => !variant.variantId)
+          .map((variant) => createVariant({
+            productId: currentProduct.productId,
+            skuCode: variant.sku,
+            sellPrice: Number(variant.price),
+            stockQuantity: Number(variant.stockQuantity),
+            attributes: attributesFromVariant(variant.attributesList)
+          }));
+
+        const deleteRequests = removedVariantIds.map((variantId) => deleteVariantApi(variantId));
+
+        await Promise.all([...updateRequests, ...createRequests, ...deleteRequests]);
       } else {
         // Create Product + Variants
         const attributesFromVariant = (attributesList) => {

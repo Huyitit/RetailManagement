@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 
-const Modal = ({ isOpen, onClose, title, children, footer, size = 'md' }) => {
+const Modal = ({ isOpen, onClose, title, children, footer, size = 'md', bodyClassName = '' }) => {
   // Prevent scrolling on body when modal is open
   useEffect(() => {
     if (isOpen) {
@@ -42,14 +42,14 @@ const Modal = ({ isOpen, onClose, title, children, footer, size = 'md' }) => {
             onClick={onClose}
             className="text-slate-400 hover:text-slate-600 transition-colors p-1 rounded-md hover:bg-slate-100"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5" fill="currentColor" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            </svg> Close
           </button>
         </div>
 
         {/* Body */}
-        <div className="p-6 overflow-y-auto custom-scrollbar flex-1">
+        <div className={`p-6 overflow-y-auto custom-scrollbar flex-1 ${bodyClassName}`.trim()}>
           {children}
         </div>
 
