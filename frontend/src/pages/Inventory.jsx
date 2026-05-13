@@ -1,25 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { 
+import {
   getImportReceipts, createImportReceipt, getImportReceiptById,
   getExportReceipts, createExportReceipt, getExportReceiptById,
-  searchSuppliers, searchVariants 
+  searchSuppliers, searchVariants
 } from '../services/api';
 import OrdersTable from '../components/OrdersTable';
 import OrderDetailModalShell from '../components/OrderDetailModalShell';
 import { FormTable, FormRow } from '../components/FormTable';
 import ReceiptDetailModal from '../components/ReceiptDetailModal';
 import SearchAutocomplete from '../components/SearchAutocomplete';
-import StatusBadge from '../components/StatusBadge';
-import { PackageOpen, PackageMinus, Plus, Search, Building2, Layers, Trash2, ArrowRightLeft } from 'lucide-react';
+import { PackageOpen, PackageMinus, Plus, Search, Building2, Layers, Trash2 } from 'lucide-react';
 
 const Inventory = () => {
-  const [activeTab, setActiveTab] = useState('import'); // 'import' or 'export'
+  const [activeTab, setActiveTab] = useState('import');
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [pagination, setPagination] = useState({ currentPage: 1, totalPages: 1, totalItems: 0 });
 
-  // Modal States
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState('');
   const [isDetailOpen, setIsDetailOpen] = useState(false);
@@ -27,22 +25,17 @@ const Inventory = () => {
   const [detailLoading, setDetailLoading] = useState(false);
   const [detailError, setDetailError] = useState('');
 
-  // Form State
   const [selectedSupplier, setSelectedSupplier] = useState(null);
-  const [details, setDetails] = useState([]); // { variantId, sku, name, qty, price, currentStock }
+  const [details, setDetails] = useState([]);
   const [notes, setNotes] = useState('');
   const [exportReason, setExportReason] = useState('return_supplier');
 
   const fetchReceipts = async (page = 1) => {
     setIsLoading(true);
     try {
-      let response;
-      if (activeTab === 'import') {
-        response = await getImportReceipts({ page, limit: 10, q: searchQuery });
-      } else {
-        response = await getExportReceipts({ page, limit: 10, q: searchQuery });
-      }
-
+      const response = activeTab === 'import'
+        ? await getImportReceipts({ page, limit: 10, q: searchQuery })
+        : await getExportReceipts({ page, limit: 10, q: searchQuery });
       if (response.data?.status === 'success') {
         setData(response.data.data);
         setPagination({
@@ -59,9 +52,7 @@ const Inventory = () => {
   };
 
   useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
-      fetchReceipts(1);
-    }, 500);
+    const delayDebounceFn = setTimeout(() => { fetchReceipts(1); }, 500);
     return () => clearTimeout(delayDebounceFn);
   }, [searchQuery, activeTab]);
 
@@ -80,13 +71,10 @@ const Inventory = () => {
     setDetailData(null);
     setIsDetailOpen(true);
     try {
-      if (activeTab === 'import') {
-        const res = await getImportReceiptById(row.receiptId);
-        setDetailData(res.data?.data || null);
-      } else {
-        const res = await getExportReceiptById(row.receiptId);
-        setDetailData(res.data?.data || null);
-      }
+      const res = activeTab === 'import'
+        ? await getImportReceiptById(row.receiptId)
+        : await getExportReceiptById(row.receiptId);
+      setDetailData(res.data?.data || null);
     } catch (err) {
       setDetailError(err.response?.data?.message || 'Không thể tải chi tiết phiếu.');
     } finally {
@@ -94,23 +82,22 @@ const Inventory = () => {
     }
   };
 
-  // Autocomplete Search Handlers
   const fetchSuppliersForSearch = async (q) => {
     try {
       const res = await searchSuppliers(q);
       return Array.isArray(res.data) ? res.data : res.data?.data || [];
-    } catch (e) { return []; }
+    } catch { return []; }
   };
 
   const fetchVariantsForSearch = async (q) => {
     try {
       const res = await searchVariants(q);
       return Array.isArray(res.data) ? res.data : res.data?.data || [];
-    } catch (e) { return []; }
+    } catch { return []; }
   };
 
   const handleAddVariant = (variant) => {
-    if (details.find(d => d.variantId === variant.variantId)) return; // Already added
+    if (details.find((d) => d.variantId === variant.variantId)) return;
     const defaultPrice = activeTab === 'import'
       ? Number(variant.importPrice || 0)
       : Number(variant.sellPrice || 0);
@@ -138,73 +125,57 @@ const Inventory = () => {
 
   const handleSave = async () => {
     if (activeTab === 'import' && !selectedSupplier) {
-      setError('Vui lòng chọn Nhà cung cấp.');
-      return;
+      setError('Vui lòng chọn Nhà cung cấp.'); return;
     }
-
     if (activeTab === 'export' && exportReason === 'return_supplier' && !selectedSupplier) {
-      setError('Vui lòng chọn Nhà cung cấp.');
-      return;
+      setError('Vui lòng chọn Nhà cung cấp.'); return;
     }
     if (details.length === 0) {
-      setError('Vui lòng thêm ít nhất 1 sản phẩm vào phiếu.');
-      return;
+      setError('Vui lòng thêm ít nhất 1 sản phẩm vào phiếu.'); return;
     }
-
     if (activeTab === 'import') {
       const invalidItem = details.find((d) => {
-        const qty = Number(d.qty);
-        const price = Number(d.price);
+        const qty = Number(d.qty); const price = Number(d.price);
         return !Number.isFinite(qty) || !Number.isInteger(qty) || qty <= 0 || !Number.isFinite(price) || price < 0;
       });
       if (invalidItem) {
-        setError(`Sản phẩm ${invalidItem.sku} có số lượng hoặc giá nhập không hợp lệ.`);
-        return;
+        setError(`Sản phẩm ${invalidItem.sku} có số lượng hoặc giá nhập không hợp lệ.`); return;
       }
     }
-
-    // Validate Export Stock
     if (activeTab === 'export') {
-      const invalidItem = details.find(d => Number(d.qty) > d.currentStock);
+      const invalidItem = details.find((d) => Number(d.qty) > d.currentStock);
       if (invalidItem) {
-        setError(`Sản phẩm ${invalidItem.sku} không đủ tồn kho (Tồn: ${invalidItem.currentStock}).`);
-        return;
+        setError(`Sản phẩm ${invalidItem.sku} không đủ tồn kho (Tồn: ${invalidItem.currentStock}).`); return;
       }
     }
 
     try {
-      const staffInfo = JSON.parse(localStorage.getItem('staffInfo') || '{}');
-      const staffId = staffInfo.staffId || 1; // Fallback for dev
-
       if (activeTab === 'import') {
-        const payload = {
+        await createImportReceipt({
           supplierId: selectedSupplier.supplierId,
           note: notes,
-          items: details.map(d => ({
+          items: details.map((d) => ({
             variantId: d.variantId,
             quantity: Number.parseInt(d.qty, 10),
             importPrice: Number(d.price)
           }))
-        };
-        await createImportReceipt(payload);
+        });
       } else {
         const reasonLabel = exportReason === 'return_supplier'
           ? 'Trả nhà cung cấp'
           : exportReason === 'warranty'
             ? 'Xuất bảo hành'
             : 'Xuất hủy';
-        const payload = {
+        await createExportReceipt({
           supplierId: exportReason === 'return_supplier' ? selectedSupplier?.supplierId : undefined,
           reason: notes ? `${reasonLabel}: ${notes}` : reasonLabel,
-          items: details.map(d => ({
+          items: details.map((d) => ({
             variantId: d.variantId,
             quantity: Number(d.qty),
             errorNote: null
           }))
-        };
-        await createExportReceipt(payload);
+        });
       }
-
       setIsModalOpen(false);
       fetchReceipts(1);
     } catch (err) {
@@ -214,93 +185,176 @@ const Inventory = () => {
 
   const formatMoney = (val) => new Intl.NumberFormat('vi-VN').format(val) + ' đ';
 
+  const codeChipStyle = (tone) => ({
+    padding: '8px',
+    borderRadius: 'var(--radius-sm)',
+    background: tone === 'import' ? 'var(--primary-light)' : 'var(--warning-bg)',
+    color: tone === 'import' ? 'var(--primary)' : 'var(--warning)',
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+  });
+
   const columns = activeTab === 'import' ? [
-    { header: 'Mã phiếu', accessor: 'receiptId', render: (row) => (
-      <div className="font-bold text-slate-800 flex items-center gap-2">
-        <div className="p-2 bg-blue-50 text-blue-600 rounded-lg"><PackageOpen size={16}/></div>
-        IMP-{String(row.receiptId).padStart(5, '0')}
-      </div>
-    )},
-    { header: 'Nhà cung cấp', accessor: 'supplierName', render: (row) => (
-      <div className="font-medium text-slate-700">{row.supplierName || 'N/A'}</div>
-    )},
-    { header: 'Ngày lập', accessor: 'importDate', render: (row) => (
-      <div className="text-slate-600 text-sm">{new Date(row.importDate).toLocaleString('vi-VN')}</div>
-    )},
-    { header: 'Tổng tiền', accessor: 'totalAmount', align: 'right', render: (row) => (
-      <div className="font-bold text-slate-900">{formatMoney(row.totalAmount)}</div>
-    )}
+    {
+      header: 'Mã phiếu', accessor: 'receiptId', render: (row) => (
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', fontWeight: 800, color: 'var(--text-main)' }}>
+          <div style={codeChipStyle('import')}><PackageOpen size={16} /></div>
+          IMP-{String(row.receiptId).padStart(5, '0')}
+        </div>
+      )
+    },
+    {
+      header: 'Nhà cung cấp', accessor: 'supplierName', render: (row) => (
+        <div style={{ color: 'var(--text-main)', fontWeight: 600 }}>{row.supplierName || 'N/A'}</div>
+      )
+    },
+    {
+      header: 'Ngày lập', accessor: 'importDate', render: (row) => (
+        <div style={{ color: 'var(--text-muted)', fontSize: '13px' }}>{new Date(row.importDate).toLocaleString('vi-VN')}</div>
+      )
+    },
+    {
+      header: 'Tổng tiền', accessor: 'totalAmount', align: 'right', render: (row) => (
+        <div style={{ fontWeight: 800, color: 'var(--text-main)' }}>{formatMoney(row.totalAmount)}</div>
+      )
+    }
   ] : [
-    { header: 'Mã phiếu', accessor: 'receiptId', render: (row) => (
-      <div className="font-bold text-slate-800 flex items-center gap-2">
-        <div className="p-2 bg-amber-50 text-amber-600 rounded-lg"><PackageMinus size={16}/></div>
-        EXP-{String(row.receiptId).padStart(5, '0')}
-      </div>
-    )},
-    { header: 'Nhà cung cấp', accessor: 'supplierName', render: (row) => (
-      <div className="text-slate-600">{row.supplierName || 'N/A'}</div>
-    )},
-    { header: 'Lý do', accessor: 'reason', render: (row) => (
-      <div className="text-slate-600 text-sm max-w-[200px] truncate">{row.reason || 'Không có lý do'}</div>
-    )},
-    { header: 'Ngày lập', accessor: 'exportDate', render: (row) => (
-      <div className="text-slate-600 text-sm">{new Date(row.exportDate).toLocaleString('vi-VN')}</div>
-    )},
-    { header: 'Tổng giá trị xuất', accessor: 'totalAmount', align: 'right', render: (row) => (
-      <div className="font-bold text-slate-900">{formatMoney(row.totalAmount)}</div>
-    )}
+    {
+      header: 'Mã phiếu', accessor: 'receiptId', render: (row) => (
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', fontWeight: 800, color: 'var(--text-main)' }}>
+          <div style={codeChipStyle('export')}><PackageMinus size={16} /></div>
+          EXP-{String(row.receiptId).padStart(5, '0')}
+        </div>
+      )
+    },
+    {
+      header: 'Nhà cung cấp', accessor: 'supplierName', render: (row) => (
+        <div style={{ color: 'var(--text-muted)' }}>{row.supplierName || 'N/A'}</div>
+      )
+    },
+    {
+      header: 'Lý do', accessor: 'reason', render: (row) => (
+        <div
+          style={{
+            color: 'var(--text-muted)',
+            fontSize: '13px',
+            maxWidth: '200px',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap'
+          }}
+        >
+          {row.reason || 'Không có lý do'}
+        </div>
+      )
+    },
+    {
+      header: 'Ngày lập', accessor: 'exportDate', render: (row) => (
+        <div style={{ color: 'var(--text-muted)', fontSize: '13px' }}>{new Date(row.exportDate).toLocaleString('vi-VN')}</div>
+      )
+    },
+    {
+      header: 'Tổng giá trị xuất', accessor: 'totalAmount', align: 'right', render: (row) => (
+        <div style={{ fontWeight: 800, color: 'var(--text-main)' }}>{formatMoney(row.totalAmount)}</div>
+      )
+    }
   ];
 
+  const tabStyle = (active) => ({
+    padding: '10px 22px',
+    borderRadius: 'var(--radius-md)',
+    border: '1px solid transparent',
+    background: active ? 'var(--primary)' : 'var(--surface)',
+    color: active ? 'white' : 'var(--text-muted)',
+    fontWeight: 800,
+    cursor: 'pointer',
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '8px',
+    borderColor: active ? 'var(--primary)' : 'var(--border-strong)',
+    boxShadow: active ? 'var(--shadow-primary)' : 'none',
+    transition: 'all 0.2s ease'
+  });
+
   return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: '#f8fafc', overflow: 'hidden' }}>
-      <header style={{ padding: '32px 40px', background: 'white', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
+    <div className="page-shell">
+      <header className="page-header">
         <div>
-          <h1 style={{ fontSize: '28px', fontWeight: '950', color: '#0f172a', margin: 0 }}>Kho hàng & Tồn kho</h1>
-          <p style={{ color: '#64748b', fontSize: '14px', marginTop: '4px', fontWeight: '600' }}>Quản lý nhập xuất hàng hóa và tính toán tồn kho tự động</p>
+          <h1 className="page-title">Kho hàng & Tồn kho</h1>
+          <p className="page-subtitle">Quản lý nhập xuất hàng hóa và tính toán tồn kho tự động</p>
         </div>
-        <button 
-          onClick={handleOpenModal}
-          style={{ background: '#4f46e5', color: 'white', padding: '12px 24px', borderRadius: '12px', border: 'none', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', boxShadow: '0 4px 6px -1px rgba(79, 70, 229, 0.2)' }}
-        >
-          <Plus size={18} /> {activeTab === 'import' ? 'Tạo Phiếu Nhập' : 'Tạo Phiếu Xuất'}
+        <button type="button" onClick={handleOpenModal} className="btn-primary">
+          <Plus size={18} /> {activeTab === 'import' ? 'Tạo phiếu nhập' : 'Tạo phiếu xuất'}
         </button>
       </header>
 
-      <div className="custom-scrollbar" style={{ flex: 1, overflowY: 'auto', padding: '32px 40px' }}>
-        <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
+      <div className="page-body custom-scrollbar">
+        <div style={{ display: 'flex', gap: '10px', marginBottom: '16px' }}>
           <button
+            type="button"
             onClick={() => { setActiveTab('import'); setSearchQuery(''); }}
-            style={{ padding: '10px 24px', borderRadius: '12px', border: 'none', background: activeTab === 'import' ? '#10b981' : '#f1f5f9', color: activeTab === 'import' ? 'white' : '#64748b', fontWeight: '800', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+            style={tabStyle(activeTab === 'import')}
           >
-            <PackageOpen size={18}/> Phieu Nhap Kho
+            <PackageOpen size={18} /> Phiếu nhập kho
           </button>
           <button
+            type="button"
             onClick={() => { setActiveTab('export'); setSearchQuery(''); }}
-            style={{ padding: '10px 24px', borderRadius: '12px', border: 'none', background: activeTab === 'export' ? '#10b981' : '#f1f5f9', color: activeTab === 'export' ? 'white' : '#64748b', fontWeight: '800', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+            style={tabStyle(activeTab === 'export')}
           >
-            <PackageMinus size={18}/> Phieu Xuat Kho
+            <PackageMinus size={18} /> Phiếu xuất kho
           </button>
         </div>
 
-        <div style={{ background: 'white', borderRadius: '24px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-          <div style={{ padding: '24px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ fontSize: '13px', fontWeight: '800', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Danh sach phieu</div>
+        <div className="surface-card-flush">
+          <div
+            style={{
+              padding: '20px 24px',
+              borderBottom: '1px solid var(--border-light)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              gap: '16px'
+            }}
+          >
+            <div
+              style={{
+                fontSize: '12px',
+                fontWeight: 800,
+                color: 'var(--text-muted)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px'
+              }}
+            >
+              Danh sách phiếu
+            </div>
             <div style={{ position: 'relative', width: '320px' }}>
-              <Search size={18} style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+              <Search
+                size={18}
+                style={{
+                  position: 'absolute',
+                  left: '14px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  color: 'var(--text-light)'
+                }}
+              />
               <input
                 type="text"
                 placeholder={`Tìm mã phiếu ${activeTab === 'import' ? 'nhập' : 'xuất'}...`}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                style={{ width: '100%', padding: '12px 16px 12px 48px', borderRadius: '14px', border: '1px solid #e2e8f0', background: '#f8fafc', outline: 'none', fontWeight: '600' }}
+                className="input-pill"
+                style={{ paddingLeft: '44px', background: 'var(--page-bg)' }}
               />
             </div>
           </div>
 
-          <div style={{ padding: '24px' }}>
-            <OrdersTable 
-              columns={columns} 
-              data={data} 
+          <div style={{ padding: '20px 24px' }}>
+            <OrdersTable
+              columns={columns}
+              data={data}
               isLoading={isLoading}
               onRowClick={handleOpenDetail}
               pagination={{ ...pagination, onPageChange: fetchReceipts }}
@@ -309,31 +363,44 @@ const Inventory = () => {
         </div>
       </div>
 
-      <OrderDetailModalShell 
-        isOpen={isModalOpen} 
+      <OrderDetailModalShell
+        isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title={activeTab === 'import' ? 'Tạo Phiếu Nhập Kho Mới' : 'Tạo Phiếu Xuất Kho Mới'}
+        title={activeTab === 'import' ? 'Tạo phiếu nhập kho mới' : 'Tạo phiếu xuất kho mới'}
         size="xl"
         footer={
           <>
-            <button onClick={() => setIsModalOpen(false)} className="px-5 py-2.5 text-slate-600 hover:bg-slate-100 rounded-xl text-sm font-bold transition-colors">Hủy</button>
-            <button onClick={handleSave} className="px-5 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 transition-colors shadow-sm">
-              Xác nhận {activeTab === 'import' ? 'Nhập Kho' : 'Xuất Kho'}
+            <button type="button" onClick={() => setIsModalOpen(false)} className="btn-secondary">Hủy</button>
+            <button type="button" onClick={handleSave} className="btn-primary">
+              Xác nhận {activeTab === 'import' ? 'nhập kho' : 'xuất kho'}
             </button>
           </>
         }
       >
-        <div className="space-y-6">
-          {error && <div className="p-4 bg-rose-50 text-rose-600 rounded-xl text-sm font-medium border border-rose-100">{error}</div>}
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Left Col: Info & Search */}
-            <div className="md:col-span-1">
-              <FormTable className="bg-slate-50">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          {error && (
+            <div
+              style={{
+                padding: '14px 16px',
+                background: 'var(--danger-bg)',
+                color: 'var(--danger)',
+                borderRadius: 'var(--radius-md)',
+                fontSize: '14px',
+                fontWeight: 600,
+                border: '1px solid rgba(239, 68, 68, 0.25)'
+              }}
+            >
+              {error}
+            </div>
+          )}
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 2fr)', gap: '20px' }}>
+            <div>
+              <FormTable>
                 {activeTab === 'export' && (
                   <FormRow label="Lý do xuất *">
                     <select
-                      className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 bg-white"
+                      className="input-pill"
                       value={exportReason}
                       onChange={(e) => { setExportReason(e.target.value); setSelectedSupplier(null); }}
                     >
@@ -345,25 +412,56 @@ const Inventory = () => {
                 )}
 
                 {(activeTab === 'import' || exportReason === 'return_supplier') && (
-                  <FormRow label={<span className="inline-flex items-center gap-1"><Building2 size={14}/> Nhà cung cấp *</span>}>
+                  <FormRow label={<span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}><Building2 size={14} /> Nhà cung cấp *</span>}>
                     {selectedSupplier ? (
-                      <div className="flex items-center justify-between bg-white p-3 rounded-lg border border-indigo-100 ring-1 ring-indigo-500/20">
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          background: 'var(--primary-light)',
+                          padding: '12px 14px',
+                          borderRadius: 'var(--radius-md)',
+                          border: '1px solid var(--primary-glow)'
+                        }}
+                      >
                         <div>
-                          <div className="font-bold text-sm text-slate-800">{selectedSupplier.companyName}</div>
-                          <div className="text-xs text-slate-500">{selectedSupplier.phone}</div>
+                          <div style={{ fontWeight: 800, fontSize: '14px', color: 'var(--text-main)' }}>
+                            {selectedSupplier.companyName}
+                          </div>
+                          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                            {selectedSupplier.phone}
+                          </div>
                         </div>
-                        <button onClick={() => setSelectedSupplier(null)} className="text-slate-400 hover:text-rose-500 transition-colors"><Trash2 size={16}/></button>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedSupplier(null)}
+                          aria-label="Bỏ chọn"
+                          className="hover-red"
+                          style={{
+                            border: '1px solid var(--border-strong)',
+                            background: 'var(--surface)',
+                            color: 'var(--text-light)',
+                            padding: '8px',
+                            borderRadius: 'var(--radius-sm)',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          <Trash2 size={14} />
+                        </button>
                       </div>
                     ) : (
-                      <SearchAutocomplete 
+                      <SearchAutocomplete
                         onSearch={fetchSuppliersForSearch}
                         onSelect={(item) => setSelectedSupplier(item)}
                         placeholder="Tìm nhà cung cấp..."
                         displayValue={(item) => item.companyName}
                         renderItem={(item) => (
                           <div>
-                            <div className="font-bold text-slate-800 text-sm">{item.companyName}</div>
-                            <div className="text-xs text-slate-500">{item.phone}</div>
+                            <div style={{ fontWeight: 800, color: 'var(--text-main)', fontSize: '14px' }}>
+                              {item.companyName}
+                            </div>
+                            <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{item.phone}</div>
                           </div>
                         )}
                       />
@@ -371,19 +469,23 @@ const Inventory = () => {
                   </FormRow>
                 )}
 
-                <FormRow label={<span className="inline-flex items-center gap-1"><Search size={14}/> Tìm sản phẩm *</span>}>
-                  <SearchAutocomplete 
+                <FormRow label={<span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}><Search size={14} /> Tìm sản phẩm *</span>}>
+                  <SearchAutocomplete
                     onSearch={fetchVariantsForSearch}
                     onSelect={handleAddVariant}
                     placeholder="Gõ tên SKU hoặc sản phẩm..."
                     displayValue={(item) => item.skuCode}
                     renderItem={(item) => (
-                      <div className="flex justify-between items-center">
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div>
-                          <div className="font-bold text-slate-800 text-sm">{item.skuCode || 'N/A'}</div>
-                          <div className="text-xs text-slate-500">{item.productName}</div>
+                          <div style={{ fontWeight: 800, color: 'var(--text-main)', fontSize: '14px' }}>
+                            {item.skuCode || 'N/A'}
+                          </div>
+                          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{item.productName}</div>
                         </div>
-                        <div className="text-xs font-bold text-indigo-600">Tồn: {item.stockQuantity}</div>
+                        <div style={{ fontSize: '12px', fontWeight: 800, color: 'var(--primary)' }}>
+                          Tồn: {item.stockQuantity}
+                        </div>
                       </div>
                     )}
                   />
@@ -391,72 +493,162 @@ const Inventory = () => {
 
                 <FormRow label="Ghi chú">
                   <textarea
-                    className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-indigo-500 bg-white"
-                    rows="3"
+                    className="input-pill"
+                    rows={3}
                     value={notes}
-                    onChange={e => setNotes(e.target.value)}
+                    onChange={(e) => setNotes(e.target.value)}
                     placeholder="Nhập ghi chú cho phiếu này..."
-                  ></textarea>
+                  />
                 </FormRow>
               </FormTable>
             </div>
 
-            {/* Right Col: Grid */}
-            <div className="md:col-span-2 flex flex-col h-[400px]">
-              <div className="flex-1 overflow-y-auto border border-slate-200 rounded-2xl bg-white">
-                <table className="w-full text-left text-sm whitespace-nowrap">
-                  <thead className="bg-slate-50 sticky top-0 z-10 border-b border-slate-200 shadow-sm">
+            <div style={{ display: 'flex', flexDirection: 'column', minHeight: '400px' }}>
+              <div
+                style={{
+                  flex: 1,
+                  overflowY: 'auto',
+                  border: '1px solid var(--border-strong)',
+                  borderRadius: 'var(--radius-lg)',
+                  background: 'var(--surface)'
+                }}
+                className="custom-scrollbar"
+              >
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px', textAlign: 'left' }}>
+                  <thead
+                    style={{
+                      background: 'var(--page-bg)',
+                      position: 'sticky',
+                      top: 0,
+                      zIndex: 10,
+                      borderBottom: '1px solid var(--border-strong)'
+                    }}
+                  >
                     <tr>
-                      <th className="px-4 py-3 font-bold text-slate-600">Sản phẩm</th>
-                      <th className="px-4 py-3 font-bold text-slate-600 w-24 text-center">Tồn kho</th>
-                      <th className="px-4 py-3 font-bold text-slate-600 w-24">Số lượng</th>
-                      <th className="px-4 py-3 font-bold text-slate-600 w-32">Đơn giá</th>
-                      <th className="px-4 py-3 font-bold text-slate-600 w-32 text-right">Thành tiền</th>
-                      <th className="px-4 py-3 w-10"></th>
+                      {['Sản phẩm', 'Tồn kho', 'Số lượng', 'Đơn giá', 'Thành tiền', ''].map((h, i) => (
+                        <th
+                          key={i}
+                          style={{
+                            padding: '12px 16px',
+                            fontSize: '11px',
+                            fontWeight: 800,
+                            letterSpacing: '0.4px',
+                            textTransform: 'uppercase',
+                            color: 'var(--text-muted)',
+                            textAlign: i === 1 || i === 2 ? 'center' : i >= 3 && i < 5 ? (i === 4 ? 'right' : 'left') : 'left',
+                            width: i === 1 ? '90px' : i === 2 ? '90px' : i === 3 || i === 4 ? '130px' : i === 5 ? '40px' : undefined
+                          }}
+                        >
+                          {h}
+                        </th>
+                      ))}
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody>
                     {details.length === 0 ? (
                       <tr>
-                        <td colSpan="6" className="py-12 text-center text-slate-400">
-                          <Layers size={32} className="mx-auto mb-2 opacity-50"/>
+                        <td colSpan={6} style={{ padding: '48px 16px', textAlign: 'center', color: 'var(--text-light)' }}>
+                          <Layers size={32} style={{ display: 'block', margin: '0 auto 8px', opacity: 0.5 }} />
                           Chưa có sản phẩm nào trong phiếu.
                         </td>
                       </tr>
-                    ) : details.map((item, idx) => (
-                      <tr key={idx} className="hover:bg-slate-50/50">
-                        <td className="px-4 py-3">
-                          <div className="font-bold text-slate-800">{item.sku}</div>
-                          <div className="text-xs text-slate-500 truncate max-w-[150px]">{item.name}</div>
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                          <span className={`px-2 py-1 rounded text-xs font-bold ${item.currentStock > 0 ? 'bg-slate-100 text-slate-600' : 'bg-rose-100 text-rose-600'}`}>
-                            {item.currentStock}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3">
-                          <input type="number" min="1" className={`w-20 border rounded-lg px-2 py-1 text-center text-sm font-bold focus:ring-2 focus:ring-indigo-500 ${activeTab === 'export' && item.qty > item.currentStock ? 'border-rose-300 bg-rose-50 text-rose-600' : 'border-slate-200'}`}
-                            value={item.qty} onChange={e => updateDetail(idx, 'qty', e.target.value)} />
-                        </td>
-                        <td className="px-4 py-3">
-                          <input type="number" min="0" className="w-full border border-slate-200 rounded-lg px-2 py-1 text-sm font-bold focus:ring-2 focus:ring-indigo-500"
-                            value={item.price} onChange={e => updateDetail(idx, 'price', e.target.value)} />
-                        </td>
-                        <td className="px-4 py-3 text-right font-bold text-indigo-700">
-                          {formatMoney(Number(item.qty) * Number(item.price))}
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                          <button onClick={() => removeDetail(idx)} className="text-slate-400 hover:text-rose-500"><Trash2 size={16}/></button>
-                        </td>
-                      </tr>
-                    ))}
+                    ) : details.map((item, idx) => {
+                      const overstock = activeTab === 'export' && Number(item.qty) > item.currentStock;
+                      return (
+                        <tr key={idx} style={{ borderBottom: '1px solid var(--border-light)' }} className="table-row-hover">
+                          <td style={{ padding: '12px 16px' }}>
+                            <div style={{ fontWeight: 800, color: 'var(--text-main)' }}>{item.sku}</div>
+                            <div
+                              style={{
+                                fontSize: '12px',
+                                color: 'var(--text-muted)',
+                                maxWidth: '150px',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap'
+                              }}
+                            >
+                              {item.name}
+                            </div>
+                          </td>
+                          <td style={{ padding: '12px 16px', textAlign: 'center' }}>
+                            <span className={`tag ${item.currentStock > 0 ? 'tag-neutral' : 'tag-danger'}`}>
+                              {item.currentStock}
+                            </span>
+                          </td>
+                          <td style={{ padding: '12px 16px' }}>
+                            <input
+                              type="number"
+                              min="1"
+                              className="input-pill"
+                              value={item.qty}
+                              onChange={(e) => updateDetail(idx, 'qty', e.target.value)}
+                              style={{
+                                width: '88px',
+                                padding: '8px 10px',
+                                textAlign: 'center',
+                                fontWeight: 800,
+                                background: overstock ? 'var(--danger-bg)' : 'var(--surface)',
+                                color: overstock ? 'var(--danger)' : 'var(--text-main)',
+                                borderColor: overstock ? 'rgba(239, 68, 68, 0.4)' : 'var(--border-strong)'
+                              }}
+                            />
+                          </td>
+                          <td style={{ padding: '12px 16px' }}>
+                            <input
+                              type="number"
+                              min="0"
+                              className="input-pill"
+                              value={item.price}
+                              onChange={(e) => updateDetail(idx, 'price', e.target.value)}
+                              style={{ padding: '8px 10px', fontWeight: 700 }}
+                            />
+                          </td>
+                          <td style={{ padding: '12px 16px', textAlign: 'right', fontWeight: 800, color: 'var(--primary)' }}>
+                            {formatMoney(Number(item.qty) * Number(item.price))}
+                          </td>
+                          <td style={{ padding: '12px 16px', textAlign: 'center' }}>
+                            <button
+                              type="button"
+                              onClick={() => removeDetail(idx)}
+                              aria-label="Xóa sản phẩm"
+                              className="hover-red"
+                              style={{
+                                border: 'none',
+                                background: 'transparent',
+                                color: 'var(--text-light)',
+                                cursor: 'pointer',
+                                padding: '4px'
+                              }}
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
 
-              <div className="mt-4 p-4 bg-indigo-50 rounded-2xl border border-indigo-100 flex justify-between items-center">
-                <span className="font-bold text-indigo-900">Tổng cộng ({details.length} mặt hàng):</span>
-                <span className="text-xl font-black text-indigo-700">{formatMoney(totalAmount)}</span>
+              <div
+                style={{
+                  marginTop: '14px',
+                  padding: '16px 20px',
+                  background: 'var(--primary-light)',
+                  borderRadius: 'var(--radius-lg)',
+                  border: '1px solid var(--primary-glow)',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}
+              >
+                <span style={{ fontWeight: 800, color: 'var(--text-main)' }}>
+                  Tổng cộng ({details.length} mặt hàng):
+                </span>
+                <span style={{ fontSize: '20px', fontWeight: 900, color: 'var(--primary)' }}>
+                  {formatMoney(totalAmount)}
+                </span>
               </div>
             </div>
           </div>

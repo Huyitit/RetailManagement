@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-const SearchAutocomplete = ({ 
-  onSearch, // Function that returns a Promise resolving to data array
-  onSelect, // Function called when an item is selected
-  placeholder = "Tìm kiếm...",
-  renderItem, // Function to render each row in dropdown
-  displayValue, // Function to get string value from selected item for input
+const SearchAutocomplete = ({
+  onSearch,
+  onSelect,
+  placeholder = 'Tìm kiếm...',
+  renderItem,
+  displayValue,
   icon,
-  className = ""
+  style
 }) => {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
@@ -16,14 +16,13 @@ const SearchAutocomplete = ({
   const wrapperRef = useRef(null);
 
   useEffect(() => {
-    // Close dropdown when clicking outside
     function handleClickOutside(event) {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
         setIsOpen(false);
       }
     }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   useEffect(() => {
@@ -35,7 +34,7 @@ const SearchAutocomplete = ({
           setResults(data);
           setIsOpen(true);
         } catch (error) {
-          console.error("Search failed:", error);
+          console.error('Search failed:', error);
           setResults([]);
         } finally {
           setIsLoading(false);
@@ -44,49 +43,100 @@ const SearchAutocomplete = ({
         setResults([]);
         setIsOpen(false);
       }
-    }, 400); // 400ms debounce
-
+    }, 400);
     return () => clearTimeout(delayDebounceFn);
   }, [query, onSearch]);
 
   const handleSelect = (item) => {
-    setQuery(''); // Reset query or set to displayValue(item) depending on use case
+    setQuery('');
     setIsOpen(false);
     onSelect(item);
   };
 
   return (
-    <div ref={wrapperRef} className={`relative ${className}`}>
-      <div className="relative">
+    <div ref={wrapperRef} style={{ position: 'relative', ...style }}>
+      <div style={{ position: 'relative' }}>
         {icon && (
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              bottom: 0,
+              left: '14px',
+              display: 'flex',
+              alignItems: 'center',
+              pointerEvents: 'none',
+              color: 'var(--text-light)'
+            }}
+          >
             {icon}
           </div>
         )}
         <input
           type="text"
-          className={`w-full bg-white border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 block ${icon ? 'pl-10' : 'pl-4'} p-2.5 transition-all`}
+          className="input-pill"
+          style={{ paddingLeft: icon ? '44px' : '16px' }}
           placeholder={placeholder}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => { if (results.length > 0) setIsOpen(true); }}
         />
         {isLoading && (
-          <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-            <div className="animate-spin h-4 w-4 border-2 border-indigo-500 border-t-transparent rounded-full"></div>
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              bottom: 0,
+              right: '14px',
+              display: 'flex',
+              alignItems: 'center',
+              pointerEvents: 'none'
+            }}
+          >
+            <div
+              style={{
+                width: '16px',
+                height: '16px',
+                border: '2px solid var(--primary)',
+                borderTopColor: 'transparent',
+                borderRadius: '50%',
+                animation: 'spin 0.8s linear infinite'
+              }}
+            />
           </div>
         )}
       </div>
 
-      {/* Dropdown Menu */}
       {isOpen && results.length > 0 && (
-        <div className="absolute z-50 mt-1 w-full bg-white rounded-xl shadow-lg border border-slate-100 max-h-60 overflow-y-auto animate-in fade-in slide-in-from-top-2">
-          <ul className="py-1 divide-y divide-slate-50">
+        <div
+          style={{
+            position: 'absolute',
+            zIndex: 50,
+            marginTop: '6px',
+            width: '100%',
+            background: 'var(--surface)',
+            borderRadius: 'var(--radius-md)',
+            boxShadow: 'var(--shadow-lg)',
+            border: '1px solid var(--border-light)',
+            maxHeight: '260px',
+            overflowY: 'auto'
+          }}
+        >
+          <ul style={{ listStyle: 'none', padding: '4px 0', margin: 0 }}>
             {results.map((item, index) => (
-              <li 
+              <li
                 key={index}
                 onClick={() => handleSelect(item)}
-                className="px-4 py-2 hover:bg-slate-50 cursor-pointer transition-colors"
+                style={{
+                  padding: '10px 16px',
+                  cursor: 'pointer',
+                  borderBottom: '1px solid var(--border-light)',
+                  fontSize: '14px',
+                  color: 'var(--text-main)',
+                  transition: 'background 0.15s ease'
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--surface-muted)')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
               >
                 {renderItem ? renderItem(item) : (displayValue ? displayValue(item) : 'Kết quả')}
               </li>
@@ -94,11 +144,26 @@ const SearchAutocomplete = ({
           </ul>
         </div>
       )}
-      
+
       {isOpen && query.length > 1 && results.length === 0 && !isLoading && (
-         <div className="absolute z-50 mt-1 w-full bg-white rounded-xl shadow-lg border border-slate-100 p-4 text-center text-sm text-slate-500">
-           Không tìm thấy kết quả phù hợp.
-         </div>
+        <div
+          style={{
+            position: 'absolute',
+            zIndex: 50,
+            marginTop: '6px',
+            width: '100%',
+            background: 'var(--surface)',
+            borderRadius: 'var(--radius-md)',
+            boxShadow: 'var(--shadow-lg)',
+            border: '1px solid var(--border-light)',
+            padding: '14px',
+            textAlign: 'center',
+            fontSize: '13px',
+            color: 'var(--text-muted)'
+          }}
+        >
+          Không tìm thấy kết quả phù hợp.
+        </div>
       )}
     </div>
   );

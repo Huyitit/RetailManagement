@@ -25,29 +25,22 @@ const Products = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [currentProduct, setCurrentProduct] = useState(null);
-  
-  // Base Product Form
+
   const [formData, setFormData] = useState({
     categoryId: '', name: '', brand: '', description: '', warrantyPeriod: 12
   });
-  
-  // Dynamic Variants Builder
+
   const [variants, setVariants] = useState([]);
   const [removedVariantIds, setRemovedVariantIds] = useState([]);
-
   const [error, setError] = useState('');
 
-  const fetchProducts = async (page = 1) => {
+  const fetchProducts = async () => {
     setIsLoading(true);
     try {
       const response = await getProducts({ q: search });
       const rows = Array.isArray(response.data) ? response.data : [];
       setData(rows);
-      setPagination({
-        currentPage: 1,
-        totalPages: 1,
-        totalItems: rows.length
-      });
+      setPagination({ currentPage: 1, totalPages: 1, totalItems: rows.length });
     } catch (err) {
       console.error('Failed to fetch products:', err);
     } finally {
@@ -65,14 +58,9 @@ const Products = () => {
     }
   };
 
+  useEffect(() => { fetchCategories(); }, []);
   useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
-      fetchProducts(1);
-    }, 500);
+    const delayDebounceFn = setTimeout(() => { fetchProducts(); }, 500);
     return () => clearTimeout(delayDebounceFn);
   }, [search]);
 
@@ -115,12 +103,7 @@ const Products = () => {
     setCurrentProduct(null);
     setFormData({ categoryId: categories[0]?.categoryId || '', name: '', brand: '', description: '', warrantyPeriod: 12 });
     setVariants([{
-      sku: '',
-      price: '',
-      importPrice: '',
-      discount: '',
-      minStock: '',
-      stockQuantity: 0,
+      sku: '', price: '', importPrice: '', discount: '', minStock: '', stockQuantity: 0,
       attributesList: [{ name: '', value: '' }]
     }]);
     setRemovedVariantIds([]);
@@ -129,12 +112,7 @@ const Products = () => {
 
   const addVariantField = () => {
     setVariants([...variants, {
-      sku: '',
-      price: '',
-      importPrice: '',
-      discount: '',
-      minStock: '',
-      stockQuantity: 0,
+      sku: '', price: '', importPrice: '', discount: '', minStock: '', stockQuantity: 0,
       attributesList: [{ name: '', value: '' }]
     }]);
   };
@@ -180,17 +158,19 @@ const Products = () => {
     setVariants(variants.filter((_, i) => i !== index));
   };
 
+  const attributesFromVariant = (attributesList) => (attributesList || [])
+    .map((attr) => ({ name: attr.name?.trim() || '', value: attr.value?.trim() || '' }))
+    .filter((attr) => attr.name && attr.value);
+
   const handleSave = async () => {
     if (!formData.name || !formData.categoryId || !formData.brand) {
       setError('Vui lòng điền đủ thông tin cơ bản sản phẩm (Tên, Danh mục, Thương hiệu).');
       return;
     }
-
     if (!isEditMode && variants.length === 0) {
       setError('Phải có ít nhất 1 phiên bản (Variant) cho sản phẩm mới.');
       return;
     }
-
     const hasInvalidPrice = variants.some((variant) => {
       const price = Number(variant.price);
       return !Number.isFinite(price) || price <= 0;
@@ -202,7 +182,6 @@ const Products = () => {
 
     try {
       if (isEditMode) {
-        // Update base product
         await updateProduct(currentProduct.productId, {
           productName: formData.name,
           categoryId: formData.categoryId,
@@ -211,70 +190,44 @@ const Products = () => {
           warrantyPeriod: formData.warrantyPeriod
         });
 
-        const attributesFromVariant = (attributesList) => {
-          return (attributesList || [])
-            .map((attr) => ({
-              name: attr.name?.trim() || '',
-              value: attr.value?.trim() || ''
-            }))
-            .filter((attr) => attr.name && attr.value);
-        };
-
-        const updateRequests = variants
-          .filter((variant) => variant.variantId)
-          .map((variant) => updateVariantApi(variant.variantId, {
-            skuCode: variant.sku,
-            sellPrice: Number(variant.price),
-            importPrice: variant.importPrice === '' ? undefined : Number(variant.importPrice),
-            discount: variant.discount === '' ? undefined : Number(variant.discount),
-            minStock: variant.minStock === '' ? undefined : Number(variant.minStock),
-            stockQuantity: Number(variant.stockQuantity),
-            attributes: attributesFromVariant(variant.attributesList)
-          }));
-
-        const createRequests = variants
-          .filter((variant) => !variant.variantId)
-          .map((variant) => createVariant({
-            productId: currentProduct.productId,
-            skuCode: variant.sku,
-            sellPrice: Number(variant.price),
-            importPrice: variant.importPrice === '' ? undefined : Number(variant.importPrice),
-            stockQuantity: Number(variant.stockQuantity),
-            attributes: attributesFromVariant(variant.attributesList)
-          }));
-
-        const deleteRequests = removedVariantIds.map((variantId) => deleteVariantApi(variantId));
+        const updateRequests = variants.filter((v) => v.variantId).map((v) => updateVariantApi(v.variantId, {
+          skuCode: v.sku,
+          sellPrice: Number(v.price),
+          importPrice: v.importPrice === '' ? undefined : Number(v.importPrice),
+          discount: v.discount === '' ? undefined : Number(v.discount),
+          minStock: v.minStock === '' ? undefined : Number(v.minStock),
+          stockQuantity: Number(v.stockQuantity),
+          attributes: attributesFromVariant(v.attributesList)
+        }));
+        const createRequests = variants.filter((v) => !v.variantId).map((v) => createVariant({
+          productId: currentProduct.productId,
+          skuCode: v.sku,
+          sellPrice: Number(v.price),
+          importPrice: v.importPrice === '' ? undefined : Number(v.importPrice),
+          stockQuantity: Number(v.stockQuantity),
+          attributes: attributesFromVariant(v.attributesList)
+        }));
+        const deleteRequests = removedVariantIds.map((id) => deleteVariantApi(id));
 
         await Promise.all([...updateRequests, ...createRequests, ...deleteRequests]);
       } else {
-        // Create Product + Variants
-        const attributesFromVariant = (attributesList) => {
-          return (attributesList || [])
-            .map((attr) => ({
-              name: attr.name?.trim() || '',
-              value: attr.value?.trim() || ''
-            }))
-            .filter((attr) => attr.name && attr.value);
-        };
-
-        const payload = {
+        await createProduct({
           productName: formData.name,
           categoryId: formData.categoryId,
           brand: formData.brand,
           description: formData.description,
           warrantyPeriod: formData.warrantyPeriod,
-          variants: variants.map(v => ({
+          variants: variants.map((v) => ({
             skuCode: v.sku,
             sellPrice: Number(v.price),
             importPrice: v.importPrice === '' ? undefined : Number(v.importPrice),
             stockQuantity: Number(v.stockQuantity),
             attributes: attributesFromVariant(v.attributesList)
           }))
-        };
-        await createProduct(payload);
+        });
       }
       setIsModalOpen(false);
-      fetchProducts(pagination.currentPage);
+      fetchProducts();
     } catch (err) {
       setError(err.response?.data?.message || 'Có lỗi xảy ra.');
     }
@@ -285,78 +238,128 @@ const Products = () => {
     if (window.confirm(`Bạn có chắc muốn xóa/ngừng kinh doanh sản phẩm "${productLabel}"?`)) {
       try {
         await deleteProduct(product.productId);
-        fetchProducts(pagination.currentPage);
+        fetchProducts();
       } catch (err) {
         alert(err.response?.data?.message || 'Lỗi khi xóa');
       }
     }
   };
 
+  const productThumbStyle = {
+    width: '48px',
+    height: '48px',
+    borderRadius: 'var(--radius-md)',
+    background: 'var(--surface-muted)',
+    color: 'var(--text-muted)',
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: '14px',
+    border: '1px solid var(--border-strong)',
+    flexShrink: 0
+  };
+
   const columns = [
-    { header: 'Sản phẩm', accessor: 'productName', render: (row) => (
-      <div className="flex items-center">
-        <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 mr-4 border border-slate-200 shadow-sm">
-          <Package size={24} />
+    {
+      header: 'Sản phẩm', accessor: 'productName', render: (row) => (
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <div style={productThumbStyle}><Package size={24} /></div>
+          <div>
+            <div style={{ fontWeight: 700, color: 'var(--text-main)', fontSize: '15px' }}>
+              {row.productName || 'N/A'}
+            </div>
+            <div style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '2px' }}>
+              {row.brand || 'N/A'}
+            </div>
+          </div>
         </div>
-        <div>
-          <div className="font-bold text-slate-900 text-base">{row.productName || 'N/A'}</div>
-          <div className="text-sm text-slate-500 font-medium mt-0.5">{row.brand || 'N/A'}</div>
-        </div>
-      </div>
-    )},
-    { header: 'Danh mục', accessor: 'categoryId', render: (row) => (
-      <div className="font-medium text-slate-700">
-        {row.category || 'N/A'}
-      </div>
-    )},
-    { header: 'Bảo hành', accessor: 'warrantyPeriod', align: 'center', render: (row) => (
-      <div className="text-slate-600 font-semibold">{row.warrantyPeriod} tháng</div>
-    )},
-    { header: 'Phân loại (Variants)', accessor: 'variants', align: 'center', render: (row) => (
-      <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-indigo-50 text-indigo-700 rounded-lg font-bold text-sm">
-        <Layers size={14} /> {row.variants?.length || 0}
-      </div>
-    )},
-    { header: 'Trạng thái', accessor: 'status', render: (row) => (
-      <StatusBadge status={row.status || 'Active'} />
-    )}
+      )
+    },
+    {
+      header: 'Danh mục', accessor: 'categoryId', render: (row) => (
+        <div style={{ color: 'var(--text-main)', fontWeight: 600 }}>{row.category || 'N/A'}</div>
+      )
+    },
+    {
+      header: 'Bảo hành', accessor: 'warrantyPeriod', align: 'center', render: (row) => (
+        <div style={{ color: 'var(--text-muted)', fontWeight: 700 }}>{row.warrantyPeriod} tháng</div>
+      )
+    },
+    {
+      header: 'Phân loại (Variants)', accessor: 'variants', align: 'center', render: (row) => (
+        <span className="tag tag-primary">
+          <Layers size={14} /> {row.variants?.length || 0}
+        </span>
+      )
+    },
+    {
+      header: 'Trạng thái', accessor: 'status', render: (row) => (
+        <StatusBadge status={row.status || 'Active'} />
+      )
+    }
   ];
 
   return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: '#f8fafc', overflow: 'hidden' }}>
-      <header style={{ padding: '32px 40px', background: 'white', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
+    <div className="page-shell">
+      <header className="page-header">
         <div>
-          <h1 style={{ fontSize: '28px', fontWeight: '950', color: '#0f172a', margin: 0 }}>Danh mục Sản phẩm</h1>
-          <p style={{ color: '#64748b', fontSize: '14px', marginTop: '4px', fontWeight: '600' }}>Quản lý kho hàng, thương hiệu và các phân loại giá</p>
+          <h1 className="page-title">Danh mục sản phẩm</h1>
+          <p className="page-subtitle">Quản lý kho hàng, thương hiệu và các phân loại giá</p>
         </div>
-        <button
-          onClick={() => handleOpenModal()}
-          style={{ background: '#4f46e5', color: 'white', padding: '12px 24px', borderRadius: '12px', border: 'none', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', boxShadow: '0 4px 6px -1px rgba(79, 70, 229, 0.2)' }}
-        >
-          <Plus size={18} /> Thêm Sản phẩm
+        <button type="button" onClick={() => handleOpenModal()} className="btn-primary">
+          <Plus size={18} /> Thêm sản phẩm
         </button>
       </header>
 
-      <div className="custom-scrollbar" style={{ flex: 1, overflowY: 'auto', padding: '32px 40px' }}>
-        <div style={{ background: 'white', borderRadius: '24px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-          <div style={{ padding: '24px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ fontSize: '13px', fontWeight: '800', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Danh sach san pham</div>
+      <div className="page-body custom-scrollbar">
+        <div className="surface-card-flush">
+          <div
+            style={{
+              padding: '20px 24px',
+              borderBottom: '1px solid var(--border-light)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              gap: '16px'
+            }}
+          >
+            <div
+              style={{
+                fontSize: '12px',
+                fontWeight: 800,
+                color: 'var(--text-muted)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px'
+              }}
+            >
+              Danh sách sản phẩm
+            </div>
             <div style={{ position: 'relative', width: '320px' }}>
-              <Search size={18} style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+              <Search
+                size={18}
+                style={{
+                  position: 'absolute',
+                  left: '14px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  color: 'var(--text-light)'
+                }}
+              />
               <input
                 type="text"
                 placeholder="Tìm theo tên sản phẩm, thương hiệu..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                style={{ width: '100%', padding: '12px 16px 12px 48px', borderRadius: '14px', border: '1px solid #e2e8f0', background: '#f8fafc', outline: 'none', fontWeight: '600' }}
+                className="input-pill"
+                style={{ paddingLeft: '44px', background: 'var(--page-bg)' }}
               />
             </div>
           </div>
 
-          <div style={{ padding: '24px' }}>
-            <OrdersTable 
-              columns={columns} 
-              data={data} 
+          <div style={{ padding: '20px 24px' }}>
+            <OrdersTable
+              columns={columns}
+              data={data}
               isLoading={isLoading}
               onEdit={handleOpenModal}
               onDelete={handleDelete}

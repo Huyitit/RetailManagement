@@ -1,65 +1,112 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, ShoppingCart, ReceiptText, ShieldCheck, LogOut, Users, Building2, UserCog, Package, PackageOpen, BarChart3 } from 'lucide-react';
+import {
+  LayoutDashboard, ShoppingCart, ReceiptText, LogOut,
+  Users, Building2, UserCog, Package, PackageOpen, BarChart3
+} from 'lucide-react';
+
+const menuItems = [
+  { icon: <LayoutDashboard size={20} />, label: 'Tổng quan', path: '/dashboard' },
+  { icon: <BarChart3 size={20} />, label: 'Báo cáo', path: '/reports' },
+  { icon: <ReceiptText size={20} />, label: 'Đơn hàng', path: '/orders' },
+  { icon: <Package size={20} />, label: 'Sản phẩm', path: '/products' },
+  { icon: <PackageOpen size={20} />, label: 'Kho hàng', path: '/inventory' },
+  { icon: <Users size={20} />, label: 'Khách hàng', path: '/customers' },
+  { icon: <Building2 size={20} />, label: 'Nhà cung cấp', path: '/suppliers' },
+  { icon: <UserCog size={20} />, label: 'Nhân sự', path: '/staff' },
+];
+
+const navLinkStyle = ({ isActive }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '12px',
+  padding: '12px 16px',
+  borderRadius: 'var(--radius-md)',
+  textDecoration: 'none',
+  fontSize: '14px',
+  fontWeight: 700,
+  transition: 'all 0.2s ease',
+  color: isActive ? 'var(--primary)' : 'var(--text-muted)',
+  background: isActive ? 'var(--primary-light)' : 'transparent',
+  border: `1px solid ${isActive ? 'var(--primary-glow)' : 'transparent'}`
+});
 
 const Sidebar = () => {
-  const menuItems = [
-    { icon: <LayoutDashboard size={20} />, label: 'Tổng quan', path: '/dashboard' },
-    { icon: <BarChart3 size={20} />, label: 'Báo cáo', path: '/reports' },
-    { icon: <ReceiptText size={20} />, label: 'Đơn hàng', path: '/orders' },
-    { icon: <Package size={20} />, label: 'Sản phẩm', path: '/products' },
-    { icon: <PackageOpen size={20} />, label: 'Kho hàng', path: '/inventory' },
-    { icon: <Users size={20} />, label: 'Khách hàng', path: '/customers' },
-    { icon: <Building2 size={20} />, label: 'Nhà cung cấp', path: '/suppliers' },
-    { icon: <UserCog size={20} />, label: 'Nhân sự', path: '/staff' },
-  ];
-
   return (
-    <div style={{
-      width: '260px',
-      background: 'white',
-      borderRight: '1px solid #e2e8f0',
-      display: 'flex',
-      flexDirection: 'column',
-      height: '100vh',
-      flexShrink: 0
-    }}>
-      <div style={{ padding: '32px 24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <div style={{ width: '40px', height: '40px', background: 'var(--primary)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
-          <LayoutDashboard size={24} />
+    <div
+      style={{
+        width: '260px',
+        background: 'var(--surface)',
+        borderRight: '1px solid var(--border-strong)',
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100vh',
+        flexShrink: 0
+      }}
+    >
+      <div style={{ padding: '28px 24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div
+          style={{
+            width: '40px',
+            height: '40px',
+            background: 'var(--primary)',
+            borderRadius: 'var(--radius-md)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'white'
+          }}
+        >
+          <LayoutDashboard size={22} />
         </div>
-        <span style={{ fontSize: '20px', fontWeight: '900', color: '#0f172a', letterSpacing: '-0.5px' }}>RETAIL POS</span>
+        <span
+          style={{
+            fontSize: '18px',
+            fontWeight: 900,
+            color: 'var(--text-main)',
+            letterSpacing: '-0.5px'
+          }}
+        >
+          RETAIL POS
+        </span>
       </div>
 
       <nav style={{ flex: 1, padding: '0 16px' }}>
-        <div style={{ color: '#94a3b8', fontSize: '11px', fontWeight: '800', textTransform: 'uppercase', marginBottom: '16px', paddingLeft: '8px' }}>Menu chính</div>
+        <div
+          style={{
+            color: 'var(--text-light)',
+            fontSize: '11px',
+            fontWeight: 800,
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px',
+            marginBottom: '12px',
+            paddingLeft: '8px'
+          }}
+        >
+          Menu chính
+        </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
           {menuItems.map((item) => (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              style={({ isActive }) => ({
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                padding: '12px 16px',
-                borderRadius: '12px',
-                textDecoration: 'none',
-                fontSize: '14px',
-                fontWeight: '700',
-                transition: 'all 0.2s',
-                color: isActive ? 'var(--primary)' : '#64748b',
-                background: isActive ? 'var(--primary-light)' : 'transparent',
-                border: isActive ? '1px solid var(--primary-glow)' : '1px solid transparent'
-              })}
-            >
+            <NavLink key={item.path} to={item.path} style={navLinkStyle}>
               {item.icon}
               {item.label}
             </NavLink>
           ))}
 
-          <div style={{ margin: '16px 0', height: '1px', background: '#f1f5f9' }}></div>
-          <div style={{ color: '#94a3b8', fontSize: '11px', fontWeight: '800', textTransform: 'uppercase', marginBottom: '8px', paddingLeft: '8px' }}>Giao dịch</div>
+          <div style={{ margin: '16px 0', height: '1px', background: 'var(--border-light)' }} />
+          <div
+            style={{
+              color: 'var(--text-light)',
+              fontSize: '11px',
+              fontWeight: 800,
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px',
+              marginBottom: '8px',
+              paddingLeft: '8px'
+            }}
+          >
+            Giao dịch
+          </div>
 
           <NavLink
             to="/pos"
@@ -68,14 +115,13 @@ const Sidebar = () => {
               alignItems: 'center',
               gap: '12px',
               padding: '14px 16px',
-              borderRadius: '12px',
+              borderRadius: 'var(--radius-md)',
               textDecoration: 'none',
               fontSize: '14px',
-              fontWeight: '800',
-              transition: 'all 0.2s',
+              fontWeight: 800,
               color: 'white',
               background: 'var(--primary)',
-              boxShadow: '0 4px 12px var(--primary-glow)'
+              boxShadow: 'var(--shadow-primary)'
             }}
           >
             <ShoppingCart size={20} />
@@ -84,7 +130,7 @@ const Sidebar = () => {
         </div>
       </nav>
 
-      <div style={{ padding: '24px', borderTop: '1px solid #f1f5f9' }}>
+      <div style={{ padding: '20px', borderTop: '1px solid var(--border-light)' }}>
         <NavLink
           to="/login"
           onClick={() => localStorage.removeItem('staffInfo')}
@@ -94,13 +140,11 @@ const Sidebar = () => {
             alignItems: 'center',
             gap: '12px',
             padding: '12px 16px',
-            borderRadius: '12px',
-            border: 'none',
-            background: '#fff1f2',
-            color: '#e11d48',
+            borderRadius: 'var(--radius-md)',
+            background: 'var(--danger-bg)',
+            color: 'var(--danger)',
             fontSize: '14px',
-            fontWeight: '700',
-            cursor: 'pointer',
+            fontWeight: 700,
             textDecoration: 'none'
           }}
         >

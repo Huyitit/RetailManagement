@@ -1,24 +1,43 @@
 import React from 'react';
 
-const FormTable = ({ children, className = '' }) => {
+const FormTable = ({ children, style }) => {
   return (
-    <div className={`border border-slate-200 rounded-2xl overflow-hidden bg-white ${className}`.trim()}>
-      <table className="w-full text-sm">
-        <tbody className="divide-y divide-slate-100">
-          {children}
-        </tbody>
+    <div
+      style={{
+        border: '1px solid var(--border-strong)',
+        borderRadius: 'var(--radius-lg)',
+        overflow: 'hidden',
+        background: 'var(--surface)',
+        ...style
+      }}
+    >
+      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
+        <tbody>{children}</tbody>
       </table>
     </div>
   );
 };
 
-const FormRow = ({ label, children, labelClassName = '', cellClassName = '' }) => {
+const FormRow = ({ label, children, labelStyle, cellStyle }) => {
   return (
-    <tr className="align-top">
-      <th className={`w-44 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wide text-slate-500 bg-slate-50 ${labelClassName}`.trim()}>
+    <tr style={{ verticalAlign: 'top', borderBottom: '1px solid var(--border-light)' }}>
+      <th
+        style={{
+          width: '180px',
+          padding: '14px 18px',
+          textAlign: 'left',
+          fontSize: '11px',
+          fontWeight: 800,
+          letterSpacing: '0.4px',
+          textTransform: 'uppercase',
+          color: 'var(--text-muted)',
+          background: 'var(--page-bg)',
+          ...labelStyle
+        }}
+      >
         {label}
       </th>
-      <td className={`px-4 py-3 bg-white ${cellClassName}`.trim()}>
+      <td style={{ padding: '14px 18px', background: 'var(--surface)', ...cellStyle }}>
         {children}
       </td>
     </tr>

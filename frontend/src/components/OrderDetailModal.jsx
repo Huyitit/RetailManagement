@@ -52,11 +52,11 @@ const OrderDetailModal = ({ receiptId, onClose }) => {
     return dateObj.toLocaleString('vi-VN');
   };
 
-  const PRIMARY_BLUE = '#3b82f6';
-  const SUCCESS_GREEN = '#10b981';
-  const SOFT_RED = '#fef2f2';
-  const BORDER_RED = '#f87171';
-  const TEXT_RED = '#ef4444';
+  const PRIMARY_BLUE = 'var(--primary)';
+  const SUCCESS_GREEN = 'var(--success)';
+  const SOFT_RED = 'var(--danger-soft-bg)';
+  const BORDER_RED = 'rgba(239, 68, 68, 0.4)';
+  const TEXT_RED = 'var(--danger)';
 
   useEffect(() => {
     if (receiptId) fetchOrderDetail();
@@ -190,8 +190,8 @@ const OrderDetailModal = ({ receiptId, onClose }) => {
         <div style={{ background: 'white', padding: '40px', borderRadius: '24px', textAlign: 'center', maxWidth: '400px' }}>
           <AlertCircle size={48} color={TEXT_RED} style={{ margin: '0 auto 16px' }} />
           <h3 style={{ margin: '0 0 8px', fontWeight: '900' }}>Lỗi dữ liệu</h3>
-          <p style={{ color: '#64748b', fontSize: '14px', marginBottom: '24px' }}>{error}</p>
-          <button onClick={onClose} style={{ padding: '12px 32px', borderRadius: '12px', background: '#f1f5f9', border: 'none', fontWeight: '800', cursor: 'pointer' }}>Đóng</button>
+          <p style={{ color: 'var(--text-muted)', fontSize: '14px', marginBottom: '24px' }}>{error}</p>
+          <button onClick={onClose} style={{ padding: '12px 32px', borderRadius: '12px', background: 'var(--border-light)', border: 'none', fontWeight: '800', cursor: 'pointer' }}>Đóng</button>
         </div>
       </div>
     );
@@ -205,9 +205,9 @@ const OrderDetailModal = ({ receiptId, onClose }) => {
         <div style={{ padding: '24px 32px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
              {view === 'return' && <button onClick={() => setView('detail')} style={{ border: 'none', background: 'none', padding: '4px', cursor: 'pointer' }}><ArrowLeft size={24} /></button>}
-             <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '900', color: '#0f172a' }}>{view === 'return' ? 'Sửa Hóa Đơn' : `Chi Tiết Hóa Đơn #HD${String(order.receiptId).padStart(6, '0')}`}</h2>
+             <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '900', color: 'var(--text-main)' }}>{view === 'return' ? 'Sửa Hóa Đơn' : `Chi Tiết Hóa Đơn #HD${String(order.receiptId).padStart(6, '0')}`}</h2>
           </div>
-          <button onClick={onClose} style={{ border: 'none', background: '#f8fafc', width: '40px', height: '40px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <button onClick={onClose} style={{ border: 'none', background: 'var(--page-bg)', width: '40px', height: '40px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <X size={20} color="#94a3b8" />
           </button>
         </div>
@@ -215,11 +215,11 @@ const OrderDetailModal = ({ receiptId, onClose }) => {
         {/* Navigation Tabs (Only in Detail View) */}
         {view === 'detail' && (
           <div style={{ padding: '16px 24px' }}>
-            <div style={{ background: '#f1f5f9', padding: '6px', borderRadius: '16px', display: 'flex', gap: '4px' }}>
-              <button onClick={() => setActiveTab('detail')} style={{ flex: 1, padding: '10px', borderRadius: '12px', border: 'none', background: activeTab === 'detail' ? 'white' : 'transparent', color: activeTab === 'detail' ? '#0f172a' : '#64748b', fontWeight: '700', fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', cursor: 'pointer', boxShadow: activeTab === 'detail' ? '0 4px 12px rgba(0,0,0,0.05)' : 'none' }}>
+            <div style={{ background: 'var(--border-light)', padding: '6px', borderRadius: '16px', display: 'flex', gap: '4px' }}>
+              <button onClick={() => setActiveTab('detail')} style={{ flex: 1, padding: '10px', borderRadius: '12px', border: 'none', background: activeTab === 'detail' ? 'white' : 'transparent', color: activeTab === 'detail' ? 'var(--text-main)' : 'var(--text-muted)', fontWeight: '700', fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', cursor: 'pointer', boxShadow: activeTab === 'detail' ? '0 4px 12px rgba(0,0,0,0.05)' : 'none' }}>
                 <FileText size={18} /> Chi tiết
               </button>
-              <button onClick={() => setActiveTab('warranty')} style={{ flex: 1, padding: '10px', borderRadius: '12px', border: 'none', background: activeTab === 'warranty' ? 'white' : 'transparent', color: activeTab === 'warranty' ? '#0f172a' : '#64748b', fontWeight: '700', fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', cursor: 'pointer', boxShadow: activeTab === 'warranty' ? '0 4px 12px rgba(0,0,0,0.05)' : 'none' }}>
+              <button onClick={() => setActiveTab('warranty')} style={{ flex: 1, padding: '10px', borderRadius: '12px', border: 'none', background: activeTab === 'warranty' ? 'white' : 'transparent', color: activeTab === 'warranty' ? 'var(--text-main)' : 'var(--text-muted)', fontWeight: '700', fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', cursor: 'pointer', boxShadow: activeTab === 'warranty' ? '0 4px 12px rgba(0,0,0,0.05)' : 'none' }}>
                 <ShieldCheck size={18} /> Lịch sử bảo hành
               </button>
             </div>
@@ -234,11 +234,11 @@ const OrderDetailModal = ({ receiptId, onClose }) => {
             <div style={{ animation: 'fadeIn 0.2s' }}>
               {/* Customer Info Row */}
               <div style={{ display: 'flex', gap: '16px', marginBottom: '24px' }}>
-                <div style={{ flex: 1, padding: '14px 20px', background: '#f8fafc', borderRadius: '16px', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ flex: 1, padding: '14px 20px', background: 'var(--page-bg)', borderRadius: '16px', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '12px' }}>
                   <User size={18} color={PRIMARY_BLUE} />
-                  <span style={{ fontWeight: '800', color: '#1e293b' }}>{order.customerName}</span>
+                  <span style={{ fontWeight: '800', color: 'var(--text-main)' }}>{order.customerName}</span>
                 </div>
-                <div style={{ flex: 1, padding: '14px 20px', background: '#f0fdf4', borderRadius: '16px', border: '1px solid #bcf0da', display: 'flex', alignItems: 'center', gap: '12px', color: '#059669' }}>
+                <div style={{ flex: 1, padding: '14px 20px', background: 'var(--success-bg)', borderRadius: '16px', border: '1px solid rgba(16, 185, 129, 0.35)', display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--success)' }}>
                   <CheckCircle2 size={18} />
                   <span style={{ fontWeight: '800' }}>Đã thanh toán</span>
                 </div>
@@ -253,11 +253,11 @@ const OrderDetailModal = ({ receiptId, onClose }) => {
               <div style={{ border: '1px solid #f1f5f9', borderRadius: '20px', overflow: 'hidden', marginBottom: '24px' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
                   <thead>
-                    <tr style={{ background: '#f8fafc', borderBottom: '1px solid #f1f5f9' }}>
-                      <th style={{ padding: '16px', textAlign: 'left', fontWeight: '800', color: '#64748b', textTransform: 'uppercase' }}>Tên sản phẩm</th>
-                      <th style={{ padding: '16px', textAlign: 'center', fontWeight: '800', color: '#64748b', textTransform: 'uppercase' }}>SL Mua</th>
+                    <tr style={{ background: 'var(--page-bg)', borderBottom: '1px solid #f1f5f9' }}>
+                      <th style={{ padding: '16px', textAlign: 'left', fontWeight: '800', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Tên sản phẩm</th>
+                      <th style={{ padding: '16px', textAlign: 'center', fontWeight: '800', color: 'var(--text-muted)', textTransform: 'uppercase' }}>SL Mua</th>
                       <th style={{ padding: '16px', textAlign: 'center', fontWeight: '800', color: TEXT_RED, textTransform: 'uppercase' }}>{processType === 'Warranty' ? 'SL BẢO HÀNH' : 'SL TRẢ'}</th>
-                      <th style={{ padding: '16px', textAlign: 'right', fontWeight: '800', color: '#64748b', textTransform: 'uppercase' }}>Giá bán</th>
+                      <th style={{ padding: '16px', textAlign: 'right', fontWeight: '800', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Giá bán</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -266,18 +266,18 @@ const OrderDetailModal = ({ receiptId, onClose }) => {
                       const isExpired = warrantyStatus?.expired;
                       return (
                       <tr key={item.variantId} style={{ borderBottom: '1px solid #f8fafc', opacity: isExpired ? 0.6 : 1 }}>
-                        <td style={{ padding: '16px', fontWeight: '700', color: '#1e293b' }}>
+                        <td style={{ padding: '16px', fontWeight: '700', color: 'var(--text-main)' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                             {item.image ? (
-                              <img src={item.image} alt="" style={{ width: '40px', height: '40px', borderRadius: '8px', objectFit: 'cover', background: '#f1f5f9' }} />
+                              <img src={item.image} alt="" style={{ width: '40px', height: '40px', borderRadius: '8px', objectFit: 'cover', background: 'var(--border-light)' }} />
                             ) : (
-                              <div style={{ width: '40px', height: '40px', borderRadius: '8px', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              <div style={{ width: '40px', height: '40px', borderRadius: '8px', background: 'var(--border-light)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                 <ShoppingBag size={20} color="#94a3b8" />
                               </div>
                             )}
                             <div>
                               <div style={{ fontWeight: '800' }}>{item.productName}</div>
-                              <div style={{ fontSize: '11px', color: '#64748b', fontWeight: 'normal', marginTop: '2px' }}>{item.variantSKU}</div>
+                              <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 'normal', marginTop: '2px' }}>{item.variantSKU}</div>
                               {processType === 'Warranty' && (
                                 <div style={{ fontSize: '11px', marginTop: '4px', color: isExpired ? TEXT_RED : SUCCESS_GREEN }}>
                                   {warrantyStatus.text}
@@ -286,14 +286,14 @@ const OrderDetailModal = ({ receiptId, onClose }) => {
                             </div>
                           </div>
                         </td>
-                        <td style={{ padding: '16px', textAlign: 'center', fontWeight: '800', color: '#94a3b8' }}>{item.quantity}</td>
+                        <td style={{ padding: '16px', textAlign: 'center', fontWeight: '800', color: 'var(--text-light)' }}>{item.quantity}</td>
                         <td style={{ padding: '16px', textAlign: 'center' }}>
                           <input
                             type="number"
                             disabled={isExpired}
                             value={returnItems[item.variantId] || 0}
                             onChange={(e) => handleReturnQtyChange(item.variantId, e.target.value, item.quantity)}
-                            style={{ width: '60px', padding: '8px', borderRadius: '10px', border: `1.5px solid ${returnItems[item.variantId] > 0 ? TEXT_RED : '#e2e8f0'}`, textAlign: 'center', fontWeight: '800', outline: 'none', background: isExpired ? '#f1f5f9' : 'white' }}
+                            style={{ width: '60px', padding: '8px', borderRadius: '10px', border: `1.5px solid ${returnItems[item.variantId] > 0 ? TEXT_RED : 'var(--border-strong)'}`, textAlign: 'center', fontWeight: '800', outline: 'none', background: isExpired ? 'var(--border-light)' : 'white' }}
                           />
                         </td>
                         <td style={{ padding: '16px', textAlign: 'right', fontWeight: '800', color: SUCCESS_GREEN }}>{formatMoney(item.finalPrice * item.quantity)}</td>
@@ -307,18 +307,18 @@ const OrderDetailModal = ({ receiptId, onClose }) => {
               {/* Status & Payment Row */}
 
               {/* Action Config Box */}
-              <div style={{ background: '#f0fdf4', border: `1px dashed #10b981`, borderRadius: '24px', padding: '24px', marginBottom: '32px', position: 'relative' }}>
+              <div style={{ background: 'var(--success-bg)', border: `1px dashed var(--success)`, borderRadius: '24px', padding: '24px', marginBottom: '32px', position: 'relative' }}>
                 <div style={{ marginBottom: '16px' }}>
-                  <h4 style={{ margin: 0, fontSize: '13px', fontWeight: '900', color: '#059669', textTransform: 'uppercase' }}>Thông tin bảo hành</h4>
+                  <h4 style={{ margin: 0, fontSize: '13px', fontWeight: '900', color: 'var(--success)', textTransform: 'uppercase' }}>Thông tin bảo hành</h4>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: warrantyType === 'Refund' ? '1fr 1fr' : '1fr', gap: '16px', marginBottom: '16px' }}>
                   <div>
-                    <label style={{ fontSize: '12px', fontWeight: '800', color: '#059669', display: 'block', marginBottom: '8px' }}>Hình thức bảo hành</label>
+                    <label style={{ fontSize: '12px', fontWeight: '800', color: 'var(--success)', display: 'block', marginBottom: '8px' }}>Hình thức bảo hành</label>
                     <select
                       value={warrantyType}
                       onChange={(e) => setWarrantyType(e.target.value)}
-                      style={{ width: '100%', padding: '14px 20px', background: 'white', border: '1px solid #10b981', borderRadius: '16px', fontWeight: '700', color: '#047857', outline: 'none', cursor: 'pointer' }}
+                      style={{ width: '100%', padding: '14px 20px', background: 'white', border: '1px solid var(--success)', borderRadius: '16px', fontWeight: '700', color: 'var(--success)', outline: 'none', cursor: 'pointer' }}
                     >
                       <option value="Replacement">1 đổi 1 (Cấp lại máy mới)</option>
                       <option value="Refund">Hoàn tiền</option>
@@ -333,7 +333,7 @@ const OrderDetailModal = ({ receiptId, onClose }) => {
                           onChange={handleVatToggle}
                           style={{ width: '18px', height: '18px', cursor: 'pointer' }}
                         />
-                        <label htmlFor="vatToggle" style={{ fontSize: '13px', fontWeight: '700', color: '#059669', cursor: 'pointer' }}>
+                        <label htmlFor="vatToggle" style={{ fontSize: '13px', fontWeight: '700', color: 'var(--success)', cursor: 'pointer' }}>
                           Cộng thuế VAT (10%) vào tiền hoàn
                         </label>
                       </div>
@@ -342,7 +342,7 @@ const OrderDetailModal = ({ receiptId, onClose }) => {
 
                   {warrantyType === 'Refund' && (
                     <div>
-                      <label style={{ fontSize: '12px', fontWeight: '800', color: '#059669', display: 'block', marginBottom: '8px' }}>Hình thức hoàn tiền</label>
+                      <label style={{ fontSize: '12px', fontWeight: '800', color: 'var(--success)', display: 'block', marginBottom: '8px' }}>Hình thức hoàn tiền</label>
                       <div style={{ position: 'relative' }}>
                         <div style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}>
                           {paymentMethod === 'Tiền mặt' ? <Wallet size={16} color="#059669" /> : <QrCode size={16} color="#059669" />}
@@ -350,7 +350,7 @@ const OrderDetailModal = ({ receiptId, onClose }) => {
                         <select
                           value={paymentMethod}
                           onChange={(e) => setPaymentMethod(e.target.value)}
-                          style={{ width: '100%', padding: '14px 16px 14px 40px', background: 'white', border: '1px solid #10b981', borderRadius: '16px', fontWeight: '700', color: '#047857', outline: 'none', cursor: 'pointer', appearance: 'none' }}
+                          style={{ width: '100%', padding: '14px 16px 14px 40px', background: 'white', border: '1px solid var(--success)', borderRadius: '16px', fontWeight: '700', color: 'var(--success)', outline: 'none', cursor: 'pointer', appearance: 'none' }}
                         >
                           <option value="Tiền mặt">Tiền mặt</option>
                           <option value="Chuyển khoản">Chuyển khoản</option>
@@ -370,14 +370,14 @@ const OrderDetailModal = ({ receiptId, onClose }) => {
                             type="text"
                             value={new Intl.NumberFormat('vi-VN').format(refundAmount)}
                             readOnly
-                            style={{ width: '100%', padding: '16px 60px 16px 24px', borderRadius: '16px', border: `2px solid ${BORDER_RED}`, background: '#fff1f2', fontSize: '28px', fontWeight: '900', color: TEXT_RED, outline: 'none', cursor: 'default' }}
+                            style={{ width: '100%', padding: '16px 60px 16px 24px', borderRadius: '16px', border: `2px solid ${BORDER_RED}`, background: 'var(--danger-soft-bg)', fontSize: '28px', fontWeight: '900', color: TEXT_RED, outline: 'none', cursor: 'default' }}
                           />
                           <span style={{ position: 'absolute', right: '20px', top: '50%', transform: 'translateY(-50%)', fontSize: '20px', fontWeight: '900', color: TEXT_RED }}>đ</span>
                         </div>
                       </>
                     ) : (
                       <div style={{ textAlign: 'center' }}>
-                        <div style={{ fontSize: '12px', fontWeight: '800', color: '#059669', marginBottom: '12px', textTransform: 'uppercase' }}>Quét mã để hoàn tiền: <span style={{ fontSize: '16px', color: TEXT_RED }}>{formatMoney(refundAmount)}</span></div>
+                        <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--success)', marginBottom: '12px', textTransform: 'uppercase' }}>Quét mã để hoàn tiền: <span style={{ fontSize: '16px', color: TEXT_RED }}>{formatMoney(refundAmount)}</span></div>
                         {refundAmount > 0 ? (
                           <img
                             src={`https://img.vietqr.io/image/mb-88886666-compact.png?amount=${refundAmount}&addInfo=Hoan tien don hang ${order?.receiptId}`}
@@ -385,7 +385,7 @@ const OrderDetailModal = ({ receiptId, onClose }) => {
                             style={{ width: '200px', borderRadius: '16px', border: `2px solid ${BORDER_RED}`, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
                           />
                         ) : (
-                          <div style={{ padding: '20px', border: '2px dashed #e2e8f0', borderRadius: '16px', color: '#94a3b8' }}>Vui lòng chọn sản phẩm để hoàn tiền</div>
+                          <div style={{ padding: '20px', border: '2px dashed #e2e8f0', borderRadius: '16px', color: 'var(--text-light)' }}>Vui lòng chọn sản phẩm để hoàn tiền</div>
                         )}
                       </div>
                     )}
@@ -393,7 +393,7 @@ const OrderDetailModal = ({ receiptId, onClose }) => {
                 )}
 
                 <div>
-                  <label style={{ fontSize: '12px', fontWeight: '800', color: '#059669', display: 'block', marginBottom: '8px' }}>Tình trạng lỗi / Ghi chú bảo hành (Bắt buộc)</label>
+                  <label style={{ fontSize: '12px', fontWeight: '800', color: 'var(--success)', display: 'block', marginBottom: '8px' }}>Tình trạng lỗi / Ghi chú bảo hành (Bắt buộc)</label>
                   <textarea
                     value={returnReason}
                     onChange={(e) => setReturnReason(e.target.value)}
@@ -405,7 +405,7 @@ const OrderDetailModal = ({ receiptId, onClose }) => {
 
               {/* Action Buttons */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '16px' }}>
-                <button onClick={() => setView('detail')} style={{ padding: '16px', borderRadius: '16px', border: '1px solid #e2e8f0', background: 'white', color: '#64748b', fontWeight: '800', cursor: 'pointer' }}>Hủy bỏ</button>
+                <button onClick={() => setView('detail')} style={{ padding: '16px', borderRadius: '16px', border: '1px solid #e2e8f0', background: 'white', color: 'var(--text-muted)', fontWeight: '800', cursor: 'pointer' }}>Hủy bỏ</button>
                 <button onClick={handleProcessReturn} style={{ padding: '16px', borderRadius: '16px', border: 'none', background: SUCCESS_GREEN, color: 'white', fontWeight: '900', cursor: 'pointer' }}>Xác nhận & Cập nhật đơn hàng</button>
               </div>
             </div>
@@ -413,39 +413,39 @@ const OrderDetailModal = ({ receiptId, onClose }) => {
             /* DETAIL VIEW */
             <div style={{ animation: 'fadeIn 0.2s' }}>
               <div style={{ textAlign: 'center', padding: '24px 0', marginBottom: '24px' }}>
-                <div style={{ width: '64px', height: '64px', background: '#f0fdf4', borderRadius: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', color: SUCCESS_GREEN }}>
+                <div style={{ width: '64px', height: '64px', background: 'var(--success-bg)', borderRadius: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', color: SUCCESS_GREEN }}>
                   <CheckCircle2 size={32} strokeWidth={3} />
                 </div>
-                <div style={{ fontSize: '32px', fontWeight: '900', color: '#0f172a' }}>{formatMoney(order.totalPrice)}</div>
+                <div style={{ fontSize: '32px', fontWeight: '900', color: 'var(--text-main)' }}>{formatMoney(order.totalPrice)}</div>
                 <div style={{ color: SUCCESS_GREEN, fontWeight: '800', fontSize: '14px', marginTop: '4px' }}>ĐÃ THANH TOÁN</div>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '32px' }}>
-                <div style={{ padding: '20px', background: '#f8fafc', borderRadius: '20px', border: '1px solid #f1f5f9' }}>
-                   <div style={{ fontSize: '11px', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase', marginBottom: '12px' }}>Thông tin đơn hàng</div>
+                <div style={{ padding: '20px', background: 'var(--page-bg)', borderRadius: '20px', border: '1px solid #f1f5f9' }}>
+                   <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-light)', textTransform: 'uppercase', marginBottom: '12px' }}>Thông tin đơn hàng</div>
                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '13px' }}>
-                     <span style={{ color: '#64748b', fontWeight: '600' }}>Thời gian</span>
+                     <span style={{ color: 'var(--text-muted)', fontWeight: '600' }}>Thời gian</span>
                      <span style={{ fontWeight: '800' }}>{formatLocalDate(order.orderAt)}</span>
                    </div>
                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
-                     <span style={{ color: '#64748b', fontWeight: '600' }}>Thu ngân</span>
+                     <span style={{ color: 'var(--text-muted)', fontWeight: '600' }}>Thu ngân</span>
                      <span style={{ fontWeight: '800' }}>{order.staffName}</span>
                    </div>
                 </div>
-                <div style={{ padding: '20px', background: '#f8fafc', borderRadius: '20px', border: '1px solid #f1f5f9' }}>
-                   <div style={{ fontSize: '11px', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase', marginBottom: '12px' }}>Thông tin khách hàng</div>
-                   <div style={{ fontWeight: '900', color: '#1e293b', fontSize: '15px' }}>{order.customerName}</div>
-                   <div style={{ fontSize: '12px', color: '#64748b', marginTop: '4px' }}>Phương thức: {order.paymentMethod}</div>
+                <div style={{ padding: '20px', background: 'var(--page-bg)', borderRadius: '20px', border: '1px solid #f1f5f9' }}>
+                   <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-light)', textTransform: 'uppercase', marginBottom: '12px' }}>Thông tin khách hàng</div>
+                   <div style={{ fontWeight: '900', color: 'var(--text-main)', fontSize: '15px' }}>{order.customerName}</div>
+                   <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>Phương thức: {order.paymentMethod}</div>
                 </div>
               </div>
 
               <div style={{ marginBottom: '32px' }}>
-                <h4 style={{ fontSize: '12px', fontWeight: '900', color: '#94a3b8', textTransform: 'uppercase', marginBottom: '16px' }}>Sản phẩm đã mua</h4>
+                <h4 style={{ fontSize: '12px', fontWeight: '900', color: 'var(--text-light)', textTransform: 'uppercase', marginBottom: '16px' }}>Sản phẩm đã mua</h4>
                 {order.items?.map((item, idx) => (
                   <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', border: '1px solid #f1f5f9', borderRadius: '16px', marginBottom: '12px' }}>
                     <div>
-                      <div style={{ fontWeight: '800', color: '#1e293b' }}>{item.productName}</div>
-                      <div style={{ fontSize: '12px', color: '#94a3b8' }}>{item.quantity} x {formatMoney(item.finalPrice)}</div>
+                      <div style={{ fontWeight: '800', color: 'var(--text-main)' }}>{item.productName}</div>
+                      <div style={{ fontSize: '12px', color: 'var(--text-light)' }}>{item.quantity} x {formatMoney(item.finalPrice)}</div>
                     </div>
                     <div style={{ fontWeight: '900' }}>{formatMoney(item.finalPrice * item.quantity)}</div>
                   </div>
@@ -456,7 +456,7 @@ const OrderDetailModal = ({ receiptId, onClose }) => {
                 <button onClick={() => setView('return')} style={{ flex: 1, padding: '16px', borderRadius: '18px', border: `1.5px solid ${PRIMARY_BLUE}`, background: 'white', color: PRIMARY_BLUE, fontWeight: '800', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                   <ShieldCheck size={18} /> Bảo hành sản phẩm
                 </button>
-                <button onClick={onClose} style={{ padding: '16px 24px', borderRadius: '18px', border: 'none', background: '#f1f5f9', fontWeight: '800', cursor: 'pointer' }}>Đóng</button>
+                <button onClick={onClose} style={{ padding: '16px 24px', borderRadius: '18px', border: 'none', background: 'var(--border-light)', fontWeight: '800', cursor: 'pointer' }}>Đóng</button>
               </div>
             </div>
           ) : (
@@ -465,60 +465,60 @@ const OrderDetailModal = ({ receiptId, onClose }) => {
               {order.warrantyHistory && order.warrantyHistory.length > 0 ? (
                 <div style={{ textAlign: 'left' }}>
                   {[...order.warrantyHistory].reverse().map((log, i) => (
-                    <div key={i} style={{ background: '#f8fafc', padding: '20px', borderRadius: '20px', border: '1px solid #e2e8f0', marginBottom: '16px' }}>
+                    <div key={i} style={{ background: 'var(--page-bg)', padding: '20px', borderRadius: '20px', border: '1px solid #e2e8f0', marginBottom: '16px' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', borderBottom: '1px solid #e2e8f0', paddingBottom: '12px' }}>
                         <div>
-                          <div style={{ fontWeight: '900', color: '#1e293b', fontSize: '15px' }}>Lần bảo hành #{order.warrantyHistory.length - i}</div>
-                          <div style={{ fontSize: '13px', color: '#64748b', marginTop: '4px' }}>Mã Hóa Đơn: #{order.receiptId}</div>
+                          <div style={{ fontWeight: '900', color: 'var(--text-main)', fontSize: '15px' }}>Lần bảo hành #{order.warrantyHistory.length - i}</div>
+                          <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '4px' }}>Mã Hóa Đơn: #{order.receiptId}</div>
                         </div>
                         <div style={{ textAlign: 'right' }}>
-                          <span style={{ fontSize: '12px', color: '#94a3b8', fontWeight: '600' }}>{formatLocalDate(log.createdAt)}</span>
+                          <span style={{ fontSize: '12px', color: 'var(--text-light)', fontWeight: '600' }}>{formatLocalDate(log.createdAt)}</span>
                         </div>
                       </div>
 
                       <div style={{ display: 'grid', gridTemplateColumns: log.warrantyType === 'Refund' ? '1fr 1fr 1fr' : '1fr 1fr', gap: '12px', marginBottom: '16px', fontSize: '13px' }}>
                         <div>
-                          <span style={{ color: '#94a3b8', fontWeight: '600' }}>Nhân viên xử lý:</span>
-                          <div style={{ fontWeight: '800', color: '#1e293b', marginTop: '2px' }}>{log.staffName}</div>
+                          <span style={{ color: 'var(--text-light)', fontWeight: '600' }}>Nhân viên xử lý:</span>
+                          <div style={{ fontWeight: '800', color: 'var(--text-main)', marginTop: '2px' }}>{log.staffName}</div>
                         </div>
                         <div>
-                          <span style={{ color: '#94a3b8', fontWeight: '600' }}>Khách hàng:</span>
-                          <div style={{ fontWeight: '800', color: '#1e293b', marginTop: '2px' }}>{order.customerName}</div>
+                          <span style={{ color: 'var(--text-light)', fontWeight: '600' }}>Khách hàng:</span>
+                          <div style={{ fontWeight: '800', color: 'var(--text-main)', marginTop: '2px' }}>{order.customerName}</div>
                         </div>
                         {log.warrantyType === 'Refund' && log.paymentMethod && (
                           <div>
-                            <span style={{ color: '#94a3b8', fontWeight: '600' }}>Hình thức nhận tiền:</span>
-                            <div style={{ fontWeight: '800', color: '#1e293b', marginTop: '2px', textTransform: 'uppercase' }}>{log.paymentMethod}</div>
+                            <span style={{ color: 'var(--text-light)', fontWeight: '600' }}>Hình thức nhận tiền:</span>
+                            <div style={{ fontWeight: '800', color: 'var(--text-main)', marginTop: '2px', textTransform: 'uppercase' }}>{log.paymentMethod}</div>
                           </div>
                         )}
                       </div>
 
                       <div style={{ background: 'white', padding: '12px 16px', borderRadius: '12px', border: '1px solid #f1f5f9', marginBottom: '16px' }}>
-                        <div style={{ fontSize: '12px', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-light)', textTransform: 'uppercase', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                           <ShieldCheck size={14} /> Sản phẩm bảo hành
                         </div>
                         {log.warrantyItems && log.warrantyItems.length > 0 ? (
                           log.warrantyItems.map((item, idx) => (
                             <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', marginBottom: '6px', borderBottom: idx < log.warrantyItems.length - 1 ? '1px dashed #f1f5f9' : 'none', paddingBottom: idx < log.warrantyItems.length - 1 ? '6px' : '0' }}>
-                              <span style={{ fontWeight: '700', color: '#1e293b' }}>{item.quantity} x {item.productName}</span>
+                              <span style={{ fontWeight: '700', color: 'var(--text-main)' }}>{item.quantity} x {item.productName}</span>
                             </div>
                           ))
                         ) : (
-                          <div style={{ fontSize: '13px', color: '#64748b', fontStyle: 'italic' }}>Không có thông tin sản phẩm</div>
+                          <div style={{ fontSize: '13px', color: 'var(--text-muted)', fontStyle: 'italic' }}>Không có thông tin sản phẩm</div>
                         )}
                       </div>
 
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', background: '#f0fdf4', padding: '16px', borderRadius: '16px', border: '1px dashed #10b981' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', background: 'var(--success-bg)', padding: '16px', borderRadius: '16px', border: '1px dashed var(--success)' }}>
                         <div style={{ flex: 1, paddingRight: log.warrantyType === 'Refund' ? '16px' : '0' }}>
-                          <div style={{ fontSize: '11px', fontWeight: '800', color: '#059669', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--success)', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '4px' }}>
                             <Info size={12} /> TÌNH TRẠNG LỖI ({log.warrantyType === 'Refund' ? 'Hoàn tiền' : '1 đổi 1'})
                           </div>
-                          <div style={{ fontSize: '13px', color: '#047857', fontWeight: '600', lineHeight: '1.4' }}>{log.reason || 'Không có ghi chú'}</div>
+                          <div style={{ fontSize: '13px', color: 'var(--success)', fontWeight: '600', lineHeight: '1.4' }}>{log.reason || 'Không có ghi chú'}</div>
                         </div>
                         {log.warrantyType === 'Refund' && log.refundAmount > 0 && (
-                          <div style={{ textAlign: 'right', borderLeft: '1px dashed #6ee7b7', paddingLeft: '16px', minWidth: '130px' }}>
-                            <div style={{ fontSize: '11px', fontWeight: '800', color: '#059669', marginBottom: '6px' }}>SỐ TIỀN HOÀN</div>
-                            <div style={{ fontSize: '17px', fontWeight: '900', color: '#059669' }}>{formatMoney(log.refundAmount)}</div>
+                          <div style={{ textAlign: 'right', borderLeft: '1px dashed rgba(16, 185, 129, 0.45)', paddingLeft: '16px', minWidth: '130px' }}>
+                            <div style={{ fontSize: '11px', fontWeight: '800', color: 'var(--success)', marginBottom: '6px' }}>SỐ TIỀN HOÀN</div>
+                            <div style={{ fontSize: '17px', fontWeight: '900', color: 'var(--success)' }}>{formatMoney(log.refundAmount)}</div>
                           </div>
                         )}
                       </div>
@@ -527,13 +527,13 @@ const OrderDetailModal = ({ receiptId, onClose }) => {
                 </div>
               ) : (
                 <div style={{ animation: 'fadeIn 0.2s' }}>
-                  <div style={{ width: '80px', height: '80px', background: '#f0fdf4', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', color: '#059669' }}>
+                  <div style={{ width: '80px', height: '80px', background: 'var(--success-bg)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', color: 'var(--success)' }}>
                     <ShieldCheck size={40} />
                   </div>
-                  <h3 style={{ margin: '0 0 8px', fontSize: '18px', fontWeight: '900', color: '#1e293b' }}>Lịch sử bảo hành</h3>
-                  <p style={{ color: '#94a3b8', fontSize: '14px', marginBottom: '32px' }}>Nhật ký các lần bảo hành sản phẩm</p>
+                  <h3 style={{ margin: '0 0 8px', fontSize: '18px', fontWeight: '900', color: 'var(--text-main)' }}>Lịch sử bảo hành</h3>
+                  <p style={{ color: 'var(--text-light)', fontSize: '14px', marginBottom: '32px' }}>Nhật ký các lần bảo hành sản phẩm</p>
 
-                  <div style={{ padding: '40px', border: '2px dashed #e2e8f0', borderRadius: '24px', color: '#94a3b8', fontWeight: '800' }}>
+                  <div style={{ padding: '40px', border: '2px dashed #e2e8f0', borderRadius: '24px', color: 'var(--text-light)', fontWeight: '800' }}>
                     Chưa có lịch sử bảo hành cho đơn này
                   </div>
                 </div>
@@ -543,13 +543,6 @@ const OrderDetailModal = ({ receiptId, onClose }) => {
         </div>
       </div>
 
-      <style>{`
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
-        .animate-spin { animation: spin 1s linear infinite; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-      `}</style>
     </div>
   );
 };

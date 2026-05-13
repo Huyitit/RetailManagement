@@ -5,7 +5,6 @@ import {
   FileText, Check, ArrowLeft, LayoutDashboard
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import '../index.css';
 
 const API_BASE = 'http://localhost:5001/api/v1';
 

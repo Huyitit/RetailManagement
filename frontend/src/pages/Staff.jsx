@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { getStaffList, createStaff, updateStaff, deactivateStaff, assignStaffRole, resetStaffPassword } from '../services/api';
+import {
+  getStaffList, createStaff, updateStaff, deactivateStaff, assignStaffRole, resetStaffPassword
+} from '../services/api';
 import OrdersTable from '../components/OrdersTable';
 import OrderDetailModalShell from '../components/OrderDetailModalShell';
 import { FormTable, FormRow } from '../components/FormTable';
 import StatusBadge from '../components/StatusBadge';
-import { ShieldCheck, Plus, Search, UserCog } from 'lucide-react';
+import { Plus, Search, UserCog } from 'lucide-react';
 
 const Staff = () => {
   const [data, setData] = useState([]);
@@ -19,8 +21,10 @@ const Staff = () => {
   const [passwordStaff, setPasswordStaff] = useState(null);
   const [passwordForm, setPasswordForm] = useState({ newPassword: '', confirmPassword: '' });
   const [passwordError, setPasswordError] = useState('');
-  
-  const [formData, setFormData] = useState({ username: '', password: '', fullname: '', phone: '', email: '', role: 'Cashier' });
+
+  const [formData, setFormData] = useState({
+    username: '', password: '', fullname: '', phone: '', email: '', role: 'Cashier'
+  });
   const [error, setError] = useState('');
 
   const fetchStaff = async (page = 1) => {
@@ -56,7 +60,7 @@ const Staff = () => {
       setCurrentStaff(staff);
       setFormData({
         username: staff.username,
-        password: '', // Leave blank on edit unless they want to change
+        password: '',
         fullname: staff.fullname,
         phone: staff.phone,
         email: staff.email || '',
@@ -82,11 +86,10 @@ const Staff = () => {
       setError('Vui lòng điền đủ thông tin bắt buộc.');
       return;
     }
-
     try {
       if (isEditMode) {
-        await updateStaff(currentStaff.staffId, { 
-          fullname: formData.fullname, phone: formData.phone, email: formData.email 
+        await updateStaff(currentStaff.staffId, {
+          fullname: formData.fullname, phone: formData.phone, email: formData.email
         });
         if (formData.role !== currentStaff.role) {
           await assignStaffRole(currentStaff.staffId, { role: formData.role });
@@ -107,99 +110,145 @@ const Staff = () => {
         await deactivateStaff(staff.staffId);
         fetchStaff(pagination.currentPage);
       } catch (err) {
-        alert(err.response?.data?.message || 'Loi khi vo hieu hoa');
+        alert(err.response?.data?.message || 'Lỗi khi vô hiệu hoá');
       }
     }
   };
 
   const handleResetPassword = async () => {
     if (!passwordForm.newPassword || passwordForm.newPassword.length < 6) {
-      setPasswordError('Mat khau moi phai co it nhat 6 ky tu.');
+      setPasswordError('Mật khẩu mới phải có ít nhất 6 ký tự.');
       return;
     }
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      setPasswordError('Mat khau xac nhan khong khop.');
+      setPasswordError('Mật khẩu xác nhận không khớp.');
       return;
     }
-
     try {
       await resetStaffPassword(passwordStaff.staffId, {
         newPassword: passwordForm.newPassword,
         confirmPassword: passwordForm.confirmPassword
       });
       setIsPasswordModalOpen(false);
-      alert('Doi mat khau thanh cong.');
+      alert('Đổi mật khẩu thành công.');
     } catch (err) {
-      setPasswordError(err.response?.data?.message || 'Khong the doi mat khau.');
+      setPasswordError(err.response?.data?.message || 'Không thể đổi mật khẩu.');
     }
   };
 
+  const avatarStyle = {
+    width: '40px',
+    height: '40px',
+    borderRadius: '50%',
+    background: 'var(--surface-muted)',
+    color: 'var(--text-muted)',
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: '12px',
+    flexShrink: 0
+  };
+
   const columns = [
-    { header: 'Nhân viên', accessor: 'fullname', render: (row) => (
-      <div className="flex items-center">
-        <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 mr-3">
-          <UserCog size={20} />
+    {
+      header: 'Nhân viên', accessor: 'fullname', render: (row) => (
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <div style={avatarStyle}><UserCog size={20} /></div>
+          <div>
+            <div style={{ fontWeight: 700, color: 'var(--text-main)' }}>{row.fullname}</div>
+            <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px' }}>@{row.username}</div>
+          </div>
         </div>
-        <div>
-          <div className="font-medium text-slate-900">{row.fullname}</div>
-          <div className="text-sm text-slate-500">@{row.username}</div>
+      )
+    },
+    {
+      header: 'Liên hệ', accessor: 'phone', render: (row) => (
+        <div style={{ color: 'var(--text-muted)', fontSize: '13px' }}>
+          <div style={{ color: 'var(--text-main)', fontWeight: 600 }}>{row.phone}</div>
+          {row.email && <div style={{ marginTop: '2px' }}>{row.email}</div>}
         </div>
-      </div>
-    )},
-    { header: 'Liên hệ', accessor: 'phone', render: (row) => (
-      <div className="text-slate-600 text-sm">
-        <div>{row.phone}</div>
-        {row.email && <div>{row.email}</div>}
-      </div>
-    )},
-    { header: 'Quyền (Role)', accessor: 'role', render: (row) => (
-      <StatusBadge status={row.role === 'Admin' ? 'Hoàn tất' : row.role === 'Manager' ? 'Active' : 'Draft'} />
-    )},
-    { header: 'Mat khau', accessor: 'password', align: 'center', render: (row) => (
-      <button
-        onClick={(e) => { e.stopPropagation(); handleOpenPasswordModal(row); }}
-        className="px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
-      >
-        Doi mat khau
-      </button>
-    )}
+      )
+    },
+    {
+      header: 'Quyền (Role)', accessor: 'role', render: (row) => (
+        <StatusBadge status={row.role === 'Admin' ? 'Completed' : row.role === 'Manager' ? 'Active' : 'Draft'} />
+      )
+    },
+    {
+      header: 'Mật khẩu', accessor: 'password', align: 'center', render: (row) => (
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); handleOpenPasswordModal(row); }}
+          className="btn-secondary"
+          style={{ padding: '6px 12px', fontSize: '12px' }}
+        >
+          Đổi mật khẩu
+        </button>
+      )
+    }
   ];
 
   return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: '#f8fafc', overflow: 'hidden' }}>
-      <header style={{ padding: '32px 40px', background: 'white', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
+    <div className="page-shell">
+      <header className="page-header">
         <div>
-          <h1 style={{ fontSize: '28px', fontWeight: '950', color: '#0f172a', margin: 0 }}>Nhân sự & Phân quyền</h1>
-          <p style={{ color: '#64748b', fontSize: '14px', marginTop: '4px', fontWeight: '600' }}>Quản lý tài khoản và quyền truy cập hệ thống</p>
+          <h1 className="page-title">Nhân sự & Phân quyền</h1>
+          <p className="page-subtitle">Quản lý tài khoản và quyền truy cập hệ thống</p>
         </div>
-        <button 
-          onClick={() => handleOpenModal()}
-          style={{ background: '#4f46e5', color: 'white', padding: '12px 24px', borderRadius: '12px', border: 'none', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', boxShadow: '0 4px 6px -1px rgba(79, 70, 229, 0.2)' }}
-        >
-          <Plus size={18} /> Thêm Tài Khoản
+        <button type="button" onClick={() => handleOpenModal()} className="btn-primary">
+          <Plus size={18} /> Thêm tài khoản
         </button>
       </header>
 
-      <div className="custom-scrollbar" style={{ flex: 1, overflowY: 'auto', padding: '32px 40px' }}>
-        <div style={{ background: 'white', borderRadius: '24px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-          <div style={{ padding: '24px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ fontSize: '13px', fontWeight: '800', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Danh sach nhan su</div>
+      <div className="page-body custom-scrollbar">
+        <div className="surface-card-flush">
+          <div
+            style={{
+              padding: '20px 24px',
+              borderBottom: '1px solid var(--border-light)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              gap: '16px'
+            }}
+          >
+            <div
+              style={{
+                fontSize: '12px',
+                fontWeight: 800,
+                color: 'var(--text-muted)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px'
+              }}
+            >
+              Danh sách nhân sự
+            </div>
             <div style={{ position: 'relative', width: '320px' }}>
-              <Search size={18} style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+              <Search
+                size={18}
+                style={{
+                  position: 'absolute',
+                  left: '14px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  color: 'var(--text-light)'
+                }}
+              />
               <input
                 type="text"
                 placeholder="Tìm theo tên, sđt, username..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                style={{ width: '100%', padding: '12px 16px 12px 48px', borderRadius: '14px', border: '1px solid #e2e8f0', background: '#f8fafc', outline: 'none', fontWeight: '600' }}
+                className="input-pill"
+                style={{ paddingLeft: '44px', background: 'var(--page-bg)' }}
               />
             </div>
           </div>
 
-          <div style={{ padding: '24px' }}>
-            <OrdersTable 
-              columns={columns} 
-              data={data} 
+          <div style={{ padding: '20px 24px' }}>
+            <OrdersTable
+              columns={columns}
+              data={data}
               isLoading={isLoading}
               onEdit={handleOpenModal}
               onDelete={handleDelete}
@@ -209,60 +258,75 @@ const Staff = () => {
         </div>
       </div>
 
-      <OrderDetailModalShell 
-        isOpen={isModalOpen} 
+      <OrderDetailModalShell
+        isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title={isEditMode ? 'Cập nhật Nhân viên' : 'Thêm Tài Khoản Mới'}
+        title={isEditMode ? 'Cập nhật nhân viên' : 'Thêm tài khoản mới'}
         footer={
           <>
-            <button onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg text-sm font-medium transition-colors">Hủy</button>
-            <button onClick={handleSave} className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors shadow-sm">Lưu thông tin</button>
+            <button type="button" onClick={() => setIsModalOpen(false)} className="btn-secondary">Hủy</button>
+            <button type="button" onClick={handleSave} className="btn-primary">Lưu thông tin</button>
           </>
         }
       >
-        <div className="space-y-4">
-          {error && <div className="p-3 bg-rose-50 text-rose-600 rounded-lg text-sm">{error}</div>}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {error && (
+            <div
+              style={{
+                padding: '12px 14px',
+                background: 'var(--danger-bg)',
+                color: 'var(--danger)',
+                borderRadius: 'var(--radius-md)',
+                fontSize: '13px',
+                fontWeight: 600,
+                border: '1px solid rgba(239, 68, 68, 0.25)'
+              }}
+            >
+              {error}
+            </div>
+          )}
           <FormTable>
             <FormRow label="Họ và tên *">
               <input
                 type="text"
-                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500"
+                className="input-pill"
                 value={formData.fullname}
-                onChange={e => setFormData({ ...formData, fullname: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, fullname: e.target.value })}
               />
             </FormRow>
             <FormRow label={`Tên đăng nhập ${isEditMode ? '' : '*'}`}>
               <input
                 type="text"
-                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 disabled:bg-slate-50 disabled:text-slate-400"
+                className="input-pill"
                 value={formData.username}
-                onChange={e => setFormData({ ...formData, username: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                 disabled={isEditMode}
+                style={isEditMode ? { background: 'var(--surface-muted)', color: 'var(--text-light)' } : undefined}
               />
             </FormRow>
             {!isEditMode && (
               <FormRow label="Mật khẩu *">
                 <input
                   type="password"
-                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500"
+                  className="input-pill"
                   value={formData.password}
-                  onChange={e => setFormData({ ...formData, password: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 />
               </FormRow>
             )}
             <FormRow label="Số điện thoại *">
               <input
                 type="text"
-                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500"
+                className="input-pill"
                 value={formData.phone}
-                onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
               />
             </FormRow>
             <FormRow label="Quyền truy cập">
               <select
-                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 bg-white"
+                className="input-pill"
                 value={formData.role}
-                onChange={e => setFormData({ ...formData, role: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, role: e.target.value })}
               >
                 <option value="Cashier">Cashier (Thu ngân)</option>
                 <option value="Manager">Manager (Quản lý)</option>
@@ -276,31 +340,45 @@ const Staff = () => {
       <OrderDetailModalShell
         isOpen={isPasswordModalOpen}
         onClose={() => setIsPasswordModalOpen(false)}
-        title={`Doi mat khau - ${passwordStaff?.username || ''}`}
+        title={`Đổi mật khẩu - ${passwordStaff?.username || ''}`}
         footer={
           <>
-            <button onClick={() => setIsPasswordModalOpen(false)} className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg text-sm font-medium transition-colors">Huy</button>
-            <button onClick={handleResetPassword} className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors shadow-sm">Luu thay doi</button>
+            <button type="button" onClick={() => setIsPasswordModalOpen(false)} className="btn-secondary">Huỷ</button>
+            <button type="button" onClick={handleResetPassword} className="btn-primary">Lưu thay đổi</button>
           </>
         }
       >
-        <div className="space-y-4">
-          {passwordError && <div className="p-3 bg-rose-50 text-rose-600 rounded-lg text-sm">{passwordError}</div>}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {passwordError && (
+            <div
+              style={{
+                padding: '12px 14px',
+                background: 'var(--danger-bg)',
+                color: 'var(--danger)',
+                borderRadius: 'var(--radius-md)',
+                fontSize: '13px',
+                fontWeight: 600,
+                border: '1px solid rgba(239, 68, 68, 0.25)'
+              }}
+            >
+              {passwordError}
+            </div>
+          )}
           <FormTable>
-            <FormRow label="Mat khau moi">
+            <FormRow label="Mật khẩu mới">
               <input
                 type="password"
-                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500"
+                className="input-pill"
                 value={passwordForm.newPassword}
-                onChange={e => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
               />
             </FormRow>
-            <FormRow label="Xac nhan mat khau moi">
+            <FormRow label="Xác nhận mật khẩu mới">
               <input
                 type="password"
-                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500"
+                className="input-pill"
                 value={passwordForm.confirmPassword}
-                onChange={e => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+                onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
               />
             </FormRow>
           </FormTable>

@@ -1,36 +1,52 @@
 import React from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 
-const VariantAttributesEditor = ({
-  attributes,
-  onAdd,
-  onChange,
-  onRemove
-}) => {
+const VariantAttributesEditor = ({ attributes, onAdd, onChange, onRemove }) => {
   return (
-    <div className="space-y-3">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
       {attributes.map((attr, index) => (
-        <div key={index} className="grid grid-cols-1 md:grid-cols-2 gap-3 items-center">
+        <div
+          key={index}
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: '12px',
+            alignItems: 'center'
+          }}
+        >
           <input
             type="text"
-            className="w-full border border-indigo-100 rounded-xl px-3.5 py-2 text-sm focus:ring-2 focus:ring-indigo-500 bg-white"
+            className="input-pill"
             placeholder="Thuộc tính (VD: Color)"
             value={attr.name}
             onChange={(e) => onChange(index, 'name', e.target.value)}
           />
-          <div className="flex items-center gap-2">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <input
               type="text"
-              className="w-full border border-indigo-100 rounded-xl px-3.5 py-2 text-sm focus:ring-2 focus:ring-indigo-500 bg-white"
+              className="input-pill"
               placeholder="Giá trị (VD: Black)"
               value={attr.value}
               onChange={(e) => onChange(index, 'value', e.target.value)}
             />
             {attributes.length > 1 && (
               <button
+                type="button"
                 onClick={() => onRemove(index)}
-                className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
-                aria-label="Xoa thuoc tinh"
+                aria-label="Xóa thuộc tính"
+                style={{
+                  padding: '8px',
+                  borderRadius: 'var(--radius-sm)',
+                  border: '1px solid var(--border-strong)',
+                  background: 'var(--surface)',
+                  color: 'var(--text-light)',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0
+                }}
+                className="hover-red"
               >
                 <Trash2 size={16} />
               </button>
@@ -40,10 +56,12 @@ const VariantAttributesEditor = ({
       ))}
 
       <button
+        type="button"
         onClick={onAdd}
-        className="text-sm font-bold text-indigo-600 hover:text-indigo-800 inline-flex items-center gap-1 bg-white border border-indigo-100 px-3 py-2 rounded-xl transition-colors"
+        className="btn-secondary"
+        style={{ alignSelf: 'flex-start', fontSize: '13px' }}
       >
-        <Plus size={16} /> Them thuoc tinh
+        <Plus size={16} /> Thêm thuộc tính
       </button>
     </div>
   );

@@ -1,4 +1,13 @@
 import React, { useEffect } from 'react';
+import { X } from 'lucide-react';
+
+const sizeMap = {
+  sm: '480px',
+  md: '680px',
+  lg: '900px',
+  xl: '1120px',
+  full: '1280px'
+};
 
 const OrderDetailModalShell = ({
   isOpen,
@@ -10,75 +19,44 @@ const OrderDetailModalShell = ({
   bodyClassName = ''
 }) => {
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
+    document.body.style.overflow = isOpen ? 'hidden' : 'unset';
+    return () => { document.body.style.overflow = 'unset'; };
   }, [isOpen]);
 
   if (!isOpen) return null;
 
-  const sizeMap = {
-    sm: '480px',
-    md: '680px',
-    lg: '900px',
-    xl: '1120px',
-    full: '1280px'
-  };
-
   return (
-    <div
-      style={{
-        position: 'fixed',
-        inset: 0,
-        background: 'rgba(15, 23, 42, 0.55)',
-        backdropFilter: 'blur(6px)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 1200,
-        padding: '24px'
-      }}
-    >
+    <div className="modal-backdrop" onClick={onClose} style={{ padding: '24px', zIndex: 1200 }}>
       <div
-        onClick={onClose}
-        style={{ position: 'absolute', inset: 0 }}
-      />
-      <div
+        className="modal-content"
+        onClick={(e) => e.stopPropagation()}
         style={{
-          background: '#ffffff',
           width: '100%',
           maxWidth: sizeMap[size] || sizeMap.md,
-          borderRadius: '28px',
-          boxShadow: '0 30px 80px rgba(15, 23, 42, 0.25)',
-          display: 'flex',
-          flexDirection: 'column',
-          maxHeight: '90vh',
-          overflow: 'hidden',
-          border: '1px solid #e2e8f0',
-          position: 'relative'
+          border: '1px solid var(--border-strong)'
         }}
       >
         <div
           style={{
-            padding: '22px 28px',
-            borderBottom: '1px solid #eef2f7',
-            background: '#f8fafc',
+            padding: '20px 28px',
+            borderBottom: '1px solid var(--border-light)',
+            background: 'var(--page-bg)',
             display: 'flex',
             justifyContent: 'space-between',
-            alignItems: 'center'
+            alignItems: 'center',
+            flexShrink: 0
           }}
         >
-          <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '800', color: '#0f172a' }}>{title}</h2>
+          <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 800, color: 'var(--text-main)' }}>
+            {title}
+          </h2>
           <button
+            type="button"
             onClick={onClose}
+            aria-label="Đóng"
             style={{
-              border: '1px solid #e2e8f0',
-              background: '#ffffff',
+              border: '1px solid var(--border-strong)',
+              background: 'var(--surface)',
               width: '36px',
               height: '36px',
               borderRadius: '999px',
@@ -86,19 +64,16 @@ const OrderDetailModalShell = ({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#94a3b8',
-              boxShadow: '0 1px 2px rgba(15, 23, 42, 0.06)'
+              color: 'var(--text-light)'
             }}
           >
-            <svg className="w-5 h-5" fill="currentColor" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <X size={18} />
           </button>
         </div>
 
         <div
           className={`custom-scrollbar ${bodyClassName}`.trim()}
-          style={{ flex: 1, overflowY: 'auto', padding: '24px 28px', background: '#ffffff' }}
+          style={{ flex: 1, overflowY: 'auto', padding: '24px 28px', background: 'var(--surface)' }}
         >
           {children}
         </div>
@@ -106,12 +81,13 @@ const OrderDetailModalShell = ({
         {footer && (
           <div
             style={{
-              padding: '18px 28px',
-              borderTop: '1px solid #eef2f7',
-              background: '#f8fafc',
+              padding: '16px 28px',
+              borderTop: '1px solid var(--border-light)',
+              background: 'var(--page-bg)',
               display: 'flex',
               justifyContent: 'flex-end',
-              gap: '12px'
+              gap: '12px',
+              flexShrink: 0
             }}
           >
             {footer}

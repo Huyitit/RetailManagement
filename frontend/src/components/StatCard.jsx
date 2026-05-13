@@ -2,34 +2,65 @@ import React from 'react';
 
 const StatCard = ({ title, value, subtitle, icon, trend }) => {
   return (
-    <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
-      <div className="flex justify-between items-start mb-4 relative z-10">
+    <div
+      className="surface-card"
+      style={{
+        padding: '24px',
+        position: 'relative',
+        overflow: 'hidden',
+        transition: 'box-shadow 0.2s ease, transform 0.2s ease'
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          marginBottom: '16px'
+        }}
+      >
         <div>
-          <p className="text-sm font-medium text-slate-500 mb-1">{title}</p>
-          <h3 className="text-2xl font-bold text-slate-800 tracking-tight">{value}</h3>
+          <p style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '4px' }}>
+            {title}
+          </p>
+          <h3 style={{ fontSize: '24px', fontWeight: 900, color: 'var(--text-main)', letterSpacing: '-0.3px', margin: 0 }}>
+            {value}
+          </h3>
         </div>
         {icon && (
-          <div className="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
+          <div
+            style={{
+              padding: '12px',
+              borderRadius: 'var(--radius-md)',
+              background: 'var(--primary-light)',
+              color: 'var(--primary)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
             {icon}
           </div>
         )}
       </div>
-      
-      {(subtitle || trend) && (
-        <div className="flex items-center mt-4 relative z-10">
-          {trend && (
-            <span className={`text-xs font-medium px-2 py-1 rounded-md mr-2 ${
-              trend > 0 ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'
-            }`}>
+
+      {(subtitle || (trend !== undefined && trend !== null)) && (
+        <div style={{ display: 'flex', alignItems: 'center', marginTop: '8px' }}>
+          {(trend !== undefined && trend !== null) && (
+            <span
+              className={`tag tag-${trend > 0 ? 'success' : 'danger'}`}
+              style={{ marginRight: '8px' }}
+            >
               {trend > 0 ? '↑' : '↓'} {Math.abs(trend)}%
             </span>
           )}
-          {subtitle && <span className="text-sm text-slate-500">{subtitle}</span>}
+          {subtitle && (
+            <span style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: 600 }}>
+              {subtitle}
+            </span>
+          )}
         </div>
       )}
-
-      {/* Decorative gradient blob */}
-      <div className="absolute -right-6 -top-6 w-24 h-24 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500"></div>
     </div>
   );
 };

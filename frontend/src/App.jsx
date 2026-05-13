@@ -14,19 +14,28 @@ import Products from './pages/Products';
 import Inventory from './pages/Inventory';
 import Reports from './pages/Reports';
 
+const FULLSCREEN_ROUTES = ['/login', '/register', '/pos', '/'];
+
 const LayoutWrapper = ({ children }) => {
   const location = useLocation();
+  const fullscreen = FULLSCREEN_ROUTES.includes(location.pathname);
 
-  const hideSidebar = ['/login', '/register', '/pos', '/'].includes(location.pathname);
-
-  if (hideSidebar) {
+  if (fullscreen) {
     return <div style={{ width: '100vw', height: '100vh' }}>{children}</div>;
   }
 
   return (
-    <div style={{ display: 'flex', width: '100vw', height: '100vh', overflow: 'hidden' }}>
+    <div
+      style={{
+        display: 'flex',
+        width: '100vw',
+        height: '100vh',
+        overflow: 'hidden',
+        background: 'var(--page-bg)'
+      }}
+    >
       <Sidebar />
-      <main style={{ flex: 1, overflow: 'hidden', background: '#f8fafc' }}>
+      <main style={{ flex: 1, overflow: 'hidden', background: 'var(--page-bg)' }}>
         {children}
       </main>
     </div>
