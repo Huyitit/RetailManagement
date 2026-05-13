@@ -1,5 +1,5 @@
 import React from 'react';
-import Modal from './Modal';
+import OrderDetailModalShell from './OrderDetailModalShell';
 import VariantAttributesEditor from './VariantAttributesEditor';
 import { Package, Plus, Settings2, Trash2 } from 'lucide-react';
 
@@ -21,7 +21,7 @@ const ProductModal = ({
   onSave
 }) => {
   return (
-    <Modal
+    <OrderDetailModalShell
       isOpen={isOpen}
       onClose={onClose}
       title={isEditMode ? 'Cập nhật Sản phẩm' : 'Tạo Sản phẩm & Phân loại mới'}
@@ -143,7 +143,7 @@ const ProductModal = ({
           </div>
         </div>
       </div>
-    </Modal>
+    </OrderDetailModalShell>
   );
 };
 

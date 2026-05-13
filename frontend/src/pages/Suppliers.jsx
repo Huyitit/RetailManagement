@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getSuppliers, createSupplier, updateSupplier, deleteSupplier } from '../services/api';
 import DataTable from '../components/DataTable';
-import Modal from '../components/Modal';
+import OrderDetailModalShell from '../components/OrderDetailModalShell';
 import { Building2, Plus, Search, Mail, Phone, MapPin } from 'lucide-react';
 
 const Suppliers = () => {
@@ -142,33 +142,38 @@ const Suppliers = () => {
       </header>
 
       <div className="custom-scrollbar" style={{ flex: 1, overflowY: 'auto', padding: '32px 40px' }}>
-        <div style={{ background: 'white', padding: '24px', borderRadius: '24px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05)' }}>
-          <div style={{ position: 'relative', maxWidth: '400px', marginBottom: '24px' }}>
-            <Search size={18} style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
-            <input
-              type="text"
-              placeholder="Tìm theo tên, sđt, email..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              style={{ width: '100%', padding: '12px 16px 12px 48px', borderRadius: '12px', border: '1px solid #e2e8f0', background: '#f8fafc', outline: 'none', fontWeight: '600', fontSize: '14px' }}
-            />
+        <div style={{ background: 'white', borderRadius: '24px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+          <div style={{ padding: '24px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ fontSize: '13px', fontWeight: '800', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Danh sach nha cung cap</div>
+            <div style={{ position: 'relative', width: '320px' }}>
+              <Search size={18} style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+              <input
+                type="text"
+                placeholder="Tìm theo tên, sđt, email..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                style={{ width: '100%', padding: '12px 16px 12px 48px', borderRadius: '14px', border: '1px solid #e2e8f0', background: '#f8fafc', outline: 'none', fontWeight: '600' }}
+              />
+            </div>
           </div>
 
-          <DataTable 
-            columns={columns} 
-            data={data} 
-            isLoading={isLoading}
-            onEdit={handleOpenModal}
-            onDelete={handleDelete}
-            pagination={{
-              ...pagination,
-              onPageChange: fetchSuppliers
-            }}
-          />
+          <div style={{ padding: '24px' }}>
+            <DataTable 
+              columns={columns} 
+              data={data} 
+              isLoading={isLoading}
+              onEdit={handleOpenModal}
+              onDelete={handleDelete}
+              pagination={{
+                ...pagination,
+                onPageChange: fetchSuppliers
+              }}
+            />
+          </div>
         </div>
       </div>
 
-      <Modal 
+      <OrderDetailModalShell 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)}
         title={isEditMode ? 'Cập nhật Nhà cung cấp' : 'Thêm Nhà cung cấp'}
@@ -224,7 +229,7 @@ const Suppliers = () => {
             </div>
           </div>
         </div>
-      </Modal>
+      </OrderDetailModalShell>
     </div>
   );
 };

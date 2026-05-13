@@ -5,7 +5,7 @@ import {
   searchSuppliers, searchVariants 
 } from '../services/api';
 import DataTable from '../components/DataTable';
-import Modal from '../components/Modal';
+import OrderDetailModalShell from '../components/OrderDetailModalShell';
 import ReceiptDetailModal from '../components/ReceiptDetailModal';
 import SearchAutocomplete from '../components/SearchAutocomplete';
 import StatusBadge from '../components/StatusBadge';
@@ -266,54 +266,49 @@ const Inventory = () => {
       </header>
 
       <div className="custom-scrollbar" style={{ flex: 1, overflowY: 'auto', padding: '32px 40px' }}>
-        
-        {/* Tabs */}
-        <div className="flex space-x-2 mb-6">
+        <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
           <button
             onClick={() => { setActiveTab('import'); setSearchQuery(''); }}
-            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm transition-all ${
-              activeTab === 'import' 
-                ? 'bg-white text-indigo-700 shadow-sm border border-indigo-100 ring-2 ring-indigo-500/20' 
-                : 'text-slate-500 hover:bg-white hover:text-slate-700 border border-transparent'
-            }`}
+            style={{ padding: '10px 24px', borderRadius: '12px', border: 'none', background: activeTab === 'import' ? '#10b981' : '#f1f5f9', color: activeTab === 'import' ? 'white' : '#64748b', fontWeight: '800', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
           >
-            <PackageOpen size={18}/> Phiếu Nhập Kho
+            <PackageOpen size={18}/> Phieu Nhap Kho
           </button>
           <button
             onClick={() => { setActiveTab('export'); setSearchQuery(''); }}
-            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm transition-all ${
-              activeTab === 'export' 
-                ? 'bg-white text-amber-700 shadow-sm border border-amber-100 ring-2 ring-amber-500/20' 
-                : 'text-slate-500 hover:bg-white hover:text-slate-700 border border-transparent'
-            }`}
+            style={{ padding: '10px 24px', borderRadius: '12px', border: 'none', background: activeTab === 'export' ? '#10b981' : '#f1f5f9', color: activeTab === 'export' ? 'white' : '#64748b', fontWeight: '800', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
           >
-            <PackageMinus size={18}/> Phiếu Xuất Kho
+            <PackageMinus size={18}/> Phieu Xuat Kho
           </button>
         </div>
 
-        <div style={{ background: 'white', padding: '24px', borderRadius: '24px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05)' }}>
-          <div style={{ position: 'relative', maxWidth: '400px', marginBottom: '24px' }}>
-            <Search size={18} style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
-            <input
-              type="text"
-              placeholder={`Tìm mã phiếu ${activeTab === 'import' ? 'nhập' : 'xuất'}...`}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              style={{ width: '100%', padding: '12px 16px 12px 48px', borderRadius: '12px', border: '1px solid #e2e8f0', background: '#f8fafc', outline: 'none', fontWeight: '600', fontSize: '14px' }}
-            />
+        <div style={{ background: 'white', borderRadius: '24px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+          <div style={{ padding: '24px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ fontSize: '13px', fontWeight: '800', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Danh sach phieu</div>
+            <div style={{ position: 'relative', width: '320px' }}>
+              <Search size={18} style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+              <input
+                type="text"
+                placeholder={`Tìm mã phiếu ${activeTab === 'import' ? 'nhập' : 'xuất'}...`}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{ width: '100%', padding: '12px 16px 12px 48px', borderRadius: '14px', border: '1px solid #e2e8f0', background: '#f8fafc', outline: 'none', fontWeight: '600' }}
+              />
+            </div>
           </div>
 
-          <DataTable 
-            columns={columns} 
-            data={data} 
-            isLoading={isLoading}
-            onRowClick={handleOpenDetail}
-            pagination={{ ...pagination, onPageChange: fetchReceipts }}
-          />
+          <div style={{ padding: '24px' }}>
+            <DataTable 
+              columns={columns} 
+              data={data} 
+              isLoading={isLoading}
+              onRowClick={handleOpenDetail}
+              pagination={{ ...pagination, onPageChange: fetchReceipts }}
+            />
+          </div>
         </div>
       </div>
 
-      <Modal 
+      <OrderDetailModalShell 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)}
         title={activeTab === 'import' ? 'Tạo Phiếu Nhập Kho Mới' : 'Tạo Phiếu Xuất Kho Mới'}
@@ -462,7 +457,7 @@ const Inventory = () => {
             </div>
           </div>
         </div>
-      </Modal>
+      </OrderDetailModalShell>
 
       <ReceiptDetailModal
         isOpen={isDetailOpen}

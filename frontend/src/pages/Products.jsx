@@ -323,41 +323,46 @@ const Products = () => {
   ];
 
   return (
-    <div className="products-page">
-      <header className="products-header">
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: '#f8fafc', overflow: 'hidden' }}>
+      <header style={{ padding: '32px 40px', background: 'white', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
         <div>
-          <h1 className="products-title">Danh mục Sản phẩm</h1>
-          <p className="products-subtitle">Quản lý kho hàng, thương hiệu và các phân loại giá</p>
+          <h1 style={{ fontSize: '28px', fontWeight: '950', color: '#0f172a', margin: 0 }}>Danh mục Sản phẩm</h1>
+          <p style={{ color: '#64748b', fontSize: '14px', marginTop: '4px', fontWeight: '600' }}>Quản lý kho hàng, thương hiệu và các phân loại giá</p>
         </div>
         <button
           onClick={() => handleOpenModal()}
-          className="products-add-btn"
+          style={{ background: '#4f46e5', color: 'white', padding: '12px 24px', borderRadius: '12px', border: 'none', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', boxShadow: '0 4px 6px -1px rgba(79, 70, 229, 0.2)' }}
         >
           <Plus size={18} /> Thêm Sản phẩm
         </button>
       </header>
 
-      <div className="products-body custom-scrollbar">
-        <div className="products-card">
-          <div className="products-search">
-            <Search size={18} className="products-search-icon" />
-            <input
-              type="text"
-              placeholder="Tìm theo tên sản phẩm, thương hiệu..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="products-search-input"
-            />
+      <div className="custom-scrollbar" style={{ flex: 1, overflowY: 'auto', padding: '32px 40px' }}>
+        <div style={{ background: 'white', borderRadius: '24px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+          <div style={{ padding: '24px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ fontSize: '13px', fontWeight: '800', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Danh sach san pham</div>
+            <div style={{ position: 'relative', width: '320px' }}>
+              <Search size={18} style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+              <input
+                type="text"
+                placeholder="Tìm theo tên sản phẩm, thương hiệu..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                style={{ width: '100%', padding: '12px 16px 12px 48px', borderRadius: '14px', border: '1px solid #e2e8f0', background: '#f8fafc', outline: 'none', fontWeight: '600' }}
+              />
+            </div>
           </div>
 
-          <DataTable 
-            columns={columns} 
-            data={data} 
-            isLoading={isLoading}
-            onEdit={handleOpenModal}
-            onDelete={handleDelete}
-            pagination={{ ...pagination, onPageChange: fetchProducts }}
-          />
+          <div style={{ padding: '24px' }}>
+            <DataTable 
+              columns={columns} 
+              data={data} 
+              isLoading={isLoading}
+              onEdit={handleOpenModal}
+              onDelete={handleDelete}
+              pagination={{ ...pagination, onPageChange: fetchProducts }}
+            />
+          </div>
         </div>
       </div>
 

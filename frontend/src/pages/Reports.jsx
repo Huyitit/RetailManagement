@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getRevenueReport, getRevenueByDate, getInventoryReport, getDebtReport, getDebtDetail } from '../services/api';
 import DataTable from '../components/DataTable';
 import StatCard from '../components/StatCard';
-import Modal from '../components/Modal';
+import OrderDetailModalShell from '../components/OrderDetailModalShell';
 import { BarChart3, TrendingUp, AlertTriangle, Wallet, ArrowDownRight, PackageOpen } from 'lucide-react';
 
 const Reports = () => {
@@ -161,36 +161,52 @@ const Reports = () => {
       </header>
 
       <div className="custom-scrollbar" style={{ flex: 1, overflowY: 'auto', padding: '32px 40px' }}>
-        
-        {/* Tabs */}
-        <div className="flex space-x-2 mb-8 border-b border-slate-200 pb-2">
-          <button onClick={() => setActiveTab('revenue')}
-            className={`flex items-center gap-2 px-4 py-2 font-bold text-sm transition-all border-b-2 ${activeTab === 'revenue' ? 'border-indigo-600 text-indigo-700' : 'border-transparent text-slate-500 hover:text-slate-700'}`}>
-            <BarChart3 size={18}/> Doanh thu bán hàng
+        <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
+          <button
+            onClick={() => setActiveTab('revenue')}
+            style={{ padding: '10px 24px', borderRadius: '12px', border: 'none', background: activeTab === 'revenue' ? '#10b981' : '#f1f5f9', color: activeTab === 'revenue' ? 'white' : '#64748b', fontWeight: '800', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+          >
+            <BarChart3 size={18}/> Doanh thu ban hang
           </button>
-          <button onClick={() => setActiveTab('inventory')}
-            className={`flex items-center gap-2 px-4 py-2 font-bold text-sm transition-all border-b-2 ${activeTab === 'inventory' ? 'border-amber-500 text-amber-700' : 'border-transparent text-slate-500 hover:text-slate-700'}`}>
-            <AlertTriangle size={18}/> Cảnh báo tồn kho
+          <button
+            onClick={() => setActiveTab('inventory')}
+            style={{ padding: '10px 24px', borderRadius: '12px', border: 'none', background: activeTab === 'inventory' ? '#10b981' : '#f1f5f9', color: activeTab === 'inventory' ? 'white' : '#64748b', fontWeight: '800', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+          >
+            <AlertTriangle size={18}/> Canh bao ton kho
           </button>
-          <button onClick={() => setActiveTab('debt')}
-            className={`flex items-center gap-2 px-4 py-2 font-bold text-sm transition-all border-b-2 ${activeTab === 'debt' ? 'border-rose-500 text-rose-700' : 'border-transparent text-slate-500 hover:text-slate-700'}`}>
-            <Wallet size={18}/> Công nợ nhà cung cấp
+          <button
+            onClick={() => setActiveTab('debt')}
+            style={{ padding: '10px 24px', borderRadius: '12px', border: 'none', background: activeTab === 'debt' ? '#10b981' : '#f1f5f9', color: activeTab === 'debt' ? 'white' : '#64748b', fontWeight: '800', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+          >
+            <Wallet size={18}/> Cong no nha cung cap
           </button>
         </div>
 
         {/* Content based on Tab */}
         {activeTab === 'revenue' && (
-          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="flex justify-between items-center bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-              <h3 className="font-bold text-slate-800 flex items-center gap-2"><BarChart3 size={18} className="text-indigo-500"/> Tổng quan doanh thu</h3>
-              <div className="flex gap-4">
-                <input type="date" value={dateRange.start} onChange={e => setDateRange({...dateRange, start: e.target.value})} className="border border-slate-200 rounded-lg px-3 py-1.5 text-sm font-semibold text-slate-700 focus:ring-2 focus:ring-indigo-500"/>
-                <span className="text-slate-400 self-center">đến</span>
-                <input type="date" value={dateRange.end} onChange={e => setDateRange({...dateRange, end: e.target.value})} className="border border-slate-200 rounded-lg px-3 py-1.5 text-sm font-semibold text-slate-700 focus:ring-2 focus:ring-indigo-500"/>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            <div style={{ background: 'white', padding: '24px', borderRadius: '24px', border: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ fontWeight: '800', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <BarChart3 size={18} /> Tong quan doanh thu
+              </div>
+              <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                <input
+                  type="date"
+                  value={dateRange.start}
+                  onChange={e => setDateRange({ ...dateRange, start: e.target.value })}
+                  style={{ padding: '10px 12px', borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '13px', outline: 'none', width: '150px', color: '#1e293b', fontWeight: '600' }}
+                />
+                <span style={{ color: '#94a3b8', fontWeight: '700' }}>den</span>
+                <input
+                  type="date"
+                  value={dateRange.end}
+                  onChange={e => setDateRange({ ...dateRange, end: e.target.value })}
+                  style={{ padding: '10px 12px', borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '13px', outline: 'none', width: '150px', color: '#1e293b', fontWeight: '600' }}
+                />
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
               <StatCard title="Tong doanh thu" value={formatMoney(revenueData.summary?.totalRevenue)} icon={<TrendingUp size={24}/>} />
               <StatCard title="So don hoan thanh" value={revenueData.summary?.totalOrders || 0} icon={<PackageOpen size={24}/>} />
               <StatCard title="Doanh thu thuan" value={formatMoney(revenueData.summary?.netRevenue)} icon={<BarChart3 size={24}/>} />
@@ -199,21 +215,25 @@ const Reports = () => {
               <StatCard title="Hoan tien" value={formatMoney(revenueData.summary?.totalRefund)} icon={<ArrowDownRight size={24}/>} />
             </div>
 
-            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-              <h3 className="font-bold text-slate-800 mb-4">Chi tiết theo ngày</h3>
-              <DataTable columns={revenueColumns} data={revenueData.daily} isLoading={isLoading} onRowDoubleClick={openRevenueDetail} />
+            <div style={{ background: 'white', borderRadius: '24px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+              <div style={{ padding: '24px', borderBottom: '1px solid #f1f5f9', fontWeight: '800', color: '#0f172a' }}>Chi tiet theo ngay</div>
+              <div style={{ padding: '24px' }}>
+                <DataTable columns={revenueColumns} data={revenueData.daily} isLoading={isLoading} onRowDoubleClick={openRevenueDetail} />
+              </div>
             </div>
           </div>
         )}
 
         {activeTab === 'inventory' && (
-          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="flex items-center justify-between bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-              <h3 className="font-bold text-slate-800 flex items-center gap-2"><AlertTriangle size={18} className="text-amber-500"/> Bo loc ton kho</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            <div style={{ background: 'white', padding: '24px', borderRadius: '24px', border: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ fontWeight: '800', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <AlertTriangle size={18} /> Bo loc ton kho
+              </div>
               <select
                 value={inventoryFilter}
                 onChange={(e) => setInventoryFilter(e.target.value)}
-                className="border border-slate-200 rounded-lg px-3 py-1.5 text-sm font-semibold text-slate-700 focus:ring-2 focus:ring-amber-500"
+                style={{ padding: '10px 12px', borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '13px', outline: 'none', color: '#1e293b', fontWeight: '600' }}
               >
                 <option value="all">Tat ca</option>
                 <option value="low_stock">Sap het hang</option>
@@ -221,34 +241,38 @@ const Reports = () => {
               </select>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '24px' }}>
               <StatCard title="San pham sap het hang" value={inventoryData.summary?.lowStockCount || 0} subtitle="Ton kho duoi muc toi thieu" icon={<AlertTriangle size={24}/>} />
               <StatCard title="Het hang" value={inventoryData.summary?.outOfStockCount || 0} subtitle="San pham da het hang" icon={<PackageOpen size={24}/>} />
             </div>
             
-            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-              <h3 className="font-bold text-slate-800 mb-4">Danh sách hàng cần nhập thêm</h3>
-              <DataTable columns={inventoryColumns} data={inventoryData.items} isLoading={isLoading} emptyMessage="Kho dang o trang thai an toan, khong co san pham sap het." />
+            <div style={{ background: 'white', borderRadius: '24px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+              <div style={{ padding: '24px', borderBottom: '1px solid #f1f5f9', fontWeight: '800', color: '#0f172a' }}>Danh sach hang can nhap them</div>
+              <div style={{ padding: '24px' }}>
+                <DataTable columns={inventoryColumns} data={inventoryData.items} isLoading={isLoading} emptyMessage="Kho dang o trang thai an toan, khong co san pham sap het." />
+              </div>
             </div>
           </div>
         )}
 
         {activeTab === 'debt' && (
-          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '24px' }}>
               <StatCard title="Tong cong no can tra" value={formatMoney(debtData.reduce((sum, d) => sum + Number(d.totalDebt || 0), 0))} subtitle="Tien hang chua thanh toan cho NCC" icon={<ArrowDownRight size={24}/>} />
             </div>
 
-            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-              <h3 className="font-bold text-slate-800 mb-4">Chi tiết công nợ theo nhà cung cấp</h3>
-              <DataTable columns={debtColumns} data={debtData} isLoading={isLoading} emptyMessage="Khong co khoan no nao duoc ghi nhan." onRowClick={openDebtDetail} />
+            <div style={{ background: 'white', borderRadius: '24px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+              <div style={{ padding: '24px', borderBottom: '1px solid #f1f5f9', fontWeight: '800', color: '#0f172a' }}>Chi tiet cong no theo nha cung cap</div>
+              <div style={{ padding: '24px' }}>
+                <DataTable columns={debtColumns} data={debtData} isLoading={isLoading} emptyMessage="Khong co khoan no nao duoc ghi nhan." onRowClick={openDebtDetail} />
+              </div>
             </div>
           </div>
         )}
 
       </div>
 
-      <Modal
+      <OrderDetailModalShell
         isOpen={revenueDetailOpen}
         onClose={() => setRevenueDetailOpen(false)}
         title={`Chi tiet doanh thu ngay ${revenueDetailDate ? new Date(revenueDetailDate).toLocaleDateString('vi-VN') : ''}`}
@@ -265,9 +289,9 @@ const Reports = () => {
           isLoading={revenueDetailLoading}
           emptyMessage="Khong co don hang nao trong ngay nay."
         />
-      </Modal>
+      </OrderDetailModalShell>
 
-      <Modal
+      <OrderDetailModalShell
         isOpen={debtDetailOpen}
         onClose={() => setDebtDetailOpen(false)}
         title={`Chi tiet cong no - ${debtDetailSupplier?.companyName || ''}`}
@@ -284,7 +308,7 @@ const Reports = () => {
           isLoading={debtDetailLoading}
           emptyMessage="Khong co phieu nhap nao cho nha cung cap nay."
         />
-      </Modal>
+      </OrderDetailModalShell>
     </div>
   );
 };

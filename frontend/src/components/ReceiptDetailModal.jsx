@@ -1,12 +1,12 @@
 import React from 'react';
-import Modal from './Modal';
+import OrderDetailModalShell from './OrderDetailModalShell';
 
 const ReceiptDetailModal = ({ isOpen, onClose, type, detail, isLoading, error }) => {
   const formatMoney = (val) => new Intl.NumberFormat('vi-VN').format(Number(val || 0)) + ' đ';
   const isImport = type === 'import';
 
   return (
-    <Modal
+    <OrderDetailModalShell
       isOpen={isOpen}
       onClose={onClose}
       title={isImport ? 'Chi tiết Phiếu Nhập' : 'Chi tiết Phiếu Xuất'}
@@ -93,7 +93,7 @@ const ReceiptDetailModal = ({ isOpen, onClose, type, detail, isLoading, error })
           </>
         )}
       </div>
-    </Modal>
+    </OrderDetailModalShell>
   );
 };
 
