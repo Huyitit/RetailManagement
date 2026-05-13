@@ -73,10 +73,56 @@ async function seed() {
     };
 
     const phoneData = [
-      ['iPhone 15 Pro Max', [{ sku: 'IP15PM-256', color: 'Titan Tự Nhiên', rom: '256GB', ram: '8GB', price: 29990000, img: 'https://images.unsplash.com/photo-1696446701796-da61225697cc?w=600' }]],
-      ['Galaxy S24 Ultra', [{ sku: 'S24U-256', color: 'Xám Titan', rom: '256GB', ram: '12GB', price: 26990000, img: 'https://images.unsplash.com/photo-1707241221132-7a8689ba488d?w=600' }]]
+      ['iPhone 15 Pro Max', [{ sku: 'IP15PM-256', color: 'Titan Tự Nhiên', rom: '256GB', ram: '8GB', price: 29990000, img: 'http://localhost:5001/uploads/iphone15pm.png' }]],
+      ['Galaxy S24 Ultra', [{ sku: 'S24U-256', color: 'Xám Titan', rom: '256GB', ram: '12GB', price: 26990000, img: 'http://localhost:5001/uploads/s24u.png' }]],
+      ['Galaxy Z Fold5', [{ sku: 'Z-FOLD5', color: 'Kem', rom: '512GB', ram: '12GB', price: 32900000, img: 'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=600' }]],
+      ['iPhone 14 Pro', [{ sku: 'IP14P-128', color: 'Tím Deep Purple', rom: '128GB', ram: '6GB', price: 23500000, img: 'https://images.unsplash.com/photo-1663499482523-1c0c1bae4ce1?w=600' }]],
+      ['Xiaomi 14 Ultra', [{ sku: 'XI-14U', color: 'Trắng', rom: '512GB', ram: '16GB', price: 28900000, img: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600' }]],
+      ['Oppo Find N3 Flip', [{ sku: 'OP-N3', color: 'Vàng', rom: '256GB', ram: '12GB', price: 22900000, img: 'http://localhost:5001/uploads/oppon3flip.png' }]],
+      ['Google Pixel 8 Pro', [{ sku: 'GG-P8P', color: 'Xanh Bay', rom: '128GB', ram: '12GB', price: 19500000, img: 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=600' }]],
+      ['Samsung Galaxy A55', [{ sku: 'SS-A55', color: 'Xanh Lơ', rom: '128GB', ram: '8GB', price: 9990000, img: 'https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?w=600' }]],
+      ['Redmi Note 13 Pro+', [{ sku: 'XI-RN13P', color: 'Đen', rom: '256GB', ram: '12GB', price: 9490000, img: 'http://localhost:5001/uploads/redmi13p.png' }]],
+      ['Realme 12 Pro+', [{ sku: 'RM-12P', color: 'Xanh Blue', rom: '256GB', ram: '8GB', price: 11900000, img: 'http://localhost:5001/uploads/realme12p.png' }]]
     ];
     for (const [name, vars] of phoneData) await insertData(cats[0].id, name, vars);
+
+    const tvData = [
+      ['Sony Bravia XR OLED A80L', [{ sku: 'SN-A80L-55', size: '55 INCH', res: '4K', panel: 'OLED', price: 34900000, img: 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=600' }]],
+      ['Samsung Neo QLED QN90C', [{ sku: 'SS-QN90-75', size: '75 INCH', res: '4K', panel: 'Neo QLED', price: 55900000, img: 'https://images.unsplash.com/photo-1552284043-199468a221f7?w=600' }]],
+      ['LG C3 OLED Evo', [{ sku: 'LG-C3-55', size: '55 INCH', res: '4K', panel: 'OLED', price: 36500000, img: 'https://images.unsplash.com/photo-1593784991095-a205039470b6?w=600' }]],
+      ['TCL Mini LED C845', [{ sku: 'TCL-C845-65', size: '65 INCH', res: '4K', panel: 'Mini LED', price: 23900000, img: 'https://images.unsplash.com/photo-1461151304267-38535e770d79?w=600' }]]
+    ];
+    for (const [name, vars] of tvData) await insertData(cats[1].id, name, vars);
+
+    const laptopData = [
+      ['MacBook Pro M3 Pro', [{ sku: 'MBP-M3', color: 'Space Black', rom: '512GB', ram: '18GB', size: '14.2 INCH', price: 49900000, img: 'http://localhost:5001/uploads/mbp_m3.jpg' }]],
+      ['ASUS TUF Gaming F15', [{ sku: 'AS-TUF', color: 'Đen nhám', rom: '512GB', ram: '16GB', size: '15.6 INCH', price: 21900000, img: 'http://localhost:5001/uploads/asus_tuf.jpg' }]],
+      ['Dell XPS 13 Plus', [{ sku: 'DELL-XPS', color: 'Bạc', rom: '512GB', ram: '16GB', size: '13.4 INCH', price: 42500000, img: 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=600' }]],
+      ['HP Pavilion 15', [{ sku: 'HP-PAV', color: 'Vàng Gold', rom: '512GB', ram: '8GB', size: '15.6 INCH', price: 14500000, img: 'https://images.unsplash.com/photo-1589561084283-930aa7b1ce50?w=600' }]],
+      ['Lenovo Legion Slim 5', [{ sku: 'LEN-LEG', color: 'Xám', rom: '512GB', ram: '16GB', size: '16 INCH', price: 32900000, img: 'http://localhost:5001/uploads/legion_slim_5.jpg' }]],
+      ['Acer Nitro 5 Tiger', [{ sku: 'ACER-N5', color: 'Đen', rom: '512GB', ram: '16GB', size: '15.6 INCH', price: 21500000, img: 'http://localhost:5001/uploads/nitro_5.jpg' }]],
+      ['MSI Katana 15', [{ sku: 'MSI-K15', color: 'Đen', rom: '512GB', ram: '16GB', size: '15.6 INCH', price: 25900000, img: 'http://localhost:5001/uploads/msi_katana.jpg' }]],
+      ['MacBook Air M2', [{ sku: 'MBA-M2', color: 'Midnight', rom: '256GB', ram: '8GB', size: '13.6 INCH', price: 26500000, img: 'http://localhost:5001/uploads/mba_m2.jpg' }]],
+      ['ASUS Zenbook 14', [{ sku: 'AS-ZEN', color: 'Xanh Blue', rom: '512GB', ram: '16GB', size: '14 INCH', price: 23900000, img: 'http://localhost:5001/uploads/zenbook_14.jpg' }]],
+      ['LG Gram 16', [{ sku: 'LG-GRAM', color: 'Trắng', rom: '512GB', ram: '16GB', size: '16 INCH', price: 35900000, img: 'http://localhost:5001/uploads/lg_gram.jpg' }]]
+    ];
+    for (const [name, vars] of laptopData) await insertData(cats[2].id, name, vars);
+
+    const giaDungData = [
+      ['Nồi chiên Philips 6L', [{ sku: 'PH-AF-6', color: 'Đen', cap: '6 Lít', type: 'Điện tử', price: 3850000, img: 'http://localhost:5001/uploads/philips_af.png' }]],
+      ['Robot hút bụi Roborock S8', [{ sku: 'RR-S8', color: 'Đen', type: 'Robot tự động', price: 15900000, img: 'http://localhost:5001/uploads/roborocks8.png' }]],
+      ['Máy lọc nước Karofi', [{ sku: 'KA-W10', cap: '10 Lõi', type: 'Tủ đứng', price: 6200000, img: 'http://localhost:5001/uploads/karofiwater.png' }]],
+      ['Máy xay sinh tố Philips', [{ sku: 'PH-BL-S', color: 'Trắng', cap: '1.5 Lít', price: 1650000, img: 'http://localhost:5001/uploads/philips_bl.png' }]],
+      ['Lò vi sóng Sharp 23L', [{ sku: 'SH-MW-23', color: 'Bạc', cap: '23 Lít', price: 2850000, img: 'http://localhost:5001/uploads/sharpmicrowave.png' }]],
+      ['Quạt đứng Mitsubishi', [{ sku: 'MIT-LV', color: 'Xám', type: 'Có điều khiển', price: 1950000, img: 'http://localhost:5001/uploads/mitsubishi_fan.png' }]],
+      ['Nồi cơm điện Cuckoo', [{ sku: 'CK-RC-18', color: 'Đỏ', cap: '1.8 Lít', type: 'Cao tần', price: 6500000, img: 'http://localhost:5001/uploads/cuckoo_rc.png' }]],
+      ['Bếp từ Sunhouse', [{ sku: 'SH-IND-2', color: 'Đen', type: 'Bếp đôi', price: 4200000, img: 'http://localhost:5001/uploads/sunhousecooker.png' }]],
+      ['Máy lọc không khí Xiaomi 4 Pro', [{ sku: 'XI-AP-4P', color: 'Trắng', cap: '60m2', price: 4500000, img: 'http://localhost:5001/uploads/xiaomiair.png' }]],
+      ['Ấm siêu tốc Bluestone', [{ sku: 'BL-KET-1', color: 'Inox', cap: '1.7 Lít', price: 650000, img: 'http://localhost:5001/uploads/bluestonekettle.png' }]],
+      ['Máy ép chậm Hurom', [{ sku: 'HU-H200', color: 'Đỏ', type: 'Máy ép chậm', price: 9900000, img: 'http://localhost:5001/uploads/hurom_sj.png' }]],
+      ['Máy xay đa năng Moulinex', [{ sku: 'MO-BL', color: 'Trắng', cap: '2 Lít', price: 2450000, img: 'http://localhost:5001/uploads/moulinex_bl.png' }]]
+    ];
+    for (const [name, vars] of giaDungData) await insertData(cats[5].id, name, vars);
 
     const promo = await Promotion.create({
       promotionName: 'SIÊU SALE MÙA HÈ - GIẢM 15%',
@@ -87,16 +133,17 @@ async function seed() {
     });
 
     const promoVariants = [
-      { promotionId: promo.id, variantId: createdVariants[0].id }
+      { promotionId: promo.id, variantId: createdVariants[0].id },
+      { promotionId: promo.id, variantId: createdVariants[createdVariants.length - 1].id }
     ];
     await PromotionVariant.bulkCreate(promoVariants);
 
     console.log('🛒 ĐANG TẠO ĐƠN HÀNG MẪU...');
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 5; i++) {
       const v = createdVariants[Math.floor(Math.random() * createdVariants.length)];
       const qty = 1;
       const subtotal = Number(v.sellPrice) * qty;
-      const total = subtotal * 1.1; // with tax
+      const total = subtotal * 1.1; 
 
       const order = await Order.create({
         staffId: 1,
@@ -129,4 +176,3 @@ async function seed() {
 }
 
 seed();
-

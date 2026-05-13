@@ -15,29 +15,10 @@ const Warranty = () => {
   const [reason, setReason] = useState('');
   const [newProductSku, setNewProductSku] = useState('');
 
-  const mockWarrantyInfo = {
-    customer: { name: 'Nguyễn Văn A', phone: '0901234567', tier: 'Gold' },
-    product: {
-      name: 'MacBook Air M2',
-      serial: 'APL-M2-8899',
-      purchaseDate: '15/01/2026',
-      warrantyExpiry: '15/01/2027',
-      status: 'In Warranty',
-      conditions: [
-        'Lỗi do nhà sản xuất',
-        'Còn nguyên tem niêm phong',
-        'Không bị vào nước hoặc rơi vỡ'
-      ]
-    },
-    history: [
-      { date: '15/01/2026', action: 'Mua mới', note: 'Kèm gói bảo hành VIP' }
-    ]
-  };
-
   const handleSearch = () => {
     if (!query) return;
-    setSelectedProduct(mockWarrantyInfo);
-    setView('detail');
+    alert('Chức năng đang được cập nhật...');
+
   };
 
   const handleProcess = () => setView('success');
