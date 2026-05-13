@@ -269,7 +269,7 @@ const Products = () => {
               {row.productName || 'N/A'}
             </div>
             <div style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '2px' }}>
-              {row.brand || 'N/A'}
+              {row.brand}
             </div>
           </div>
         </div>

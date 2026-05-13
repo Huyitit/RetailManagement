@@ -187,7 +187,7 @@ const Staff = () => {
         } else if (row.role === 'Manager') {
           bgColor = 'rgba(16, 185, 129, 0.1)';
           color = '#10b981';
-        } else if (row.role === 'Cashier' || row.role === 'Staff') {
+        } else if (row.role === 'Cashier') {
           bgColor = 'rgba(245, 158, 11, 0.1)';
           color = '#f59e0b';
         }
