@@ -27,7 +27,7 @@ const FormRow = ({ label, children, labelStyle, cellStyle }) => {
           padding: '14px 18px',
           textAlign: 'left',
           fontSize: '11px',
-          fontWeight: 800,
+          fontWeight: 600,
           letterSpacing: '0.4px',
           textTransform: 'uppercase',
           color: 'var(--text-muted)',

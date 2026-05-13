@@ -18,7 +18,7 @@ const OrdersTable = ({
     padding: '14px 20px',
     textAlign: align || 'left',
     fontSize: '11px',
-    fontWeight: 800,
+    fontWeight: 600,
     color: 'var(--text-light)',
     textTransform: 'uppercase',
     letterSpacing: '0.4px'
@@ -157,7 +157,7 @@ const OrdersTable = ({
           >
             Trước
           </button>
-          <div style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-muted)' }}>
+          <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-muted)' }}>
             Trang <span style={{ color: 'var(--text-main)' }}>{pagination.currentPage}</span> /{' '}
             {pagination.totalPages}
           </div>

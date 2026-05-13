@@ -38,7 +38,7 @@ const ReceiptDetailModal = ({ isOpen, onClose, type, detail, isLoading, error })
           <>
             <FormTable>
               <FormRow label="Mã phiếu">
-                <div style={{ fontSize: '18px', fontWeight: 900, color: 'var(--text-main)' }}>
+                <div style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-main)' }}>
                   {isImport
                     ? `IMP-${String(detail.receiptId).padStart(5, '0')}`
                     : `EXP-${String(detail.receiptId).padStart(5, '0')}`}
@@ -60,7 +60,7 @@ const ReceiptDetailModal = ({ isOpen, onClose, type, detail, isLoading, error })
                 </div>
               </FormRow>
               <FormRow label="Tổng tiền">
-                <div style={{ fontSize: '20px', fontWeight: 900, color: 'var(--primary)' }}>
+                <div style={{ fontSize: '20px', fontWeight: 700, color: 'var(--primary)' }}>
                   {formatMoney(detail.totalAmount)}
                 </div>
               </FormRow>
@@ -83,7 +83,7 @@ const ReceiptDetailModal = ({ isOpen, onClose, type, detail, isLoading, error })
                         style={{
                           padding: '12px 16px',
                           fontSize: '11px',
-                          fontWeight: 800,
+                          fontWeight: 600,
                           letterSpacing: '0.4px',
                           textTransform: 'uppercase',
                           color: 'var(--text-muted)',
@@ -111,7 +111,7 @@ const ReceiptDetailModal = ({ isOpen, onClose, type, detail, isLoading, error })
                       <td style={{ padding: '12px 16px', textAlign: 'right', color: 'var(--text-main)' }}>
                         {isImport ? formatMoney(item.importPrice) : '-'}
                       </td>
-                      <td style={{ padding: '12px 16px', textAlign: 'right', fontWeight: 800, color: 'var(--text-main)' }}>
+                      <td style={{ padding: '12px 16px', textAlign: 'right', fontWeight: 600, color: 'var(--text-main)' }}>
                         {isImport ? formatMoney(item.lineTotal) : '-'}
                       </td>
                     </tr>

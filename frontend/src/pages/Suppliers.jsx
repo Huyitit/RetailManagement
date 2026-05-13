@@ -176,7 +176,7 @@ const Suppliers = () => {
             <div
               style={{
                 fontSize: '12px',
-                fontWeight: 800,
+                fontWeight: 600,
                 color: 'var(--text-muted)',
                 textTransform: 'uppercase',
                 letterSpacing: '0.5px'

@@ -105,7 +105,7 @@ const Reports = () => {
     border: `1px solid ${active ? 'var(--primary)' : 'var(--border-strong)'}`,
     background: active ? 'var(--primary)' : 'var(--surface)',
     color: active ? 'white' : 'var(--text-muted)',
-    fontWeight: 800,
+    fontWeight: 600,
     cursor: 'pointer',
     display: 'inline-flex',
     alignItems: 'center',
@@ -129,7 +129,7 @@ const Reports = () => {
     },
     {
       header: 'Doanh thu', accessor: 'revenue', align: 'right', render: (row) => (
-        <span style={{ fontWeight: 800, color: 'var(--primary)' }}>{formatMoney(row.revenue)}</span>
+        <span style={{ fontWeight: 600, color: 'var(--primary)' }}>{formatMoney(row.revenue)}</span>
       )
     },
     {
@@ -142,7 +142,7 @@ const Reports = () => {
   const inventoryColumns = [
     {
       header: 'Mã SKU', accessor: 'skuCode', render: (row) => (
-        <span style={{ fontWeight: 800, color: 'var(--text-main)' }}>{row.skuCode}</span>
+        <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>{row.skuCode}</span>
       )
     },
     {
@@ -167,7 +167,7 @@ const Reports = () => {
   const debtColumns = [
     {
       header: 'Nhà cung cấp', accessor: 'companyName', render: (row) => (
-        <span style={{ fontWeight: 800, color: 'var(--text-main)' }}>{row.companyName}</span>
+        <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>{row.companyName}</span>
       )
     },
     {
@@ -182,7 +182,7 @@ const Reports = () => {
     },
     {
       header: 'Còn nợ', accessor: 'totalDebt', align: 'right', render: (row) => (
-        <span style={{ fontWeight: 800, color: 'var(--danger)' }}>{formatMoney(row.totalDebt)}</span>
+        <span style={{ fontWeight: 600, color: 'var(--danger)' }}>{formatMoney(row.totalDebt)}</span>
       )
     }
   ];
@@ -197,7 +197,7 @@ const Reports = () => {
         <span className="tag tag-neutral">{row.itemCount}</span>
       )
     },
-    { header: 'Tổng tiền', accessor: 'finalTotal', align: 'right', render: (row) => <span style={{ fontWeight: 800, color: 'var(--primary)' }}>{formatMoney(row.finalTotal)}</span> },
+    { header: 'Tổng tiền', accessor: 'finalTotal', align: 'right', render: (row) => <span style={{ fontWeight: 600, color: 'var(--primary)' }}>{formatMoney(row.finalTotal)}</span> },
     { header: 'Hoàn tiền', accessor: 'refundAmount', align: 'right', render: (row) => <span style={{ color: 'var(--danger)' }}>{formatMoney(row.refundAmount)}</span> }
   ];
 
@@ -209,7 +209,7 @@ const Reports = () => {
         <span className="tag tag-neutral">{row.items?.length || 0}</span>
       )
     },
-    { header: 'Tổng tiền', accessor: 'totalAmount', align: 'right', render: (row) => <span style={{ fontWeight: 800, color: 'var(--primary)' }}>{formatMoney(row.totalAmount)}</span> },
+    { header: 'Tổng tiền', accessor: 'totalAmount', align: 'right', render: (row) => <span style={{ fontWeight: 600, color: 'var(--primary)' }}>{formatMoney(row.totalAmount)}</span> },
     { header: 'Ghi chú', accessor: 'note', render: (row) => <span>{row.note || 'N/A'}</span> }
   ];
 
@@ -218,7 +218,7 @@ const Reports = () => {
       className="surface-card"
       style={{ padding: '20px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px' }}
     >
-      <div style={{ fontWeight: 800, color: 'var(--text-main)', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+      <div style={{ fontWeight: 600, color: 'var(--text-main)', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
         {titleNode}
       </div>
       <div style={{ display: 'inline-flex', gap: '10px', alignItems: 'center' }}>{controls}</div>
@@ -231,7 +231,7 @@ const Reports = () => {
         style={{
           padding: '20px 24px',
           borderBottom: '1px solid var(--border-light)',
-          fontWeight: 800,
+          fontWeight: 600,
           color: 'var(--text-main)'
         }}
       >

@@ -27,8 +27,11 @@ const Staff = () => {
   });
   const [error, setError] = useState('');
 
+  const [tableError, setTableError] = useState('');
+
   const fetchStaff = async (page = 1) => {
     setIsLoading(true);
+    setTableError('');
     try {
       const response = await getStaffList({ page, limit: 10, q: search });
       if (response.data?.status === 'success') {
@@ -41,6 +44,11 @@ const Staff = () => {
       }
     } catch (err) {
       console.error('Failed to fetch staff:', err);
+      if (err.response?.status === 403) {
+        setTableError('Bạn không có quyền (Admin/Owner) để xem danh sách nhân sự.');
+      } else {
+        setTableError(err.response?.data?.message || 'Lỗi kết nối máy chủ.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -170,9 +178,34 @@ const Staff = () => {
       )
     },
     {
-      header: 'Quyền (Role)', accessor: 'role', render: (row) => (
-        <StatusBadge status={row.role === 'Admin' ? 'Completed' : row.role === 'Manager' ? 'Active' : 'Draft'} />
-      )
+      header: 'Quyền (Role)', accessor: 'role', render: (row) => {
+        let bgColor = 'var(--surface-muted)';
+        let color = 'var(--text-main)';
+        if (row.role === 'Admin' || row.role === 'Owner') {
+          bgColor = 'rgba(59, 130, 246, 0.1)';
+          color = '#3b82f6';
+        } else if (row.role === 'Manager') {
+          bgColor = 'rgba(16, 185, 129, 0.1)';
+          color = '#10b981';
+        } else if (row.role === 'Cashier' || row.role === 'Staff') {
+          bgColor = 'rgba(245, 158, 11, 0.1)';
+          color = '#f59e0b';
+        }
+        
+        return (
+          <span style={{
+            padding: '4px 10px',
+            borderRadius: 'var(--radius-full)',
+            fontSize: '12px',
+            fontWeight: 600,
+            backgroundColor: bgColor,
+            color: color,
+            display: 'inline-block'
+          }}>
+            {row.role}
+          </span>
+        );
+      }
     },
     {
       header: 'Mật khẩu', accessor: 'password', align: 'center', render: (row) => (
@@ -215,7 +248,7 @@ const Staff = () => {
             <div
               style={{
                 fontSize: '12px',
-                fontWeight: 800,
+                fontWeight: 600,
                 color: 'var(--text-muted)',
                 textTransform: 'uppercase',
                 letterSpacing: '0.5px'
@@ -246,6 +279,25 @@ const Staff = () => {
           </div>
 
           <div style={{ padding: '20px 24px' }}>
+            {tableError && (
+              <div
+                style={{
+                  padding: '16px',
+                  marginBottom: '20px',
+                  background: 'var(--danger-bg)',
+                  color: 'var(--danger)',
+                  borderRadius: 'var(--radius-md)',
+                  fontWeight: 600,
+                  fontSize: '14px',
+                  border: '1px solid rgba(239, 68, 68, 0.25)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                ⚠️ {tableError}
+              </div>
+            )}
             <OrdersTable
               columns={columns}
               data={data}

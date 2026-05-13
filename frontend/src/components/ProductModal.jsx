@@ -12,7 +12,7 @@ const sectionCardStyle = {
 
 const sectionTitleStyle = {
   fontSize: '11px',
-  fontWeight: 800,
+  fontWeight: 600,
   textTransform: 'uppercase',
   letterSpacing: '0.5px',
   color: 'var(--text-muted)',
@@ -153,7 +153,7 @@ const ProductModal = ({
                 alignItems: 'center',
                 gap: '8px',
                 fontSize: '13px',
-                fontWeight: 800,
+                fontWeight: 600,
                 color: 'var(--text-main)',
                 textTransform: 'uppercase',
                 letterSpacing: '0.5px',
@@ -179,7 +179,7 @@ const ProductModal = ({
                   <div
                     style={{
                       fontSize: '11px',
-                      fontWeight: 800,
+                      fontWeight: 600,
                       letterSpacing: '0.5px',
                       textTransform: 'uppercase',
                       color: 'var(--text-muted)'
@@ -293,7 +293,7 @@ const ProductModal = ({
                 borderRadius: 'var(--radius-lg)',
                 background: 'rgba(239, 246, 255, 0.5)',
                 color: 'var(--primary)',
-                fontWeight: 800,
+                fontWeight: 600,
                 fontSize: '14px',
                 cursor: 'pointer',
                 display: 'inline-flex',

@@ -6,7 +6,7 @@ import Warranty from './pages/Warranty';
 import Sidebar from './components/Sidebar';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
-import Register from './pages/Register';
+
 import Suppliers from './pages/Suppliers';
 import Customers from './pages/Customers';
 import Staff from './pages/Staff';
@@ -14,7 +14,7 @@ import Products from './pages/Products';
 import Inventory from './pages/Inventory';
 import Reports from './pages/Reports';
 
-const FULLSCREEN_ROUTES = ['/login', '/register', '/pos', '/'];
+const FULLSCREEN_ROUTES = ['/login', '/pos', '/'];
 
 const LayoutWrapper = ({ children }) => {
   const location = useLocation();
@@ -49,7 +49,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/pos" element={<POSScreen />} />
           <Route path="/orders" element={<Orders />} />

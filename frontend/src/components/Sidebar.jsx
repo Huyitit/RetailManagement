@@ -32,6 +32,19 @@ const navLinkStyle = ({ isActive }) => ({
 });
 
 const Sidebar = () => {
+  const staff = JSON.parse(localStorage.getItem('staffInfo') || '{}');
+  const role = staff.role || 'Cashier';
+
+  // Define allowed paths for each role
+  const filteredMenuItems = menuItems.filter(item => {
+    if (role === 'Admin' || role === 'Owner') return true;
+    if (role === 'Manager') return item.path !== '/staff';
+    if (role === 'Cashier' || role === 'Staff') {
+      return ['/dashboard', '/orders', '/customers'].includes(item.path);
+    }
+    return false;
+  });
+
   return (
     <div
       style={{
@@ -62,7 +75,7 @@ const Sidebar = () => {
         <span
           style={{
             fontSize: '18px',
-            fontWeight: 900,
+            fontWeight: 700,
             color: 'var(--text-main)',
             letterSpacing: '-0.5px'
           }}
@@ -76,7 +89,7 @@ const Sidebar = () => {
           style={{
             color: 'var(--text-light)',
             fontSize: '11px',
-            fontWeight: 800,
+            fontWeight: 600,
             textTransform: 'uppercase',
             letterSpacing: '0.5px',
             marginBottom: '12px',
@@ -86,7 +99,7 @@ const Sidebar = () => {
           Menu chính
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-          {menuItems.map((item) => (
+          {filteredMenuItems.map((item) => (
             <NavLink key={item.path} to={item.path} style={navLinkStyle}>
               {item.icon}
               {item.label}
@@ -98,7 +111,7 @@ const Sidebar = () => {
             style={{
               color: 'var(--text-light)',
               fontSize: '11px',
-              fontWeight: 800,
+              fontWeight: 600,
               textTransform: 'uppercase',
               letterSpacing: '0.5px',
               marginBottom: '8px',
@@ -118,7 +131,7 @@ const Sidebar = () => {
               borderRadius: 'var(--radius-md)',
               textDecoration: 'none',
               fontSize: '14px',
-              fontWeight: 800,
+              fontWeight: 600,
               color: 'white',
               background: 'var(--primary)',
               boxShadow: 'var(--shadow-primary)'

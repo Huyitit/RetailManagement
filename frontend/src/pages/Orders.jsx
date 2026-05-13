@@ -106,7 +106,7 @@ const Orders = () => {
         border: `1px solid ${filter === key ? 'var(--primary)' : 'var(--border-strong)'}`,
         background: filter === key ? 'var(--primary)' : 'var(--surface)',
         color: filter === key ? 'white' : 'var(--text-muted)',
-        fontWeight: 800,
+        fontWeight: 600,
         cursor: 'pointer',
         fontSize: '13px',
         boxShadow: filter === key ? 'var(--shadow-primary)' : 'none',
@@ -123,7 +123,7 @@ const Orders = () => {
         <div
           style={{
             fontSize: '12px',
-            fontWeight: 800,
+            fontWeight: 600,
             color: 'var(--text-muted)',
             textTransform: 'uppercase',
             letterSpacing: '0.5px'
@@ -131,7 +131,7 @@ const Orders = () => {
         >
           {label}
         </div>
-        <div style={{ fontSize: '28px', fontWeight: 900, color: 'var(--text-main)', margin: '8px 0' }}>
+        <div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--text-main)', margin: '8px 0' }}>
           {value}
         </div>
         <div style={{ fontSize: '13px', fontWeight: 700, color: accentColor }}>
@@ -251,7 +251,7 @@ const Orders = () => {
                       padding: '14px 24px',
                       textAlign: i === 6 ? 'right' : 'left',
                       fontSize: '11px',
-                      fontWeight: 800,
+                      fontWeight: 600,
                       color: 'var(--text-light)',
                       textTransform: 'uppercase',
                       letterSpacing: '0.4px'
@@ -285,7 +285,7 @@ const Orders = () => {
                   <td style={{ padding: '18px 24px' }}>
                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: '10px' }}>
                       <FileText size={16} color="var(--text-light)" />
-                      <span style={{ fontWeight: 800, color: 'var(--text-main)' }}>
+                      <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>
                         HD{String(order.receiptId).padStart(6, '0')}
                       </span>
                     </div>
@@ -307,7 +307,7 @@ const Orders = () => {
                   <td style={{ padding: '18px 24px', textAlign: 'right' }}>
                     {order.saleStatus === 'Warranty' && parseFloat(order.refundAmount || 0) > 0 ? (
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-                        <div style={{ fontWeight: 900, color: 'var(--text-main)', fontSize: '15px' }}>
+                        <div style={{ fontWeight: 700, color: 'var(--text-main)', fontSize: '15px' }}>
                           {formatMoney(order.netTotal)}
                         </div>
                         <div
@@ -335,7 +335,7 @@ const Orders = () => {
                         {formatMoney(order.totalPrice)}
                       </div>
                     ) : (
-                      <div style={{ fontWeight: 900, color: 'var(--text-main)', fontSize: '15px' }}>
+                      <div style={{ fontWeight: 700, color: 'var(--text-main)', fontSize: '15px' }}>
                         {formatMoney(order.netTotal || order.totalPrice)}
                       </div>
                     )}
@@ -374,7 +374,7 @@ const Orders = () => {
               >
                 Trước
               </button>
-              <div style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-muted)' }}>
+              <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-muted)' }}>
                 Trang <span style={{ color: 'var(--text-main)' }}>{page}</span> / {totalPages}
               </div>
               <button

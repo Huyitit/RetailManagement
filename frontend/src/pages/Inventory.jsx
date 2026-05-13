@@ -198,7 +198,7 @@ const Inventory = () => {
   const columns = activeTab === 'import' ? [
     {
       header: 'Mã phiếu', accessor: 'receiptId', render: (row) => (
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', fontWeight: 800, color: 'var(--text-main)' }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', fontWeight: 600, color: 'var(--text-main)' }}>
           <div style={codeChipStyle('import')}><PackageOpen size={16} /></div>
           IMP-{String(row.receiptId).padStart(5, '0')}
         </div>
@@ -216,13 +216,13 @@ const Inventory = () => {
     },
     {
       header: 'Tổng tiền', accessor: 'totalAmount', align: 'right', render: (row) => (
-        <div style={{ fontWeight: 800, color: 'var(--text-main)' }}>{formatMoney(row.totalAmount)}</div>
+        <div style={{ fontWeight: 600, color: 'var(--text-main)' }}>{formatMoney(row.totalAmount)}</div>
       )
     }
   ] : [
     {
       header: 'Mã phiếu', accessor: 'receiptId', render: (row) => (
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', fontWeight: 800, color: 'var(--text-main)' }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', fontWeight: 600, color: 'var(--text-main)' }}>
           <div style={codeChipStyle('export')}><PackageMinus size={16} /></div>
           EXP-{String(row.receiptId).padStart(5, '0')}
         </div>
@@ -256,7 +256,7 @@ const Inventory = () => {
     },
     {
       header: 'Tổng giá trị xuất', accessor: 'totalAmount', align: 'right', render: (row) => (
-        <div style={{ fontWeight: 800, color: 'var(--text-main)' }}>{formatMoney(row.totalAmount)}</div>
+        <div style={{ fontWeight: 600, color: 'var(--text-main)' }}>{formatMoney(row.totalAmount)}</div>
       )
     }
   ];
@@ -267,7 +267,7 @@ const Inventory = () => {
     border: '1px solid transparent',
     background: active ? 'var(--primary)' : 'var(--surface)',
     color: active ? 'white' : 'var(--text-muted)',
-    fontWeight: 800,
+    fontWeight: 600,
     cursor: 'pointer',
     display: 'inline-flex',
     alignItems: 'center',
@@ -321,7 +321,7 @@ const Inventory = () => {
             <div
               style={{
                 fontSize: '12px',
-                fontWeight: 800,
+                fontWeight: 600,
                 color: 'var(--text-muted)',
                 textTransform: 'uppercase',
                 letterSpacing: '0.5px'
@@ -426,7 +426,7 @@ const Inventory = () => {
                         }}
                       >
                         <div>
-                          <div style={{ fontWeight: 800, fontSize: '14px', color: 'var(--text-main)' }}>
+                          <div style={{ fontWeight: 600, fontSize: '14px', color: 'var(--text-main)' }}>
                             {selectedSupplier.companyName}
                           </div>
                           <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
@@ -458,7 +458,7 @@ const Inventory = () => {
                         displayValue={(item) => item.companyName}
                         renderItem={(item) => (
                           <div>
-                            <div style={{ fontWeight: 800, color: 'var(--text-main)', fontSize: '14px' }}>
+                            <div style={{ fontWeight: 600, color: 'var(--text-main)', fontSize: '14px' }}>
                               {item.companyName}
                             </div>
                             <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{item.phone}</div>
@@ -478,12 +478,12 @@ const Inventory = () => {
                     renderItem={(item) => (
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div>
-                          <div style={{ fontWeight: 800, color: 'var(--text-main)', fontSize: '14px' }}>
+                          <div style={{ fontWeight: 600, color: 'var(--text-main)', fontSize: '14px' }}>
                             {item.skuCode || 'N/A'}
                           </div>
                           <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{item.productName}</div>
                         </div>
-                        <div style={{ fontSize: '12px', fontWeight: 800, color: 'var(--primary)' }}>
+                        <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--primary)' }}>
                           Tồn: {item.stockQuantity}
                         </div>
                       </div>
@@ -531,7 +531,7 @@ const Inventory = () => {
                           style={{
                             padding: '12px 16px',
                             fontSize: '11px',
-                            fontWeight: 800,
+                            fontWeight: 600,
                             letterSpacing: '0.4px',
                             textTransform: 'uppercase',
                             color: 'var(--text-muted)',
@@ -557,7 +557,7 @@ const Inventory = () => {
                       return (
                         <tr key={idx} style={{ borderBottom: '1px solid var(--border-light)' }} className="table-row-hover">
                           <td style={{ padding: '12px 16px' }}>
-                            <div style={{ fontWeight: 800, color: 'var(--text-main)' }}>{item.sku}</div>
+                            <div style={{ fontWeight: 600, color: 'var(--text-main)' }}>{item.sku}</div>
                             <div
                               style={{
                                 fontSize: '12px',
@@ -587,7 +587,7 @@ const Inventory = () => {
                                 width: '88px',
                                 padding: '8px 10px',
                                 textAlign: 'center',
-                                fontWeight: 800,
+                                fontWeight: 600,
                                 background: overstock ? 'var(--danger-bg)' : 'var(--surface)',
                                 color: overstock ? 'var(--danger)' : 'var(--text-main)',
                                 borderColor: overstock ? 'rgba(239, 68, 68, 0.4)' : 'var(--border-strong)'
@@ -604,7 +604,7 @@ const Inventory = () => {
                               style={{ padding: '8px 10px', fontWeight: 700 }}
                             />
                           </td>
-                          <td style={{ padding: '12px 16px', textAlign: 'right', fontWeight: 800, color: 'var(--primary)' }}>
+                          <td style={{ padding: '12px 16px', textAlign: 'right', fontWeight: 600, color: 'var(--primary)' }}>
                             {formatMoney(Number(item.qty) * Number(item.price))}
                           </td>
                           <td style={{ padding: '12px 16px', textAlign: 'center' }}>
@@ -643,10 +643,10 @@ const Inventory = () => {
                   alignItems: 'center'
                 }}
               >
-                <span style={{ fontWeight: 800, color: 'var(--text-main)' }}>
+                <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>
                   Tổng cộng ({details.length} mặt hàng):
                 </span>
-                <span style={{ fontSize: '20px', fontWeight: 900, color: 'var(--primary)' }}>
+                <span style={{ fontSize: '20px', fontWeight: 700, color: 'var(--primary)' }}>
                   {formatMoney(totalAmount)}
                 </span>
               </div>

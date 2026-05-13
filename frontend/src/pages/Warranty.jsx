@@ -27,7 +27,7 @@ const Warranty = () => {
 
   const sectionLabelStyle = {
     fontSize: '12px',
-    fontWeight: 800,
+    fontWeight: 600,
     color: 'var(--text-light)',
     textTransform: 'uppercase',
     letterSpacing: '0.5px'
@@ -40,7 +40,7 @@ const Warranty = () => {
     border: 'none',
     background: active ? 'var(--surface)' : 'transparent',
     color: active ? 'var(--primary)' : 'var(--text-muted)',
-    fontWeight: 800,
+    fontWeight: 600,
     cursor: 'pointer',
     boxShadow: active ? 'var(--shadow-sm)' : 'none',
     display: 'flex',
@@ -98,7 +98,7 @@ const Warranty = () => {
             >
               <ShieldCheck size={36} />
             </div>
-            <h2 style={{ fontSize: '22px', fontWeight: 900, color: 'var(--text-main)', marginBottom: '10px' }}>
+            <h2 style={{ fontSize: '22px', fontWeight: 700, color: 'var(--text-main)', marginBottom: '10px' }}>
               Kiểm tra thông tin bảo hành
             </h2>
             <p style={{ color: 'var(--text-muted)', fontWeight: 600, marginBottom: '32px' }}>
@@ -178,7 +178,7 @@ const Warranty = () => {
               <div className="surface-card" style={{ padding: '28px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
                   <div>
-                    <h3 style={{ fontSize: '22px', fontWeight: 900, color: 'var(--text-main)', margin: '0 0 6px 0' }}>
+                    <h3 style={{ fontSize: '22px', fontWeight: 700, color: 'var(--text-main)', margin: '0 0 6px 0' }}>
                       {selectedProduct.product.name}
                     </h3>
                     <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
@@ -237,7 +237,7 @@ const Warranty = () => {
                         )}
                       </div>
                       <div>
-                        <div style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-main)' }}>
+                        <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-main)' }}>
                           {h.action}
                         </div>
                         <div
@@ -282,7 +282,7 @@ const Warranty = () => {
                     <User size={26} />
                   </div>
                   <div>
-                    <div style={{ fontSize: '17px', fontWeight: 900 }}>{selectedProduct.customer.name}</div>
+                    <div style={{ fontSize: '17px', fontWeight: 700 }}>{selectedProduct.customer.name}</div>
                     <div style={{ fontSize: '12px', opacity: 0.85, fontWeight: 700 }}>
                       {selectedProduct.customer.tier} Member
                     </div>
@@ -317,7 +317,7 @@ const Warranty = () => {
                       border: '1px solid var(--border-strong)',
                       background: 'var(--surface)',
                       color: 'var(--text-main)',
-                      fontWeight: 800,
+                      fontWeight: 600,
                       cursor: 'pointer',
                       textAlign: 'left',
                       display: 'flex',
@@ -351,7 +351,7 @@ const Warranty = () => {
                       border: '1px solid var(--border-strong)',
                       background: 'var(--surface)',
                       color: 'var(--text-main)',
-                      fontWeight: 800,
+                      fontWeight: 600,
                       cursor: 'pointer',
                       textAlign: 'left',
                       display: 'flex',
@@ -406,7 +406,7 @@ const Warranty = () => {
 
         {view === 'processing' && (
           <div style={{ width: '600px' }}>
-            <h2 style={{ fontSize: '22px', fontWeight: 900, color: 'var(--text-main)', marginBottom: '28px', textAlign: 'center' }}>
+            <h2 style={{ fontSize: '22px', fontWeight: 700, color: 'var(--text-main)', marginBottom: '28px', textAlign: 'center' }}>
               {processingType === 'exchange' ? 'Xử lý đổi sản phẩm mới' : 'Xử lý trả hàng hoàn tiền'}
             </h2>
 
@@ -452,7 +452,7 @@ const Warranty = () => {
                   <label style={{ ...sectionLabelStyle, color: 'var(--danger)', display: 'block', marginBottom: '6px' }}>
                     Số tiền hoàn lại dự kiến
                   </label>
-                  <div style={{ fontSize: '28px', fontWeight: 900, color: 'var(--danger)' }}>
+                  <div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--danger)' }}>
                     {formatMoney(25900000)}
                   </div>
                 </div>
@@ -484,7 +484,7 @@ const Warranty = () => {
                     border: 'none',
                     background: 'var(--success)',
                     color: 'white',
-                    fontWeight: 800,
+                    fontWeight: 600,
                     cursor: 'pointer'
                   }}
                 >
@@ -513,7 +513,7 @@ const Warranty = () => {
             >
               <CheckCircle2 size={44} strokeWidth={3} />
             </div>
-            <h2 style={{ fontSize: '24px', fontWeight: 900, color: 'var(--text-main)', marginBottom: '10px' }}>
+            <h2 style={{ fontSize: '24px', fontWeight: 700, color: 'var(--text-main)', marginBottom: '10px' }}>
               Xử lý hoàn tất!
             </h2>
             <p style={{ color: 'var(--text-muted)', fontWeight: 600, marginBottom: '32px', lineHeight: 1.6 }}>

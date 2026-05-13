@@ -23,7 +23,7 @@ const StatCard = ({ title, value, subtitle, icon, trend }) => {
           <p style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '4px' }}>
             {title}
           </p>
-          <h3 style={{ fontSize: '24px', fontWeight: 900, color: 'var(--text-main)', letterSpacing: '-0.3px', margin: 0 }}>
+          <h3 style={{ fontSize: '24px', fontWeight: 700, color: 'var(--text-main)', letterSpacing: '-0.3px', margin: 0 }}>
             {value}
           </h3>
         </div>

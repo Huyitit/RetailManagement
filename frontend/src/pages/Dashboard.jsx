@@ -12,7 +12,7 @@ const Dashboard = () => {
   const [liveStats, setLiveStats] = useState({
     todayRevenue: 0,
     todayOrders: 0,
-    newCustomers: 0,
+    totalCustomers: 0,
     lowStockCount: 0
   });
 
@@ -35,18 +35,20 @@ const Dashboard = () => {
   const stats = [
     { label: 'Doanh thu hôm nay', value: formatMoney(liveStats.todayRevenue) },
     { label: 'Số đơn hoàn thành', value: liveStats.todayOrders },
-    { label: 'Tổng số khách hàng', value: liveStats.newCustomers },
-    { label: 'Sản phẩm sắp hết', value: liveStats.lowStockCount }
-  ];
+    { label: 'Tổng số khách hàng', value: liveStats.totalCustomers, roles: ['Admin', 'Owner', 'Manager'] },
+    { label: 'Sản phẩm sắp hết', value: liveStats.lowStockCount, roles: ['Admin', 'Owner', 'Manager'] }
+  ].filter(s => !s.roles || s.roles.includes(staff.role || 'Cashier'));
 
-  const menuItems = [
+  const allMenuItems = [
     { icon: <ShoppingCart size={22} />, label: 'Bán hàng (POS)', path: '/pos' },
     { icon: <FileText size={22} />, label: 'Quản lý đơn hàng', path: '/orders' },
-    { icon: <Package size={22} />, label: 'Kho & Nhập xuất', path: '/inventory' },
+    { icon: <Package size={22} />, label: 'Kho & Nhập xuất', path: '/inventory', roles: ['Admin', 'Owner', 'Manager'] },
     { icon: <Users size={22} />, label: 'Khách hàng', path: '/customers' },
-    { icon: <BarChart3 size={22} />, label: 'Báo cáo doanh thu', path: '/reports' },
-    { icon: <Settings size={22} />, label: 'Nhân sự & Phân quyền', path: '/staff' }
+    { icon: <BarChart3 size={22} />, label: 'Báo cáo doanh thu', path: '/reports', roles: ['Admin', 'Owner', 'Manager'] },
+    { icon: <Settings size={22} />, label: 'Nhân sự & Phân quyền', path: '/staff', roles: ['Admin', 'Owner'] }
   ];
+
+  const menuItems = allMenuItems.filter(item => !item.roles || item.roles.includes(staff.role || 'Cashier'));
 
   return (
     <div className="page-shell">
@@ -56,21 +58,6 @@ const Dashboard = () => {
           <p className="page-subtitle">Hiệu suất hôm nay và các công cụ vận hành nhanh</p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-          <div style={{ position: 'relative', cursor: 'pointer' }}>
-            <Bell size={20} color="var(--text-muted)" />
-            <div
-              style={{
-                position: 'absolute',
-                top: '-4px',
-                right: '-4px',
-                width: '8px',
-                height: '8px',
-                background: 'var(--danger)',
-                borderRadius: '50%',
-                border: '2px solid var(--surface)'
-              }}
-            />
-          </div>
           <div
             style={{
               display: 'flex',
@@ -82,7 +69,7 @@ const Dashboard = () => {
             }}
           >
             <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-main)' }}>
+              <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-main)' }}>
                 {staff.fullname || staff.fullName || staff.username || 'Nhân viên'}
               </div>
               <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)' }}>
@@ -132,7 +119,7 @@ const Dashboard = () => {
               <div
                 style={{
                   fontSize: '26px',
-                  fontWeight: 900,
+                  fontWeight: 700,
                   color: 'var(--text-main)',
                   letterSpacing: '-0.3px'
                 }}
@@ -146,7 +133,7 @@ const Dashboard = () => {
         <h3
           style={{
             fontSize: '18px',
-            fontWeight: 900,
+            fontWeight: 700,
             color: 'var(--text-main)',
             marginBottom: '16px',
             letterSpacing: '-0.2px'
@@ -199,7 +186,7 @@ const Dashboard = () => {
                 {item.icon}
               </div>
               <div>
-                <div style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text-main)' }}>
+                <div style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-main)' }}>
                   {item.label}
                 </div>
               </div>

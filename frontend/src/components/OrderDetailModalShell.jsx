@@ -47,7 +47,7 @@ const OrderDetailModalShell = ({
             flexShrink: 0
           }}
         >
-          <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 800, color: 'var(--text-main)' }}>
+          <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 600, color: 'var(--text-main)' }}>
             {title}
           </h2>
           <button

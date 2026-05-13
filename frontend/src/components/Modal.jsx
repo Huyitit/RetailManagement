@@ -34,7 +34,7 @@ const Modal = ({ isOpen, onClose, title, children, footer, size = 'md', bodyClas
             flexShrink: 0
           }}
         >
-          <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>{title}</h3>
+          <h3 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-main)', margin: 0 }}>{title}</h3>
           <button
             type="button"
             onClick={onClose}

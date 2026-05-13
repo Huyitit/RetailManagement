@@ -68,7 +68,7 @@ const Login = () => {
           <div style={{ background: 'white', padding: '8px', borderRadius: 'var(--radius-md)' }}>
             <Layout size={28} color="var(--primary-hover)" />
           </div>
-          <h2 style={{ fontSize: '26px', fontWeight: 900, margin: 0, letterSpacing: '-0.5px' }}>
+          <h2 style={{ fontSize: '26px', fontWeight: 700, margin: 0, letterSpacing: '-0.5px' }}>
             Architect POS
           </h2>
         </div>
@@ -76,7 +76,7 @@ const Login = () => {
         <h1
           style={{
             fontSize: '56px',
-            fontWeight: 900,
+            fontWeight: 700,
             lineHeight: 1.1,
             marginBottom: '20px',
             letterSpacing: '-1.5px'
@@ -111,7 +111,7 @@ const Login = () => {
             }}
           >
             <Zap size={22} style={{ marginBottom: '10px', color: '#60a5fa' }} />
-            <div style={{ fontWeight: 800, marginBottom: '4px' }}>Tốc độ tối ưu</div>
+            <div style={{ fontWeight: 600, marginBottom: '4px' }}>Tốc độ tối ưu</div>
             <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)' }}>Xử lý giao dịch &lt; 1s</div>
           </div>
           <div
@@ -125,7 +125,7 @@ const Login = () => {
             }}
           >
             <ShieldCheck size={22} style={{ marginBottom: '10px', color: '#34d399' }} />
-            <div style={{ fontWeight: 800, marginBottom: '4px' }}>Bảo mật đa lớp</div>
+            <div style={{ fontWeight: 600, marginBottom: '4px' }}>Bảo mật đa lớp</div>
             <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)' }}>Chuẩn mã hóa ngân hàng</div>
           </div>
         </div>
@@ -142,7 +142,7 @@ const Login = () => {
         }}
       >
         <div style={{ maxWidth: '440px', width: '100%' }}>
-          <h2 style={{ fontSize: '28px', fontWeight: 900, color: 'var(--text-main)', marginBottom: '32px' }}>
+          <h2 style={{ fontSize: '28px', fontWeight: 700, color: 'var(--text-main)', marginBottom: '32px' }}>
             Đăng nhập hệ thống
           </h2>
 
@@ -253,23 +253,7 @@ const Login = () => {
             </button>
           </form>
 
-          <div
-            style={{
-              textAlign: 'center',
-              marginTop: '36px',
-              color: 'var(--text-muted)',
-              fontSize: '13px',
-              fontWeight: 600
-            }}
-          >
-            Chưa có tài khoản cửa hàng?{' '}
-            <span
-              onClick={() => navigate('/register')}
-              style={{ color: 'var(--primary)', fontWeight: 800, cursor: 'pointer' }}
-            >
-              Đăng ký ngay →
-            </span>
-          </div>
+
 
           <div
             style={{
