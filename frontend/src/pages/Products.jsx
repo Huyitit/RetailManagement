@@ -10,7 +10,7 @@ import {
   updateVariant as updateVariantApi,
   deleteVariant as deleteVariantApi
 } from '../services/api';
-import DataTable from '../components/DataTable';
+import OrdersTable from '../components/OrdersTable';
 import ProductModal from '../components/ProductModal';
 import StatusBadge from '../components/StatusBadge';
 import { Package, Plus, Search, Layers } from 'lucide-react';
@@ -354,7 +354,7 @@ const Products = () => {
           </div>
 
           <div style={{ padding: '24px' }}>
-            <DataTable 
+            <OrdersTable 
               columns={columns} 
               data={data} 
               isLoading={isLoading}

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { getStaffList, createStaff, updateStaff, deactivateStaff, assignStaffRole, resetStaffPassword } from '../services/api';
-import DataTable from '../components/DataTable';
+import OrdersTable from '../components/OrdersTable';
 import OrderDetailModalShell from '../components/OrderDetailModalShell';
+import { FormTable, FormRow } from '../components/FormTable';
 import StatusBadge from '../components/StatusBadge';
 import { ShieldCheck, Plus, Search, UserCog } from 'lucide-react';
 
@@ -196,7 +197,7 @@ const Staff = () => {
           </div>
 
           <div style={{ padding: '24px' }}>
-            <DataTable 
+            <OrdersTable 
               columns={columns} 
               data={data} 
               isLoading={isLoading}
@@ -219,44 +220,56 @@ const Staff = () => {
           </>
         }
       >
-        <div className="grid grid-cols-2 gap-4">
-          {error && <div className="col-span-2 p-3 bg-rose-50 text-rose-600 rounded-lg text-sm">{error}</div>}
-          
-          <div className="col-span-2">
-            <label className="block text-sm font-medium text-slate-700 mb-1">Họ và tên *</label>
-            <input type="text" className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500"
-              value={formData.fullname} onChange={e => setFormData({...formData, fullname: e.target.value})} />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Tên đăng nhập {isEditMode ? '' : '*'}</label>
-            <input type="text" className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 disabled:bg-slate-50 disabled:text-slate-400"
-              value={formData.username} onChange={e => setFormData({...formData, username: e.target.value})} disabled={isEditMode} />
-          </div>
-
-          {!isEditMode && (
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Mật khẩu *</label>
-              <input type="password" className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500"
-                value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} />
-            </div>
-          )}
-          
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Số điện thoại *</label>
-            <input type="text" className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500"
-              value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Quyền truy cập</label>
-            <select className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 bg-white"
-              value={formData.role} onChange={e => setFormData({...formData, role: e.target.value})}>
-              <option value="Cashier">Cashier (Thu ngân)</option>
-              <option value="Manager">Manager (Quản lý)</option>
-              <option value="Admin">Admin (Quản trị)</option>
-            </select>
-          </div>
+        <div className="space-y-4">
+          {error && <div className="p-3 bg-rose-50 text-rose-600 rounded-lg text-sm">{error}</div>}
+          <FormTable>
+            <FormRow label="Họ và tên *">
+              <input
+                type="text"
+                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500"
+                value={formData.fullname}
+                onChange={e => setFormData({ ...formData, fullname: e.target.value })}
+              />
+            </FormRow>
+            <FormRow label={`Tên đăng nhập ${isEditMode ? '' : '*'}`}>
+              <input
+                type="text"
+                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 disabled:bg-slate-50 disabled:text-slate-400"
+                value={formData.username}
+                onChange={e => setFormData({ ...formData, username: e.target.value })}
+                disabled={isEditMode}
+              />
+            </FormRow>
+            {!isEditMode && (
+              <FormRow label="Mật khẩu *">
+                <input
+                  type="password"
+                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500"
+                  value={formData.password}
+                  onChange={e => setFormData({ ...formData, password: e.target.value })}
+                />
+              </FormRow>
+            )}
+            <FormRow label="Số điện thoại *">
+              <input
+                type="text"
+                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500"
+                value={formData.phone}
+                onChange={e => setFormData({ ...formData, phone: e.target.value })}
+              />
+            </FormRow>
+            <FormRow label="Quyền truy cập">
+              <select
+                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 bg-white"
+                value={formData.role}
+                onChange={e => setFormData({ ...formData, role: e.target.value })}
+              >
+                <option value="Cashier">Cashier (Thu ngân)</option>
+                <option value="Manager">Manager (Quản lý)</option>
+                <option value="Admin">Admin (Quản trị)</option>
+              </select>
+            </FormRow>
+          </FormTable>
         </div>
       </OrderDetailModalShell>
 
@@ -273,26 +286,24 @@ const Staff = () => {
       >
         <div className="space-y-4">
           {passwordError && <div className="p-3 bg-rose-50 text-rose-600 rounded-lg text-sm">{passwordError}</div>}
-
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Mat khau moi</label>
-            <input
-              type="password"
-              className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500"
-              value={passwordForm.newPassword}
-              onChange={e => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Xac nhan mat khau moi</label>
-            <input
-              type="password"
-              className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500"
-              value={passwordForm.confirmPassword}
-              onChange={e => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
-            />
-          </div>
+          <FormTable>
+            <FormRow label="Mat khau moi">
+              <input
+                type="password"
+                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500"
+                value={passwordForm.newPassword}
+                onChange={e => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+              />
+            </FormRow>
+            <FormRow label="Xac nhan mat khau moi">
+              <input
+                type="password"
+                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500"
+                value={passwordForm.confirmPassword}
+                onChange={e => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+              />
+            </FormRow>
+          </FormTable>
         </div>
       </OrderDetailModalShell>
     </div>

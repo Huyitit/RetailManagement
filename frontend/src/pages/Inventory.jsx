@@ -4,8 +4,9 @@ import {
   getExportReceipts, createExportReceipt, getExportReceiptById,
   searchSuppliers, searchVariants 
 } from '../services/api';
-import DataTable from '../components/DataTable';
+import OrdersTable from '../components/OrdersTable';
 import OrderDetailModalShell from '../components/OrderDetailModalShell';
+import { FormTable, FormRow } from '../components/FormTable';
 import ReceiptDetailModal from '../components/ReceiptDetailModal';
 import SearchAutocomplete from '../components/SearchAutocomplete';
 import StatusBadge from '../components/StatusBadge';
@@ -297,7 +298,7 @@ const Inventory = () => {
           </div>
 
           <div style={{ padding: '24px' }}>
-            <DataTable 
+            <OrdersTable 
               columns={columns} 
               data={data} 
               isLoading={isLoading}
@@ -327,74 +328,77 @@ const Inventory = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Left Col: Info & Search */}
-            <div className="space-y-5 md:col-span-1">
-              {activeTab === 'export' && (
-                <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                  <label className="block text-xs font-bold text-slate-600 mb-2 uppercase">Lý do xuất *</label>
-                  <select
-                    className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 bg-white"
-                    value={exportReason}
-                    onChange={(e) => { setExportReason(e.target.value); setSelectedSupplier(null); }}
-                  >
-                    <option value="return_supplier">Trả nhà cung cấp</option>
-                    <option value="warranty">Xuất bảo hành</option>
-                    <option value="damage">Xuất hủy</option>
-                  </select>
-                </div>
-              )}
+            <div className="md:col-span-1">
+              <FormTable className="bg-slate-50">
+                {activeTab === 'export' && (
+                  <FormRow label="Lý do xuất *">
+                    <select
+                      className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 bg-white"
+                      value={exportReason}
+                      onChange={(e) => { setExportReason(e.target.value); setSelectedSupplier(null); }}
+                    >
+                      <option value="return_supplier">Trả nhà cung cấp</option>
+                      <option value="warranty">Xuất bảo hành</option>
+                      <option value="damage">Xuất hủy</option>
+                    </select>
+                  </FormRow>
+                )}
 
-              {(activeTab === 'import' || exportReason === 'return_supplier') && (
-                <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                  <label className="block text-xs font-bold text-slate-600 mb-2 uppercase flex items-center gap-1"><Building2 size={14}/> Nhà cung cấp *</label>
-                  {selectedSupplier ? (
-                    <div className="flex items-center justify-between bg-white p-3 rounded-lg border border-indigo-100 ring-1 ring-indigo-500/20">
-                      <div>
-                        <div className="font-bold text-sm text-slate-800">{selectedSupplier.companyName}</div>
-                        <div className="text-xs text-slate-500">{selectedSupplier.phone}</div>
-                      </div>
-                      <button onClick={() => setSelectedSupplier(null)} className="text-slate-400 hover:text-rose-500 transition-colors"><Trash2 size={16}/></button>
-                    </div>
-                  ) : (
-                    <SearchAutocomplete 
-                      onSearch={fetchSuppliersForSearch}
-                      onSelect={(item) => setSelectedSupplier(item)}
-                      placeholder="Tìm nhà cung cấp..."
-                      displayValue={(item) => item.companyName}
-                      renderItem={(item) => (
+                {(activeTab === 'import' || exportReason === 'return_supplier') && (
+                  <FormRow label={<span className="inline-flex items-center gap-1"><Building2 size={14}/> Nhà cung cấp *</span>}>
+                    {selectedSupplier ? (
+                      <div className="flex items-center justify-between bg-white p-3 rounded-lg border border-indigo-100 ring-1 ring-indigo-500/20">
                         <div>
-                          <div className="font-bold text-slate-800 text-sm">{item.companyName}</div>
-                          <div className="text-xs text-slate-500">{item.phone}</div>
+                          <div className="font-bold text-sm text-slate-800">{selectedSupplier.companyName}</div>
+                          <div className="text-xs text-slate-500">{selectedSupplier.phone}</div>
                         </div>
-                      )}
-                    />
-                  )}
-                </div>
-              )}
-
-              <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                <label className="block text-xs font-bold text-slate-600 mb-2 uppercase flex items-center gap-1"><Search size={14}/> Tìm sản phẩm *</label>
-                <SearchAutocomplete 
-                  onSearch={fetchVariantsForSearch}
-                  onSelect={handleAddVariant}
-                  placeholder="Gõ tên SKU hoặc sản phẩm..."
-                  displayValue={(item) => item.skuCode}
-                  renderItem={(item) => (
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <div className="font-bold text-slate-800 text-sm">{item.skuCode || 'N/A'}</div>
-                        <div className="text-xs text-slate-500">{item.productName}</div>
+                        <button onClick={() => setSelectedSupplier(null)} className="text-slate-400 hover:text-rose-500 transition-colors"><Trash2 size={16}/></button>
                       </div>
-                      <div className="text-xs font-bold text-indigo-600">Tồn: {item.stockQuantity}</div>
-                    </div>
-                  )}
-                />
-              </div>
+                    ) : (
+                      <SearchAutocomplete 
+                        onSearch={fetchSuppliersForSearch}
+                        onSelect={(item) => setSelectedSupplier(item)}
+                        placeholder="Tìm nhà cung cấp..."
+                        displayValue={(item) => item.companyName}
+                        renderItem={(item) => (
+                          <div>
+                            <div className="font-bold text-slate-800 text-sm">{item.companyName}</div>
+                            <div className="text-xs text-slate-500">{item.phone}</div>
+                          </div>
+                        )}
+                      />
+                    )}
+                  </FormRow>
+                )}
 
-              <div>
-                <label className="block text-xs font-bold text-slate-600 mb-2 uppercase">Ghi chú</label>
-                <textarea className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-indigo-500 bg-white" rows="3"
-                  value={notes} onChange={e => setNotes(e.target.value)} placeholder="Nhập ghi chú cho phiếu này..."></textarea>
-              </div>
+                <FormRow label={<span className="inline-flex items-center gap-1"><Search size={14}/> Tìm sản phẩm *</span>}>
+                  <SearchAutocomplete 
+                    onSearch={fetchVariantsForSearch}
+                    onSelect={handleAddVariant}
+                    placeholder="Gõ tên SKU hoặc sản phẩm..."
+                    displayValue={(item) => item.skuCode}
+                    renderItem={(item) => (
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <div className="font-bold text-slate-800 text-sm">{item.skuCode || 'N/A'}</div>
+                          <div className="text-xs text-slate-500">{item.productName}</div>
+                        </div>
+                        <div className="text-xs font-bold text-indigo-600">Tồn: {item.stockQuantity}</div>
+                      </div>
+                    )}
+                  />
+                </FormRow>
+
+                <FormRow label="Ghi chú">
+                  <textarea
+                    className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-indigo-500 bg-white"
+                    rows="3"
+                    value={notes}
+                    onChange={e => setNotes(e.target.value)}
+                    placeholder="Nhập ghi chú cho phiếu này..."
+                  ></textarea>
+                </FormRow>
+              </FormTable>
             </div>
 
             {/* Right Col: Grid */}

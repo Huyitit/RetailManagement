@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getRevenueReport, getRevenueByDate, getInventoryReport, getDebtReport, getDebtDetail } from '../services/api';
-import DataTable from '../components/DataTable';
+import OrdersTable from '../components/OrdersTable';
 import StatCard from '../components/StatCard';
 import OrderDetailModalShell from '../components/OrderDetailModalShell';
 import { BarChart3, TrendingUp, AlertTriangle, Wallet, ArrowDownRight, PackageOpen } from 'lucide-react';
@@ -218,7 +218,7 @@ const Reports = () => {
             <div style={{ background: 'white', borderRadius: '24px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
               <div style={{ padding: '24px', borderBottom: '1px solid #f1f5f9', fontWeight: '800', color: '#0f172a' }}>Chi tiet theo ngay</div>
               <div style={{ padding: '24px' }}>
-                <DataTable columns={revenueColumns} data={revenueData.daily} isLoading={isLoading} onRowDoubleClick={openRevenueDetail} />
+                <OrdersTable columns={revenueColumns} data={revenueData.daily} isLoading={isLoading} onRowDoubleClick={openRevenueDetail} />
               </div>
             </div>
           </div>
@@ -249,7 +249,7 @@ const Reports = () => {
             <div style={{ background: 'white', borderRadius: '24px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
               <div style={{ padding: '24px', borderBottom: '1px solid #f1f5f9', fontWeight: '800', color: '#0f172a' }}>Danh sach hang can nhap them</div>
               <div style={{ padding: '24px' }}>
-                <DataTable columns={inventoryColumns} data={inventoryData.items} isLoading={isLoading} emptyMessage="Kho dang o trang thai an toan, khong co san pham sap het." />
+                <OrdersTable columns={inventoryColumns} data={inventoryData.items} isLoading={isLoading} emptyMessage="Kho dang o trang thai an toan, khong co san pham sap het." />
               </div>
             </div>
           </div>
@@ -264,7 +264,7 @@ const Reports = () => {
             <div style={{ background: 'white', borderRadius: '24px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
               <div style={{ padding: '24px', borderBottom: '1px solid #f1f5f9', fontWeight: '800', color: '#0f172a' }}>Chi tiet cong no theo nha cung cap</div>
               <div style={{ padding: '24px' }}>
-                <DataTable columns={debtColumns} data={debtData} isLoading={isLoading} emptyMessage="Khong co khoan no nao duoc ghi nhan." onRowClick={openDebtDetail} />
+                <OrdersTable columns={debtColumns} data={debtData} isLoading={isLoading} emptyMessage="Khong co khoan no nao duoc ghi nhan." onRowClick={openDebtDetail} />
               </div>
             </div>
           </div>
@@ -283,7 +283,7 @@ const Reports = () => {
             {revenueDetailError}
           </div>
         )}
-        <DataTable
+        <OrdersTable
           columns={revenueDetailColumns}
           data={revenueDetailOrders}
           isLoading={revenueDetailLoading}
@@ -302,7 +302,7 @@ const Reports = () => {
             {debtDetailError}
           </div>
         )}
-        <DataTable
+        <OrdersTable
           columns={debtDetailColumns}
           data={debtDetailReceipts}
           isLoading={debtDetailLoading}

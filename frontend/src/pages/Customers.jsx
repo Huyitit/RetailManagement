@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { getAllCustomers, createCustomer, updateCustomer, deleteCustomer } from '../services/api';
-import DataTable from '../components/DataTable';
+import OrdersTable from '../components/OrdersTable';
 import OrderDetailModalShell from '../components/OrderDetailModalShell';
+import { FormTable, FormRow } from '../components/FormTable';
 import StatusBadge from '../components/StatusBadge';
 import { Users, Plus, Search, Mail, Phone, Award } from 'lucide-react';
 
@@ -153,7 +154,7 @@ const Customers = () => {
           </div>
 
           <div style={{ padding: '24px' }}>
-            <DataTable 
+            <OrdersTable 
               columns={columns} 
               data={data} 
               isLoading={isLoading}
@@ -178,24 +179,35 @@ const Customers = () => {
       >
         <div className="space-y-4">
           {error && <div className="p-3 bg-rose-50 text-rose-600 rounded-lg text-sm">{error}</div>}
-          
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Họ và tên *</label>
-            <input type="text" className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500"
-              value={formData.fullName} onChange={e => setFormData({...formData, fullName: e.target.value})} placeholder="Nguyễn Văn A" />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Số điện thoại *</label>
-            <input type="text" className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500"
-              value={formData.phoneNumber} onChange={e => setFormData({...formData, phoneNumber: e.target.value})} placeholder="0901234567" />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
-            <input type="email" className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500"
-              value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} placeholder="abc@email.com" />
-          </div>
+          <FormTable>
+            <FormRow label="Họ và tên *">
+              <input
+                type="text"
+                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500"
+                value={formData.fullName}
+                onChange={e => setFormData({ ...formData, fullName: e.target.value })}
+                placeholder="Nguyễn Văn A"
+              />
+            </FormRow>
+            <FormRow label="Số điện thoại *">
+              <input
+                type="text"
+                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500"
+                value={formData.phoneNumber}
+                onChange={e => setFormData({ ...formData, phoneNumber: e.target.value })}
+                placeholder="0901234567"
+              />
+            </FormRow>
+            <FormRow label="Email">
+              <input
+                type="email"
+                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500"
+                value={formData.email}
+                onChange={e => setFormData({ ...formData, email: e.target.value })}
+                placeholder="abc@email.com"
+              />
+            </FormRow>
+          </FormTable>
         </div>
       </OrderDetailModalShell>
     </div>

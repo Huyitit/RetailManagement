@@ -10,10 +10,10 @@ const VariantAttributesEditor = ({
   return (
     <div className="space-y-3">
       {attributes.map((attr, index) => (
-        <div key={index} className="grid grid-cols-2 gap-3 items-center">
+        <div key={index} className="grid grid-cols-1 md:grid-cols-2 gap-3 items-center">
           <input
             type="text"
-            className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 font-medium"
+            className="w-full border border-indigo-100 rounded-xl px-3.5 py-2 text-sm focus:ring-2 focus:ring-indigo-500 bg-white"
             placeholder="Thuộc tính (VD: Color)"
             value={attr.name}
             onChange={(e) => onChange(index, 'name', e.target.value)}
@@ -21,7 +21,7 @@ const VariantAttributesEditor = ({
           <div className="flex items-center gap-2">
             <input
               type="text"
-              className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 font-medium"
+              className="w-full border border-indigo-100 rounded-xl px-3.5 py-2 text-sm focus:ring-2 focus:ring-indigo-500 bg-white"
               placeholder="Giá trị (VD: Black)"
               value={attr.value}
               onChange={(e) => onChange(index, 'value', e.target.value)}
@@ -41,7 +41,7 @@ const VariantAttributesEditor = ({
 
       <button
         onClick={onAdd}
-        className="text-sm font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 bg-indigo-50 px-3 py-1.5 rounded-lg transition-colors"
+        className="text-sm font-bold text-indigo-600 hover:text-indigo-800 inline-flex items-center gap-1 bg-white border border-indigo-100 px-3 py-2 rounded-xl transition-colors"
       >
         <Plus size={16} /> Them thuoc tinh
       </button>

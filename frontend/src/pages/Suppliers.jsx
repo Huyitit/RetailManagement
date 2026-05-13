@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { getSuppliers, createSupplier, updateSupplier, deleteSupplier } from '../services/api';
-import DataTable from '../components/DataTable';
+import OrdersTable from '../components/OrdersTable';
 import OrderDetailModalShell from '../components/OrderDetailModalShell';
+import { FormTable, FormRow } from '../components/FormTable';
 import { Building2, Plus, Search, Mail, Phone, MapPin } from 'lucide-react';
 
 const Suppliers = () => {
@@ -158,7 +159,7 @@ const Suppliers = () => {
           </div>
 
           <div style={{ padding: '24px' }}>
-            <DataTable 
+            <OrdersTable 
               columns={columns} 
               data={data} 
               isLoading={isLoading}
@@ -190,44 +191,57 @@ const Suppliers = () => {
       >
         <div className="space-y-4">
           {error && <div className="p-3 bg-rose-50 text-rose-600 rounded-lg text-sm">{error}</div>}
-          
-          <div className="grid grid-cols-2 gap-4">
-            <div className="col-span-2">
-              <label className="block text-sm font-medium text-slate-700 mb-1">Tên công ty *</label>
-              <input type="text" className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                value={formData.companyName} onChange={e => setFormData({...formData, companyName: e.target.value})} placeholder="Vd: Công ty TNHH ABC" />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Người liên hệ *</label>
-              <input type="text" className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                value={formData.contactName} onChange={e => setFormData({...formData, contactName: e.target.value})} />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Số điện thoại *</label>
-              <input type="text" className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Mã số thuế</label>
-              <input type="text" className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                value={formData.taxCode} onChange={e => setFormData({...formData, taxCode: e.target.value})} />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
-              <input type="email" className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
-            </div>
-
-            <div className="col-span-2">
-              <label className="block text-sm font-medium text-slate-700 mb-1">Địa chỉ</label>
-              <textarea className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" rows="2"
-                value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})}></textarea>
-            </div>
-          </div>
+          <FormTable>
+            <FormRow label="Tên công ty *">
+              <input
+                type="text"
+                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                value={formData.companyName}
+                onChange={e => setFormData({ ...formData, companyName: e.target.value })}
+                placeholder="Vd: Công ty TNHH ABC"
+              />
+            </FormRow>
+            <FormRow label="Người liên hệ *">
+              <input
+                type="text"
+                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                value={formData.contactName}
+                onChange={e => setFormData({ ...formData, contactName: e.target.value })}
+              />
+            </FormRow>
+            <FormRow label="Số điện thoại *">
+              <input
+                type="text"
+                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                value={formData.phone}
+                onChange={e => setFormData({ ...formData, phone: e.target.value })}
+              />
+            </FormRow>
+            <FormRow label="Mã số thuế">
+              <input
+                type="text"
+                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                value={formData.taxCode}
+                onChange={e => setFormData({ ...formData, taxCode: e.target.value })}
+              />
+            </FormRow>
+            <FormRow label="Email">
+              <input
+                type="email"
+                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                value={formData.email}
+                onChange={e => setFormData({ ...formData, email: e.target.value })}
+              />
+            </FormRow>
+            <FormRow label="Địa chỉ">
+              <textarea
+                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                rows="2"
+                value={formData.address}
+                onChange={e => setFormData({ ...formData, address: e.target.value })}
+              ></textarea>
+            </FormRow>
+          </FormTable>
         </div>
       </OrderDetailModalShell>
     </div>

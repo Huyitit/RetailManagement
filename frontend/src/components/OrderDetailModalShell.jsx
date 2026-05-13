@@ -35,8 +35,8 @@ const OrderDetailModalShell = ({
       style={{
         position: 'fixed',
         inset: 0,
-        background: 'rgba(15, 23, 42, 0.7)',
-        backdropFilter: 'blur(8px)',
+        background: 'rgba(15, 23, 42, 0.55)',
+        backdropFilter: 'blur(6px)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -50,11 +50,11 @@ const OrderDetailModalShell = ({
       />
       <div
         style={{
-          background: 'white',
+          background: '#ffffff',
           width: '100%',
           maxWidth: sizeMap[size] || sizeMap.md,
-          borderRadius: '32px',
-          boxShadow: '0 25px 70px rgba(0,0,0,0.3)',
+          borderRadius: '28px',
+          boxShadow: '0 30px 80px rgba(15, 23, 42, 0.25)',
           display: 'flex',
           flexDirection: 'column',
           maxHeight: '90vh',
@@ -65,27 +65,29 @@ const OrderDetailModalShell = ({
       >
         <div
           style={{
-            padding: '24px 32px',
-            borderBottom: '1px solid #f1f5f9',
+            padding: '22px 28px',
+            borderBottom: '1px solid #eef2f7',
+            background: '#f8fafc',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center'
           }}
         >
-          <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '900', color: '#0f172a' }}>{title}</h2>
+          <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '800', color: '#0f172a' }}>{title}</h2>
           <button
             onClick={onClose}
             style={{
-              border: 'none',
-              background: '#f8fafc',
-              width: '40px',
-              height: '40px',
+              border: '1px solid #e2e8f0',
+              background: '#ffffff',
+              width: '36px',
+              height: '36px',
               borderRadius: '999px',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#94a3b8'
+              color: '#94a3b8',
+              boxShadow: '0 1px 2px rgba(15, 23, 42, 0.06)'
             }}
           >
             <svg className="w-5 h-5" fill="currentColor" stroke="currentColor" viewBox="0 0 24 24">
@@ -96,7 +98,7 @@ const OrderDetailModalShell = ({
 
         <div
           className={`custom-scrollbar ${bodyClassName}`.trim()}
-          style={{ flex: 1, overflowY: 'auto', padding: '24px 32px' }}
+          style={{ flex: 1, overflowY: 'auto', padding: '24px 28px', background: '#ffffff' }}
         >
           {children}
         </div>
@@ -104,8 +106,8 @@ const OrderDetailModalShell = ({
         {footer && (
           <div
             style={{
-              padding: '20px 32px',
-              borderTop: '1px solid #f1f5f9',
+              padding: '18px 28px',
+              borderTop: '1px solid #eef2f7',
               background: '#f8fafc',
               display: 'flex',
               justifyContent: 'flex-end',
