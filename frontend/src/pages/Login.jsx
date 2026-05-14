@@ -75,7 +75,7 @@ const Login = () => {
 
         <h1
           style={{
-            fontSize: '56px',
+            fontSize: '80px',
             fontWeight: 700,
             lineHeight: 1.1,
             marginBottom: '20px',
@@ -96,11 +96,11 @@ const Login = () => {
             fontWeight: 500
           }}
         >
-          Hệ thống quản lý điểm bán hàng chuyên dụng cho các doanh nghiệp kiến trúc, nội thất và bán lẻ cao cấp.
+          Hệ thống quản lý cho cửa hàng máy tính, điện thoại, thiết bị điện máy 
         </p>
 
         <div style={{ display: 'flex', gap: '20px' }}>
-          <div
+          {/* <div
             style={{
               background: 'rgba(255,255,255,0.1)',
               backdropFilter: 'blur(10px)',
@@ -113,8 +113,8 @@ const Login = () => {
             <Zap size={22} style={{ marginBottom: '10px', color: '#60a5fa' }} />
             <div style={{ fontWeight: 600, marginBottom: '4px' }}>Tốc độ tối ưu</div>
             <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)' }}>Xử lý giao dịch &lt; 1s</div>
-          </div>
-          <div
+          </div> */}
+          {/* <div
             style={{
               background: 'rgba(255,255,255,0.1)',
               backdropFilter: 'blur(10px)',
@@ -127,7 +127,7 @@ const Login = () => {
             <ShieldCheck size={22} style={{ marginBottom: '10px', color: '#34d399' }} />
             <div style={{ fontWeight: 600, marginBottom: '4px' }}>Bảo mật đa lớp</div>
             <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)' }}>Chuẩn mã hóa ngân hàng</div>
-          </div>
+          </div> */}
         </div>
       </div>
 

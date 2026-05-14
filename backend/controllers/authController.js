@@ -60,7 +60,7 @@ exports.login = async (req, res) => {
     });
 
     if (!staff) {
-      return res.status(401).json({ status: 'error', message: 'Tên đăng nhập/Số điện thoại hoặc mật khẩu không chính xác' });
+      return res.status(401).json({ status: 'error', message: 'Chỉ nhân viên mới có thể đăng nhập' });
     }
 
     const isMatch = await bcrypt.compare(password, staff.hashedPassword);

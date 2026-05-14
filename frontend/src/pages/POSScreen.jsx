@@ -954,7 +954,7 @@ const POSScreen = () => {
             </div>
 
           <div style={{ flexShrink: 0 }}>
-              <button onClick={handleCompletePayment} style={{ width: '100%', padding: '20px', background: 'var(--primary)', color: 'white', border: 'none', borderRadius: '20px', fontSize: '18px', fontWeight: '950', cursor: 'pointer' }}>HOÀN TẤT GIAO DỊCH</button>
+              <button onClick={handleCompletePayment} style={{ width: '100%', padding: '20px', background: 'var(--primary)', color: 'white', border: 'none', borderRadius: '20px', fontSize: '18px', fontWeight: '800', cursor: 'pointer', letterSpacing: '0.5px' }}>HOÀN TẤT GIAO DỊCH</button>
             </div>
           </div>
         </div>
