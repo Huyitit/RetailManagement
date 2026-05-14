@@ -422,7 +422,7 @@ const POSScreen = () => {
               />
             </div>
 
-            <div style={{ display: 'flex', gap: '8px', flex: 1, overflowX: 'auto', padding: '4px 0' }} className="no-scrollbar">
+            <div style={{ display: 'flex', gap: '8px', flex: 1, overflowX: 'auto', padding: '4px 0' }} className="custom-scrollbar">
               {categories.map(c => (
                 <button
                   key={c.categoryId}

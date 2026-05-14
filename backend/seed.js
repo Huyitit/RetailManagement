@@ -94,6 +94,19 @@ async function seed() {
     ];
     for (const [name, vars] of tvData) await insertData(cats[1].id, name, vars);
 
+    const washerData = [
+      ['LG AI DD 10kg', [{ sku: 'LG-W10', color: 'Xám', cap: '10 KG', type: 'Cửa trước', price: 10900000, img: 'http://localhost:5001/uploads/lg_washer_10kg.png' }]],
+      ['Samsung Ecobubble 9kg', [{ sku: 'SS-W9', color: 'Trắng', cap: '9 KG', type: 'Cửa trước', price: 8500000, img: 'http://localhost:5001/uploads/samsung_9kg.png' }]],
+      ['Electrolux Inverter 11kg', [{ sku: 'EL-W11', color: 'Đen', cap: '11 KG', type: 'Cửa trước', price: 15500000, img: 'http://localhost:5001/uploads/electrolux_11kg.png' }]],
+      ['Panasonic 9.5kg', [{ sku: 'PAN-W95', color: 'Bạc', cap: '9.5 KG', type: 'Cửa trên', price: 6900000, img: 'http://localhost:5001/uploads/panasonic_95kg.png' }]],
+      ['Toshiba Inverter 8.5kg', [{ sku: 'TOS-W85', color: 'Trắng', cap: '8.5 KG', type: 'Cửa trên', price: 5400000, img: 'http://localhost:5001/uploads/toshiba_85kg.png' }]],
+      ['Aqua Inverter 10.5kg', [{ sku: 'AQ-W105', color: 'Bạc', cap: '10.5 KG', type: 'Cửa trước', price: 8900000, img: 'http://localhost:5001/uploads/aqua_105kg.png' }]],
+      ['Beko Inverter 9kg', [{ sku: 'BEKO-W9', color: 'Xám', cap: '9 KG', type: 'Cửa trước', price: 7200000, img: 'http://localhost:5001/uploads/beko_9kg.png' }]],
+      ['Whirlpool 10.5kg', [{ sku: 'WHI-W10', color: 'Trắng', cap: '10.5 KG', type: 'Cửa trước', price: 13500000, img: 'http://localhost:5001/uploads/whirlpool_105kg.png' }]],
+      ['Samsung Washer & Dryer 12kg', [{ sku: 'SS-WD12', color: 'Đen', cap: '12 KG', type: 'Giặt sấy', price: 18900000, img: 'http://localhost:5001/uploads/samsung_wd_12kg.png' }]]
+    ];
+    for (const [name, vars] of washerData) await insertData(cats[4].id, name, vars);
+
     const laptopData = [
       ['MacBook Pro M3 Pro', [{ sku: 'MBP-M3', color: 'Space Black', rom: '512GB', ram: '18GB', size: '14.2 INCH', price: 49900000, img: 'http://localhost:5001/uploads/mbp_m3.jpg' }]],
       ['ASUS TUF Gaming F15', [{ sku: 'AS-TUF', color: 'Đen nhám', rom: '512GB', ram: '16GB', size: '15.6 INCH', price: 21900000, img: 'http://localhost:5001/uploads/asus_tuf.jpg' }]],
@@ -108,17 +121,30 @@ async function seed() {
     ];
     for (const [name, vars] of laptopData) await insertData(cats[2].id, name, vars);
 
+    const refrigeratorData = [
+      ['Samsung Bespoke 648L', [{ sku: 'SS-BS-648', color: 'Trắng/Xanh', cap: '648 LÍT', type: 'Side by Side', price: 38900000, img: 'http://localhost:5001/uploads/samsung_bespoke_648l.png' }]],
+      ['LG Inverter 635L', [{ sku: 'LG-635-SL', color: 'Bạc', cap: '635 LÍT', type: 'Side by Side', price: 24500000, img: 'http://localhost:5001/uploads/lg_635l.png' }]],
+      ['Panasonic Prime+ 540L', [{ sku: 'PAN-540', color: 'Đen Gương', cap: '540 LÍT', type: 'Multi Door', price: 32500000, img: 'http://localhost:5001/uploads/panasonic_540l.png' }]],
+      ['Hitachi Inverter 450L', [{ sku: 'HIT-450', color: 'Trắng', cap: '450 LÍT', type: '2 Cánh', price: 17900000, img: 'http://localhost:5001/uploads/hitachi_450l.png' }]],
+      ['Toshiba Inverter 320L', [{ sku: 'TOS-320', color: 'Bạc', cap: '320 LÍT', type: '2 Cánh', price: 9500000, img: 'http://localhost:5001/uploads/toshiba_320l.png' }]],
+      ['Sharp 4 Cánh 556L', [{ sku: 'SH-556', color: 'Đen', cap: '556 LÍT', type: 'Multi Door', price: 19900000, img: 'http://localhost:5001/uploads/sharp_556l.png' }]],
+      ['Aqua Inverter 541L', [{ sku: 'AQ-541', color: 'Đen Gương', cap: '541 LÍT', type: 'Side by Side', price: 16500000, img: 'http://localhost:5001/uploads/aqua_541l.png' }]],
+      ['Beko Inverter 323L', [{ sku: 'BE-323', color: 'Xám', cap: '323 LÍT', type: '2 Cánh', price: 8900000, img: 'http://localhost:5001/uploads/beko_323l.png' }]],
+      ['Whirlpool 594L', [{ sku: 'WHI-594', color: 'Inox', cap: '594 LÍT', type: 'French Door', price: 27900000, img: 'http://localhost:5001/uploads/whirlpool_594l.png' }]]
+    ];
+    for (const [name, vars] of refrigeratorData) await insertData(cats[3].id, name, vars);
+
     const giaDungData = [
       ['Nồi chiên Philips 6L', [{ sku: 'PH-AF-6', color: 'Đen', cap: '6 Lít', type: 'Điện tử', price: 3850000, img: 'http://localhost:5001/uploads/philips_af.png' }]],
-      ['Robot hút bụi Roborock S8', [{ sku: 'RR-S8', color: 'Đen', type: 'Robot tự động', price: 15900000, img: 'http://localhost:5001/uploads/roborocks8.png' }]],
-      ['Máy lọc nước Karofi', [{ sku: 'KA-W10', cap: '10 Lõi', type: 'Tủ đứng', price: 6200000, img: 'http://localhost:5001/uploads/karofiwater.png' }]],
+      ['Robot hút bụi Roborock S8', [{ sku: 'RR-S8', color: 'Đen', type: 'Robot tự động', price: 15900000, img: 'http://localhost:5001/uploads/roborock_s8.png' }]],
+      ['Máy lọc nước Karofi', [{ sku: 'KA-W10', cap: '10 Lõi', type: 'Tủ đứng', price: 6200000, img: 'http://localhost:5001/uploads/karofi_water.png' }]],
       ['Máy xay sinh tố Philips', [{ sku: 'PH-BL-S', color: 'Trắng', cap: '1.5 Lít', price: 1650000, img: 'http://localhost:5001/uploads/philips_bl.png' }]],
-      ['Lò vi sóng Sharp 23L', [{ sku: 'SH-MW-23', color: 'Bạc', cap: '23 Lít', price: 2850000, img: 'http://localhost:5001/uploads/sharpmicrowave.png' }]],
+      ['Lò vi sóng Sharp 23L', [{ sku: 'SH-MW-23', color: 'Bạc', cap: '23 Lít', price: 2850000, img: 'http://localhost:5001/uploads/sharp_mw.png' }]],
       ['Quạt đứng Mitsubishi', [{ sku: 'MIT-LV', color: 'Xám', type: 'Có điều khiển', price: 1950000, img: 'http://localhost:5001/uploads/mitsubishi_fan.png' }]],
       ['Nồi cơm điện Cuckoo', [{ sku: 'CK-RC-18', color: 'Đỏ', cap: '1.8 Lít', type: 'Cao tần', price: 6500000, img: 'http://localhost:5001/uploads/cuckoo_rc.png' }]],
-      ['Bếp từ Sunhouse', [{ sku: 'SH-IND-2', color: 'Đen', type: 'Bếp đôi', price: 4200000, img: 'http://localhost:5001/uploads/sunhousecooker.png' }]],
-      ['Máy lọc không khí Xiaomi 4 Pro', [{ sku: 'XI-AP-4P', color: 'Trắng', cap: '60m2', price: 4500000, img: 'http://localhost:5001/uploads/xiaomiair.png' }]],
-      ['Ấm siêu tốc Bluestone', [{ sku: 'BL-KET-1', color: 'Inox', cap: '1.7 Lít', price: 650000, img: 'http://localhost:5001/uploads/bluestonekettle.png' }]],
+      ['Bếp từ Sunhouse', [{ sku: 'SH-IND-2', color: 'Đen', type: 'Bếp đôi', price: 4200000, img: 'http://localhost:5001/uploads/sunhouse_cooker.png' }]],
+      ['Máy lọc không khí Xiaomi 4 Pro', [{ sku: 'XI-AP-4P', color: 'Trắng', cap: '60m2', price: 4500000, img: 'http://localhost:5001/uploads/xiaomi_ap.png' }]],
+      ['Ấm siêu tốc Bluestone', [{ sku: 'BL-KET-1', color: 'Inox', cap: '1.7 Lít', price: 650000, img: 'http://localhost:5001/uploads/bluestone_kettle.png' }]],
       ['Máy ép chậm Hurom', [{ sku: 'HU-H200', color: 'Đỏ', type: 'Máy ép chậm', price: 9900000, img: 'http://localhost:5001/uploads/hurom_sj.png' }]],
       ['Máy xay đa năng Moulinex', [{ sku: 'MO-BL', color: 'Trắng', cap: '2 Lít', price: 2450000, img: 'http://localhost:5001/uploads/moulinex_bl.png' }]]
     ];
